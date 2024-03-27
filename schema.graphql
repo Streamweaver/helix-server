@@ -2656,7 +2656,7 @@ type Mutation {
   createClient(data: ClientCreateInputType!): CreateClient
   updateClient(data: ClientUpdateInputType!): UpdateClient
   exportTrackingData(filters: ClientTrackInfoFilterDataInputType!): ExportTrackingData
-  exportClient(filters: ClientFilterDataInputType!): ExportClients
+  exportClients(filters: ClientFilterDataInputType!): ExportClients
   triggerBulkOperation(data: BulkApiOperationInputType!): TriggerBulkOperation
   createContact(data: ContactCreateInputType!): CreateContact
   updateContact(data: ContactUpdateInputType!): UpdateContact

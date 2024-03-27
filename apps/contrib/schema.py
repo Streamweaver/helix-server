@@ -64,6 +64,12 @@ class ExcelExportsListType(CustomDjangoListObjectType):
 
 
 class ClientType(DjangoObjectType):
+    use_case = graphene.List(graphene.NonNull(ClientUseCaseEnum), description="List of use cases for the client.")
+    use_case_display = EnumDescription(
+        source='get_use_case_display',
+        description="Display string for the client's use case."
+    )
+
     class Meta:
         model = Client
         fields = (
@@ -82,8 +88,13 @@ class ClientType(DjangoObjectType):
             'last_modified_by',
             'modified_at',
         )
-    use_case = graphene.List(graphene.NonNull(ClientUseCaseEnum))
-    use_case_display = EnumDescription(source='get_use_case_display')
+        description = "Represents a client with various attributes."
+
+    def resolve_use_case_display(self, info):
+        """
+        Resolve method for use_case_display field.
+        """
+        return ', '.join(self.use_cases.values_list('name', flat=True))
 
 
 class ClientListType(CustomDjangoListObjectType):

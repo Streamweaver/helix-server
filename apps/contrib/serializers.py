@@ -162,25 +162,41 @@ class ClientSerializer(
             'opted_out_of_emails',
         )
         read_only_fields = (
-            'code',
-            'created_by',
-            'created_at',
-            'last_modified_by',
-            'modified_at',
+            'code',  # Automatically generated, not to be provided by the user
+            'created_by', 'created_at',  # Managed by MetaInformationSerializerMixin
+            'last_modified_by', 'modified_at',  # Managed by MetaInformationSerializerMixin
         )
 
+    def validate(self, data):
+        errors = super().validate(data)
+        # Check if all mandatory fields are provided
+        mandatory_fields = ['contact_name', 'contact_email', 'use_case', 'opted_out_of_emails']
+        missing_fields = [field for field in mandatory_fields if field not in data]
+        if missing_fields:
+            raise serializers.ValidationError({field: "This field is required." for field in missing_fields})
+
+        # Validating use_case choices
+        use_case_choices = {choice.value for choice in Client.USE_CASE_CHOICES}
+        invalid_use_cases = set(data.get('use_case', [])) - use_case_choices
+        if invalid_use_cases:
+            errors['use_case'] = f"Invalid choices for use_case: {', '.join(map(str, invalid_use_cases))}"
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return data
+
     def create(self, validated_data):
-        # Generate a random alphanumeric key of length 16
-        validated_data['code'] = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
-        # Set the user who created the client
-        validated_data['created_by'] = self.context['request'].user
+        # Generate a unique, random alphanumeric code of length 16 for the client
+        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
+        if Client.objects.filter(code=code).exists():
+            raise serializers.ValidationError("Failed to generate a unique client code.")
+        validated_data['code'] = code
+        validated_data['created_by'] = self.context['request'].user  # Automatically set the creator
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        # Check if the client is being revoked
-        if 'revoked_by' in validated_data and validated_data['revoked_by'] is not None:
-            # Set the revoked_at field to the current datetime if it's being revoked
-            instance.revoked_at = timezone.now()
+        validated_data['last_modified_by'] = self.context['request'].user  # Automatically set the modifier
         return super().update(instance, validated_data)
 
 

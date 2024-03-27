@@ -159,6 +159,10 @@ class ExportTrackingData(ExportBaseMutation):
 
 
 class ExportClients(ExportBaseMutation):
+    """
+    A mutation for exporting client data based on provided filters.
+    Utilizes the DOWNLOAD_TYPE attribute to specify the type of data to be exported.
+    """
     class Arguments:
         filters = ClientFilterDataInputType(required=True)
     DOWNLOAD_TYPE = ExcelDownload.DOWNLOAD_TYPES.CLIENT
@@ -189,5 +193,6 @@ class Mutation:
     create_client = CreateClient.Field()
     update_client = UpdateClient.Field()
     export_tracking_data = ExportTrackingData.Field()
-    export_client = ExportClients.Field()
+    # Mutation for exporting client data.
+    export_clients = ExportClients.Field()
     trigger_bulk_operation = TriggerBulkOperation.Field()
