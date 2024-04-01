@@ -110,13 +110,6 @@ class CommonFigureValidationMixin:
             raise serializers.ValidationError('Please provide unique age range and sex.')
         return age_groups
 
-    def validate_disaggregation_strata_json(self, strata):
-        values = [each['date'] for each in strata]
-        if len(values) != len(set(values)):
-            raise serializers.ValidationError(
-                gettext('Make sure the dates are unique in a figure.'))
-        return strata
-
     def _validate_unit_and_household_size(self, instance, attrs):
         errors = OrderedDict()
 
