@@ -650,6 +650,13 @@ class FigureReadOnlySerializer(serializers.ModelSerializer):
     standard_popup_text = serializers.CharField()
     standard_info_text = serializers.CharField()
     role = serializers.CharField()
+    sources = serializers.CharField(source='sources_name')
+    source_url = serializers.CharField(source='entry_url_or_document_url')
+    locations_name = serializers.CharField()
+    locations = serializers.CharField()
+    locations_accuracy = serializers.CharField()
+    type_of_point = serializers.CharField()
+    displacement_occurred = serializers.CharField(source='displacement_occurred_transformed')
 
     class Meta:
         model = Figure
@@ -668,6 +675,7 @@ class FigureReadOnlySerializer(serializers.ModelSerializer):
             'displacement_start_date',
             'displacement_end_date',
             'year',
+            'event_id',
             'event_name',
             'event_start_date',
             'event_end_date',
@@ -678,5 +686,12 @@ class FigureReadOnlySerializer(serializers.ModelSerializer):
             'standard_popup_text',
             'standard_info_text',
             'old_id',
+            'sources',
+            'source_url',
+            'locations_name',
+            'locations',
+            'locations_accuracy',
+            'type_of_point',
+            'displacement_occurred',
             'created_at',
         )
