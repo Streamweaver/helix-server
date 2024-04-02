@@ -1,13 +1,12 @@
 import typing
 from datetime import datetime
-from django.db.models.functions import Coalesce
 
 from collections import OrderedDict
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.postgres.aggregates.general import StringAgg
 from django.db import models
 from django.db.models.query import QuerySet
-from django.db.models import Count, OuterRef
+from django.db.models import Count, OuterRef, Subquery
 from django.contrib.postgres.fields import ArrayField
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
@@ -128,79 +127,47 @@ class MonitoringSubRegion(models.Model):
 
     @classmethod
     def get_excel_sheets_data(cls, user_id, filters):
-        from apps.country.filters import MonitoringSubRegionFilter
-
         class DummyRequest:
             def __init__(self, user):
                 self.user = user
 
         headers = OrderedDict(
             id='ID',
-            name='Region Name',
+            country__monitoring_sub_region__name='Region Name',
             regional_coordinator='Regional Coordinator',
-            monitoring_expert_count='No. of Monitoring Experts',
-            monitoring_experts='Monitoring Experts',
+            user__full_name='Monitoring Expert',
             countries_count='No. of Countries',
             monitored_countries='Monitored Countries',
-            unmonitored_countries_count='No. of Unmonitored Countries',
-            unmonitored_countries='Unmonitored Countries',
         )
 
-        unmonitored_countries_qs = Country.objects.filter(
-            monitoring_sub_region=models.OuterRef('pk'),
-        ).exclude(
-            portfolio__role=USER_ROLE.MONITORING_EXPERT,
-        )
-
-        subregions = MonitoringSubRegionFilter(
-            data=filters,
-            request=DummyRequest(user=User.objects.get(id=user_id)),
-        ).qs.annotate(
-            # User stats
-            monitoring_experts=StringAgg(
-                'portfolios__user__full_name',
-                EXTERNAL_TUPLE_SEPARATOR,
-                filter=models.Q(portfolios__role=USER_ROLE.MONITORING_EXPERT),
-                distinct=True,
-            ),
-            monitoring_expert_count=Count(
-                'portfolios__user',
-                filter=models.Q(portfolios__role=USER_ROLE.MONITORING_EXPERT),
-                distinct=True,
-            ),
-            regional_coordinator=StringAgg(
-                'portfolios__user__full_name',
-                EXTERNAL_TUPLE_SEPARATOR,
-                filter=models.Q(portfolios__role=USER_ROLE.REGIONAL_COORDINATOR),
-                distinct=True,
-            ),
-            # Country stats
-            countries_count=Count('countries', distinct=True),
+        portfolios = Portfolio.objects.filter(
+            role=USER_ROLE.MONITORING_EXPERT
+        ).values(
+            'user__full_name',
+            'country__monitoring_sub_region__name',
+        ).annotate(
+            id=models.F('country__monitoring_sub_region__id'),
             monitored_countries=StringAgg(
-                'portfolios__country__idmc_full_name',
-                EXTERNAL_TUPLE_SEPARATOR,
-                filter=models.Q(portfolios__role=USER_ROLE.MONITORING_EXPERT),
-                distinct=True,
+                'country__name',
+                EXTERNAL_ARRAY_SEPARATOR,
             ),
-            unmonitored_countries=models.Subquery(
-                unmonitored_countries_qs.order_by().values('monitoring_sub_region').annotate(
-                    country_names=StringAgg(
-                        'idmc_full_name',
+            countries_count=Count('country'),
+            regional_coordinator=Subquery(
+                Portfolio.objects.filter(
+                    role=USER_ROLE.REGIONAL_COORDINATOR,
+                    monitoring_sub_region=models.OuterRef('country__monitoring_sub_region'),
+                ).values('monitoring_sub_region').annotate(
+                    user_full_names=StringAgg(
+                        'user__full_name',
                         EXTERNAL_TUPLE_SEPARATOR,
-                        distinct=True,
                     ),
-                ).values('country_names')[:1],
+                ).values('user_full_names')[:1],
             ),
-            unmonitored_countries_count=Coalesce(models.Subquery(
-                unmonitored_countries_qs.order_by().values('monitoring_sub_region').annotate(
-                    count=models.Count('id', distinct=True),
-                ).values('count')[:1],
-            ), 0),
-        ).order_by('id')
+        )
 
         return {
             'headers': headers,
-            'data': subregions.values(*[header for header in headers.keys()]),
+            'data': portfolios.values(*[header for header in headers.keys()]),
             'formulae': None,
             'transformer': None,
         }
