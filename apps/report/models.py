@@ -212,6 +212,10 @@ class Report(MetaInformationArchiveAbstractModel,
         verbose_name=_('Is PFA published in GIDD'),
         default=False
     )
+    change_in_source = models.BooleanField(default=False)
+    change_in_methodology = models.BooleanField(default=False)
+    change_in_data_availability = models.BooleanField(default=False)
+    retroactive_change = models.BooleanField(default=False)
 
     @classmethod
     def get_excel_sheets_data(cls, user_id, filters):
@@ -246,7 +250,11 @@ class Report(MetaInformationArchiveAbstractModel,
             summary='Summary',
             remarks='Remarks',
             gidd_published_date='Date of data publication in GIDD',
-            is_pfa_published_in_gidd='Is public figure analysis published in GIDD'
+            is_pfa_published_in_gidd='Is public figure analysis published in GIDD',
+            change_in_source='Change in source',
+            change_in_methodology='Change in methodology',
+            change_in_data_availability='Change in data availability',
+            retroactive_change='Retroactive change'
         )
         data = ReportFilter(
             data=filters,
@@ -280,6 +288,10 @@ class Report(MetaInformationArchiveAbstractModel,
                 'filter_figure_categories': transform_filter_figure_category(datum['filter_figure_categories']),
 
                 'is_pfa_published_in_gidd': 'Yes' if datum['is_pfa_published_in_gidd'] else 'No',
+                'change_in_source': 'Yes' if datum['change_in_source'] else 'No',
+                'change_in_methodology': 'Yes' if datum['change_in_methodology'] else 'No',
+                'change_in_data_availability': 'Yes' if datum['change_in_data_availability'] else 'No',
+                'retroactive_change': 'Yes' if datum['retroactive_change'] else 'No'
             }
 
         return {
