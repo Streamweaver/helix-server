@@ -132,7 +132,7 @@ class MonitoringSubRegion(models.Model):
                 self.user = user
 
         headers = OrderedDict(
-            id='ID',
+            id='Region ID',
             country__monitoring_sub_region__name='Region Name',
             regional_coordinator='Regional Coordinator',
             user__full_name='Monitoring Expert',
@@ -145,6 +145,9 @@ class MonitoringSubRegion(models.Model):
         ).values(
             'user__full_name',
             'country__monitoring_sub_region__name',
+        ).order_by(
+            'country__monitoring_sub_region__name',
+            'user__full_name',
         ).annotate(
             id=models.F('country__monitoring_sub_region__id'),
             monitored_countries=StringAgg(
