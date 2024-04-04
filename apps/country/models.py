@@ -133,11 +133,12 @@ class MonitoringSubRegion(models.Model):
 
         headers = OrderedDict(
             id='Region ID',
-            country__monitoring_sub_region__name='Region Name',
-            regional_coordinator='Regional Coordinator',
-            user__full_name='Monitoring Expert',
-            countries_count='No. of Countries',
-            monitored_countries='Monitored Countries',
+            country__monitoring_sub_region__name='Region name',
+            regional_coordinator='Regional coordinator',
+            user__full_name='Monitoring expert',
+            countries_count='No. of countries',
+            monitored_countries='Countries',
+            monitored_iso3='ISO3',
         )
 
         portfolios = Portfolio.objects.filter(
@@ -151,7 +152,11 @@ class MonitoringSubRegion(models.Model):
         ).annotate(
             id=models.F('country__monitoring_sub_region__id'),
             monitored_countries=StringAgg(
-                'country__name',
+                'country__idmc_short_name',
+                EXTERNAL_ARRAY_SEPARATOR,
+            ),
+            monitored_iso3=StringAgg(
+                'country__iso3',
                 EXTERNAL_ARRAY_SEPARATOR,
             ),
             countries_count=Count('country'),
