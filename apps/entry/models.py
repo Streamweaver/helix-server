@@ -40,9 +40,9 @@ from apps.notification.models import Notification
 from apps.common.utils import (
     format_event_codes,
     format_locations,
+    format_locations_as_string,
     EXTERNAL_ARRAY_SEPARATOR,
     EXTERNAL_TUPLE_SEPARATOR,
-    EXTERNAL_FIELD_SEPARATOR,
 )
 from .documents import README_DATA
 
@@ -916,7 +916,7 @@ class Figure(MetaInformationArchiveAbstractModel,
             last_modified_by__full_name='Updated by',
             event_codes='Event codes (Code:Type)',
             locations='Locations (Name:Lat, Lon:Accuracy:Type)',
-            location_display_name='Location name',
+            location_display_name='Locations name',
             loc_lat_lon='Locations',
             accuracy='Locations accuracy',
             type_of_points='Type of point',
@@ -1052,8 +1052,7 @@ class Figure(MetaInformationArchiveAbstractModel,
                 lat_lon = []
                 accuracy = []
                 type_of_points = []
-                for loc in format_locations(data).split(EXTERNAL_ARRAY_SEPARATOR):
-                    loc = loc.split(EXTERNAL_FIELD_SEPARATOR)
+                for loc in format_locations(data):
                     names.append(loc[0])
                     lat_lon.append(loc[1])
                     accuracy.append(loc[2])
@@ -1065,6 +1064,8 @@ class Figure(MetaInformationArchiveAbstractModel,
                     'accuracy': EXTERNAL_ARRAY_SEPARATOR.join(accuracy),
                     'type_of_points': EXTERNAL_ARRAY_SEPARATOR.join(type_of_points)
                 }
+
+            location_data = extract_location_data(datum['locations'])
 
             return {
                 **datum,
@@ -1114,11 +1115,11 @@ class Figure(MetaInformationArchiveAbstractModel,
                 ),
                 'is_disaggregated': 'Yes' if datum['is_disaggregated'] else 'No',
                 'event_codes': format_event_codes(datum['event_codes']),
-                'locations': format_locations(datum['locations']),
-                'location_display_name': extract_location_data(datum['locations'])['display_name'],
-                'loc_lat_lon': extract_location_data(datum['locations'])['lat_lon'],
-                'accuracy': extract_location_data(datum['locations'])['accuracy'],
-                'type_of_points': extract_location_data(datum['locations'])['type_of_points'],
+                'locations': format_locations_as_string(datum['locations']),
+                'location_display_name': location_data['display_name'],
+                'loc_lat_lon': location_data['lat_lon'],
+                'accuracy': location_data['accuracy'],
+                'type_of_points': location_data['type_of_points'],
             }
 
         readme_data = [

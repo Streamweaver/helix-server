@@ -313,6 +313,7 @@ class ExtractionQueryFactory(DjangoModelFactory):
 
 
 class OSMNameFactory(DjangoModelFactory):
+    display_name = factory.Sequence(lambda n: f'osm-name-{n}')
     lat = factory.Faker('pyint', min_value=100, max_value=200)
     lon = factory.Faker('pyint', min_value=100, max_value=200)
     identifier = factory.Iterator(OSMName.IDENTIFIER)

@@ -8,7 +8,12 @@ from django.core.files.temp import NamedTemporaryFile
 # from rest_framework import serializers
 
 from utils.tests import HelixGraphQLTestCase, create_user_with_role
-from utils.factories import FigureFactory, EventFactory, CountryFactory
+from utils.factories import (
+    FigureFactory,
+    EventFactory,
+    CountryFactory,
+    OSMNameFactory,
+)
 from apps.contrib.models import Attachment
 from apps.event.models import Figure
 from apps.users.enums import USER_ROLE
@@ -156,11 +161,16 @@ class TestBulkOperation(HelixGraphQLTestCase):
             country=self.country,
             created_by=self.editor,
             category=Figure.FIGURE_CATEGORY_TYPES.IDPS,
+            geo_locations=OSMNameFactory.create_batch(3),
         )
         self.force_login(self.editor)
 
     def test_bulk_figure_role(self):
-        fig1, fig2, fig3 = FigureFactory.create_batch(3, **self.figure_kwargs, role=Figure.ROLE.TRIANGULATION)
+        fig1, fig2, fig3 = FigureFactory.create_batch(
+            3,
+            **self.figure_kwargs,
+            role=Figure.ROLE.TRIANGULATION
+        )
         fig4 = FigureFactory.create(**self.figure_kwargs, role=Figure.ROLE.RECOMMENDED)
         FigureFactory.create(
             **{

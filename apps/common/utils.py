@@ -18,7 +18,7 @@ EventCodeDataType = typing.List[
 EventCodeAttrType = typing.Literal['code', 'code_type', 'iso3']
 
 
-def format_locations(locations_data):
+def format_locations(locations_data) -> typing.List[typing.Tuple[str, str, str, str]]:
     from apps.entry.models import OSMName
 
     def _get_accuracy_label(key: str) -> str:
@@ -32,13 +32,20 @@ def format_locations(locations_data):
     location_list = []
     for loc in locations_data:
         location_name, location, accuracy, type_of_point = loc
-        location_list.append(EXTERNAL_FIELD_SEPARATOR.join([
+        location_list.append([
             location_name.strip(),
             location,
             _get_accuracy_label(accuracy),
             _get_identifier_label(type_of_point)
-        ]))
-    return EXTERNAL_ARRAY_SEPARATOR.join(location_list)
+        ])
+    return location_list
+
+
+def format_locations_as_string(locations_data) -> str:
+    return EXTERNAL_ARRAY_SEPARATOR.join(
+        EXTERNAL_FIELD_SEPARATOR.join(loc)
+        for loc in format_locations(locations_data)
+    )
 
 
 def format_event_codes(event_codes):
