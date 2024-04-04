@@ -1586,6 +1586,7 @@ type EventType {
   reviewStatusDisplay: EnumDescription
   reviewCount: EventReviewCountType
   eventCodes: [EventCodeType!]
+  crisisId: ID!
 }
 
 input EventUpdateInputType {
@@ -2053,7 +2054,7 @@ type FigureType {
   disaggregationConflictCommunal: Int
   disaggregationConflictOther: Int
   uuid: UUID!
-  entry: EntryType
+  entry: EntryType!
   wasSubfact: Boolean!
   quantifier: QUANTIFIER
   reported: Int!
@@ -2077,7 +2078,7 @@ type FigureType {
   calculationLogic: String
   tags: [FigureTagType!]!
   sourceExcerpt: String
-  event: EventType
+  event: EventType!
   contextOfViolence: [ContextOfViolenceType!]!
   figureCause: CRISIS_TYPE
   violence: ViolenceType
@@ -2853,7 +2854,7 @@ type OrganizationType {
   name: String!
   shortName: String
   category: ORGANIZATION_CATEGORY
-  countries: [CountryType!]
+  countries: [CountryType!]!
   organizationKind: OrganizationKindObjectType
   methodology: String
   parent: OrganizationType

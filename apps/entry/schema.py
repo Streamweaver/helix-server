@@ -161,9 +161,9 @@ class FigureType(DjangoObjectType):
     review_status = graphene.Field(FigureReviewStatusEnum)
     review_status_display = EnumDescription(source='get_review_status_display')
     last_review_comment_status = graphene.List(graphene.NonNull(FigureLastReviewCommentStatusType))
-    event = graphene.Field(EventType)
+    event = graphene.Field(EventType, required=True)
     event_id = graphene.ID(required=True, source='event_id')
-    entry = graphene.Field("apps.entry.schema.EntryType")
+    entry = graphene.Field("apps.entry.schema.EntryType", required=True)
     entry_id = graphene.ID(required=True, source='entry_id')
 
     def resolve_stock_date(root, info, **kwargs):

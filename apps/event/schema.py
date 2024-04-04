@@ -221,6 +221,7 @@ class EventType(DjangoObjectType):
     review_count = graphene.Field(EventReviewCountType)
     event_codes = graphene.List(graphene.NonNull(EventCodeType))
     crisis = graphene.Field('apps.crisis.schema.CrisisType')
+    crisis_id = graphene.ID(required=True, source='crisis_id')
 
     def resolve_crisis(root, info, **kwargs):
         return info.context.event_crisis_loader.load(root.id)
