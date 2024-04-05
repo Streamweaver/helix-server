@@ -550,11 +550,14 @@ class EventCode(UUIDAbstractModel, models.Model):
         GOV_ASSIGNED_IDENTIFIER = 2
         IFRC_APPEAL_ID = 3
         ACLED_ID = 4
+        LOCAL_IDENTIFIER = 5
+
         __labels__ = {
             GLIDE_NUMBER: _("Glide Number"),
             GOV_ASSIGNED_IDENTIFIER: _("Government Assigned Identifier"),
             IFRC_APPEAL_ID: _("IFRC Appeal ID"),
             ACLED_ID: _("ACLED ID"),
+            LOCAL_IDENTIFIER: _("Local Identifier"),
         }
 
     event = models.ForeignKey(
