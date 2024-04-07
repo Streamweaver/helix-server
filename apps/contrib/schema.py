@@ -25,12 +25,12 @@ from apps.contrib.enums import (
     ExcelGenerationStatusGrapheneEnum,
     BulkApiOperationActionEnum,
     BulkApiOperationStatusEnum,
+    ClientUseCaseEnum,
 )
 from apps.contrib.bulk_operations.serializers import BulkApiOperationPayloadSerializer
 from apps.extraction.filters import FigureExtractionBulkOperationFilterDataType
 from apps.entry.models import ExternalApiDump
 from apps.entry.enums import ExternalApiTypeEnum
-from apps.contrib.enums import ClientUseCaseEnum
 from utils.graphene.types import CustomDjangoListObjectType
 from utils.graphene.fields import DjangoPaginatedListObjectField, generate_type_for_serializer
 from utils.error_types import CustomErrorType
@@ -64,11 +64,8 @@ class ExcelExportsListType(CustomDjangoListObjectType):
 
 
 class ClientType(DjangoObjectType):
-    use_case = graphene.List(graphene.NonNull(ClientUseCaseEnum), description="List of use cases for the client.")
-    use_case_display = EnumDescription(
-        source='get_use_case_display',
-        description="Display string for the client's use case."
-    )
+    use_cases = graphene.List(graphene.NonNull(ClientUseCaseEnum), description="List of use cases for the client.")
+    use_cases_display = graphene.List(graphene.String, description="Display string for the client's use case.")
 
     class Meta:
         model = Client
@@ -88,13 +85,15 @@ class ClientType(DjangoObjectType):
             'last_modified_by',
             'modified_at',
         )
-        description = "Represents a client with various attributes."
 
-    def resolve_use_case_display(self, info):
+    def resolve_use_cases_display(self, info):
         """
-        Resolve method for use_case_display field.
+        Resolve method for use_case_display field. Returns a list of labels for the client's use cases.
         """
-        return ', '.join(self.use_cases.values_list('name', flat=True))
+        return [
+            Client.USE_CASE_TYPES(use_case).label
+            for use_case in self.use_cases
+        ]
 
 
 class ClientListType(CustomDjangoListObjectType):

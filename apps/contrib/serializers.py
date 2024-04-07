@@ -147,6 +147,16 @@ class ClientSerializer(
     MetaInformationSerializerMixin,
     serializers.ModelSerializer
 ):
+    """
+    Serializer for Client objects, including custom validation and creation logic.
+    """
+    contact_name = serializers.CharField(required=True)
+    contact_email = serializers.EmailField(required=True)
+    use_cases = serializers.ListField(
+        child=serializers.ChoiceField(choices=Client.USE_CASE_TYPES.choices()),
+        required=True,
+    )
+
     class Meta:
         model = Client
         fields = (
@@ -157,47 +167,52 @@ class ClientSerializer(
             'contact_name',
             'contact_email',
             'contact_website',
-            'use_case',
+            'use_cases',
             'other_notes',
             'opted_out_of_emails',
         )
-        read_only_fields = (
-            'code',  # Automatically generated, not to be provided by the user
-            'created_by', 'created_at',  # Managed by MetaInformationSerializerMixin
-            'last_modified_by', 'modified_at',  # Managed by MetaInformationSerializerMixin
-        )
 
-    def validate(self, data):
-        errors = super().validate(data)
-        # Check if all mandatory fields are provided
-        mandatory_fields = ['contact_name', 'contact_email', 'use_case', 'opted_out_of_emails']
-        missing_fields = [field for field in mandatory_fields if field not in data]
-        if missing_fields:
-            raise serializers.ValidationError({field: "This field is required." for field in missing_fields})
-
-        # Validating use_case choices
-        use_case_choices = {choice.value for choice in Client.USE_CASE_CHOICES}
-        invalid_use_cases = set(data.get('use_case', [])) - use_case_choices
-        if invalid_use_cases:
-            errors['use_case'] = f"Invalid choices for use_case: {', '.join(map(str, invalid_use_cases))}"
-
-        if errors:
-            raise serializers.ValidationError(errors)
-
-        return data
+    def validate(self, attrs):
+        """
+        Ensures 'other_notes' is provided when 'Other' is selected in use_cases.
+        """
+        attrs = super().validate(attrs)
+        use_cases = attrs.get('use_cases', [])
+        if Client.USE_CASE_TYPES.OTHER.value in use_cases and not attrs.get('other_notes'):
+            raise serializers.ValidationError({"other_notes": "Required when 'Other' is selected in use cases."})
+        return attrs
 
     def create(self, validated_data):
-        # Generate a unique, random alphanumeric code of length 16 for the client
-        code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=16))
-        if Client.objects.filter(code=code).exists():
-            raise serializers.ValidationError("Failed to generate a unique client code.")
-        validated_data['code'] = code
-        validated_data['created_by'] = self.context['request'].user  # Automatically set the creator
+        """
+        Generates a unique client code before creating a new Client instance.
+        """
+        validated_data['code'] = self._generate_unique_client_code()
         return super().create(validated_data)
 
-    def update(self, instance, validated_data):
-        validated_data['last_modified_by'] = self.context['request'].user  # Automatically set the modifier
-        return super().update(instance, validated_data)
+    def _generate_unique_client_code(self, code_length=16, max_attempts=5):
+        """
+        Generates a unique client code consisting of uppercase letters and digits.
+
+        This method attempts to generate a unique code by combining random uppercase letters and digits.
+        It checks the uniqueness of the generated code against existing client codes in the database.
+        If a unique code is found within the specified number of attempts, it is returned.
+        Otherwise, an exception is raised indicating the failure to generate a unique code.
+
+        Parameters:
+        - code_length (int): The length of the code to be generated. Defaults to 16.
+        - max_attempts (int): The maximum number of attempts to generate a unique code. Defaults to 5.
+
+        Returns:
+        - str: A unique client code.
+
+        Raises:
+        - Exception: If a unique code cannot be generated after the specified number of attempts.
+        """
+        for _ in range(max_attempts):
+            code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=code_length))
+            if not Client.objects.filter(code=code).exists():
+                return code
+        raise Exception("Failed to generate a unique code after several attempts.")
 
 
 class ClientUpdateSerializer(UpdateSerializerMixin, ClientSerializer):

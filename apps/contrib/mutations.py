@@ -193,6 +193,5 @@ class Mutation:
     create_client = CreateClient.Field()
     update_client = UpdateClient.Field()
     export_tracking_data = ExportTrackingData.Field()
-    # Mutation for exporting client data.
     export_clients = ExportClients.Field()
     trigger_bulk_operation = TriggerBulkOperation.Field()

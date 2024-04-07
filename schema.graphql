@@ -246,10 +246,10 @@ input ClientCreateInputType {
   name: String!
   isActive: Boolean
   acronym: String
-  contactName: String
-  contactEmail: String
+  contactName: String!
+  contactEmail: String!
   contactWebsite: String
-  useCase: [USE_CASE_CHOICES!]
+  useCases: [USE_CASE_TYPES!]!
   otherNotes: String
   optedOutOfEmails: Boolean
 }
@@ -309,8 +309,8 @@ type ClientType {
   optedOutOfEmails: Boolean!
   otherNotes: String
   isActive: Boolean!
-  useCase: [USE_CASE_CHOICES!]
-  useCaseDisplay: EnumDescription
+  useCases: [USE_CASE_TYPES!]
+  useCasesDisplay: [String]
 }
 
 input ClientUpdateInputType {
@@ -321,7 +321,7 @@ input ClientUpdateInputType {
   contactName: String
   contactEmail: String
   contactWebsite: String
-  useCase: [USE_CASE_CHOICES!]
+  useCases: [USE_CASE_TYPES!]
   otherNotes: String
   optedOutOfEmails: Boolean
 }
@@ -3777,7 +3777,7 @@ enum USER_ROLE {
   REPORTING_TEAM
 }
 
-enum USE_CASE_CHOICES {
+enum USE_CASE_TYPES {
   ANTICIPATORY_ACTION
   RESPONSE
   PREVENTION

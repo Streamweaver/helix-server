@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_enumfield import enum
 
+from apps.common.utils import EXTERNAL_ARRAY_SEPARATOR
 from apps.users.models import User
 from utils.fields import CachedFileField
 from apps.contrib.redis_client_track import set_client_ids_in_redis
@@ -303,7 +304,7 @@ class ExcelDownload(MetaInformationAbstractModel):
 
 
 class Client(MetaInformationAbstractModel):
-    class USE_CASE_CHOICES(enum.Enum):
+    class USE_CASE_TYPES(enum.Enum):
         ANTICIPATORY_ACTION = 0
         RESPONSE = 1
         PREVENTION = 2
@@ -327,7 +328,7 @@ class Client(MetaInformationAbstractModel):
         max_length=100,
         unique=True,
         verbose_name=_('Client Code'),
-        editable=False  # Make it non-editable
+        editable=False
     )
     acronym = models.CharField(
         max_length=255,
@@ -339,13 +340,13 @@ class Client(MetaInformationAbstractModel):
         max_length=255,
         verbose_name=_('Client Contact Name'),
         help_text=_('Client Contact Name: focal person'),
-        blank=True,
+        blank=False,
         null=True
     )
     contact_email = models.EmailField(
         verbose_name=_('Client Contact Email'),
         help_text=_('Client Contact Email: email focal person'),
-        blank=True,
+        blank=False,
         null=True
     )
     contact_website = models.URLField(
@@ -355,9 +356,9 @@ class Client(MetaInformationAbstractModel):
         null=True
     )
     opted_out_of_emails = models.BooleanField(verbose_name='Opted out of receiving emails', default=False)
-    use_case = ArrayField(
-        base_field=enum.EnumField(USE_CASE_CHOICES, verbose_name=_('Use case')),
-        blank=True, default=list
+    use_cases = ArrayField(
+        base_field=enum.EnumField(USE_CASE_TYPES, verbose_name=_('Use case')),
+        null=False, default=list
     )
     other_notes = models.CharField(max_length=255, null=True, blank=True)
     is_active = models.BooleanField(
@@ -366,7 +367,7 @@ class Client(MetaInformationAbstractModel):
     )
 
     def __str__(self):
-        return self.name
+        return self.code
 
     @classmethod
     def get_excel_sheets_data(cls, user_id, filters):
@@ -389,13 +390,13 @@ class Client(MetaInformationAbstractModel):
         headers = OrderedDict(
             id='ID',
             name='Name',
-            code='Client Code',
-            acronym='Client Acronym',
-            contact_name='Client Contact Name',
-            contact_email='Client Contact Email',
-            contact_website='Client Contact Website',
-            use_case='Use case',
-            other_notes='Other Notes',
+            code='Code',
+            acronym='Acronym',
+            contact_name='Contact Name',
+            contact_email='Contact Email',
+            contact_website='Website',
+            use_cases='Use cases',
+            other_notes='Notes',
             opted_out_of_emails='Opted out of receiving emails',
             created_by__full_name='Created By',
             created_at='Created At',
@@ -410,11 +411,13 @@ class Client(MetaInformationAbstractModel):
         ).qs.order_by('created_at')
 
         def transformer(datum):
-            transformed_use_cases = [getattr(Client.USE_CASE_CHOICES.get(use_case), 'label', '') for use_case in
-                                     datum['use_case']]
+            transformed_use_cases = [
+                getattr(Client.USE_CASE_TYPES.get(use_case), 'label', '')
+                for use_case in datum['use_cases']
+            ]
             return {
                 **datum,
-                'use_case': ', '.join(transformed_use_cases),
+                'use_cases': EXTERNAL_ARRAY_SEPARATOR.join(transformed_use_cases),
                 'is_active': 'Yes' if datum['is_active'] else 'No',
                 'opted_out_of_emails': 'Yes' if datum['opted_out_of_emails'] else 'No'
             }
