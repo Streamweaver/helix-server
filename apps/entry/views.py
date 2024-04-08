@@ -1,7 +1,8 @@
 from rest_framework import viewsets
 from django.db.models import F, When, Case, Value, CharField, Avg, Q, Func
-from django.db.models.functions import Concat, Coalesce, ExtractYear, Lower
-from django.contrib.postgres.aggregates.general import StringAgg
+from django.db.models.functions import Concat, Coalesce, ExtractYear, Lower, Cast
+from django.contrib.postgres.aggregates.general import StringAgg, ArrayAgg
+from django.contrib.postgres.fields import ArrayField
 from apps.entry.models import Figure, ExternalApiDump
 from apps.entry.serializers import FigureReadOnlySerializer
 from rest_framework.permissions import AllowAny
@@ -10,13 +11,35 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import redirect
 
+from apps.common.utils import (
+    EXTERNAL_TUPLE_SEPARATOR,
+    EXTERNAL_ARRAY_SEPARATOR,
+    EXTERNAL_FIELD_SEPARATOR,
+    format_locations,
+)
 from apps.gidd.views import client_id
 from utils.common import track_gidd
-from apps.common.utils import EXTERNAL_TUPLE_SEPARATOR
+from utils.db import Array
 
 
-def get_idu_data():
-    return Figure.objects.annotate(
+def extract_location_data(data):
+    # Split the formatted location data into individual components
+    location_components = [
+        loc.split(EXTERNAL_FIELD_SEPARATOR)
+        for loc in format_locations(data).split(EXTERNAL_ARRAY_SEPARATOR)
+    ]
+
+    transposed_components = zip(*location_components)
+    return {
+        'display_name': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, [])),
+        'lat_lon': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, [])),
+        'accuracy': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, [])),
+        'type_of_points': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, []))
+    }
+
+
+def get_idu_data(filters=None):
+    base_query = Figure.objects.annotate(
         displacement_date=Coalesce('end_date', 'start_date'),
     ).filter(
         category__in=[
@@ -87,6 +110,38 @@ def get_idu_data():
             F('total_figures'),
             Value('999G999G999G990D'),
             function='to_char',
+            output_field=CharField()
+        ),
+        sources_name=StringAgg(
+            'sources__name', EXTERNAL_ARRAY_SEPARATOR,
+            distinct=True, output_field=CharField()
+        ),
+        entry_url_or_document_url=Case(
+            When(entry__document__isnull=False, then=F('entry__document_url')),
+            When(entry__document__isnull=True, then=F('entry__url')),
+            output_field=CharField()
+        ),
+        locations=ArrayAgg(
+            Array(
+                F('geo_locations__display_name'),
+                Concat(
+                    F('geo_locations__lat'),
+                    Value(EXTERNAL_TUPLE_SEPARATOR),
+                    F('geo_locations__lon'),
+                    output_field=CharField(),
+                ),
+                Cast('geo_locations__accuracy', CharField()),
+                Cast('geo_locations__identifier', CharField()),
+                output_field=ArrayField(CharField()),
+            ),
+            distinct=True,
+            filter=~Q(
+                Q(geo_locations__display_name__isnull=True) | Q(geo_locations__display_name='')
+            ),
+        ),
+        displacement_occurred_transformed=Case(
+            When(displacement_occurred=0, then=Value("Displacement due to preventive evacuation")),
+            When(displacement_occurred__in=[1, 2, 3], then=Value("Displacement without preventive evacuation")),
             output_field=CharField()
         ),
         custom_figure_text=Case(
@@ -267,6 +322,22 @@ def get_idu_data():
             Value(' </b>'),
         )
     ).order_by('-start_date', '-end_date')
+
+    # Apply filters if provided
+    if filters:
+        base_query = base_query.filter(**filters)
+
+    for figure_data in base_query.values():
+        locations_data = figure_data.pop('locations', None)
+        location_parse = extract_location_data(locations_data)
+
+        yield {
+            **figure_data,
+            'locations_name': location_parse['display_name'],
+            'locations': location_parse['lat_lon'],
+            'locations_accuracy': location_parse['accuracy'],
+            'type_of_point': location_parse['type_of_points'],
+        }
 
 
 class FigureViewSet(viewsets.ReadOnlyModelViewSet):

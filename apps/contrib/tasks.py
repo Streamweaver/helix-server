@@ -225,14 +225,14 @@ def _generate_idus_dump_file(api_type):
         return generate_external_endpoint_dump_file(
             ExternalApiDump.ExternalApiType.IDUS_ALL_DISASTER,
             FigureReadOnlySerializer,
-            lambda: get_idu_data().filter(figure_cause=Crisis.CRISIS_TYPE.DISASTER),
+            lambda: get_idu_data(filters={'figure_cause': Crisis.CRISIS_TYPE.DISASTER}),
             'idus_all_disaster.json',
         )
     idu_date_from = timezone.now() - timedelta(days=180)
     return generate_external_endpoint_dump_file(
         ExternalApiDump.ExternalApiType.IDUS,
         FigureReadOnlySerializer,
-        lambda: get_idu_data().filter(displacement_date__gte=idu_date_from),
+        lambda: get_idu_data(filters={'displacement_date__gte': idu_date_from}),
         'idus.json',
     )
 
