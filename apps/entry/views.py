@@ -14,7 +14,6 @@ from django.shortcuts import redirect
 from apps.common.utils import (
     EXTERNAL_TUPLE_SEPARATOR,
     EXTERNAL_ARRAY_SEPARATOR,
-    EXTERNAL_FIELD_SEPARATOR,
     format_locations,
 )
 from apps.gidd.views import client_id
@@ -24,10 +23,7 @@ from utils.db import Array
 
 def extract_location_data(data):
     # Split the formatted location data into individual components
-    location_components = [
-        loc.split(EXTERNAL_FIELD_SEPARATOR)
-        for loc in format_locations(data).split(EXTERNAL_ARRAY_SEPARATOR)
-    ]
+    location_components = format_locations(data)
 
     transposed_components = zip(*location_components)
     return {

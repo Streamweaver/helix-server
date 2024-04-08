@@ -209,6 +209,7 @@ class BulkFigureBulkUpdateTask(BulkApiOperationBaseTask[Figure]):
         from apps.contrib.tasks import get_excel_sheet_content
 
         qs = Figure.objects.filter(id__in=[item.pk for item in items])
+
         sheet_data = Figure.get_figure_excel_sheets_data(qs)
         workbook = get_excel_sheet_content(**sheet_data)
         save_workbook_file(operation, workbook)

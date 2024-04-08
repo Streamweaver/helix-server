@@ -40,6 +40,7 @@ from apps.notification.models import Notification
 from apps.common.utils import (
     format_event_codes,
     format_locations,
+    format_locations_as_string,
     EXTERNAL_ARRAY_SEPARATOR,
     EXTERNAL_TUPLE_SEPARATOR,
 )
@@ -914,12 +915,14 @@ class Figure(MetaInformationArchiveAbstractModel,
             created_by__full_name='Created by',
             last_modified_by__full_name='Updated by',
             event_codes='Event codes (Code:Type)',
-            locations__display_name='Location Name',
-            locations_lat_lon='Locations',
-            locations__accuracy='Location accuracy',
-            locations__identifier='Type of Point',
             locations='Locations (Name:Lat, Lon:Accuracy:Type)',
+            location_display_name='Locations name',
+            loc_lat_lon='Locations',
+            accuracy='Locations accuracy',
+            type_of_points='Type of point',
         )
+        exclude_headers = ['location_display_name', 'loc_lat_lon', 'accuracy', 'type_of_points']
+
         values = figures.annotate(
             **Figure.annotate_stock_and_flow_dates(),
             **Figure.annotate_sources_reliability(),
@@ -1033,34 +1036,9 @@ class Figure(MetaInformationArchiveAbstractModel,
                     Q(geo_locations__display_name__isnull=True) | Q(geo_locations__display_name='')
                 ),
             ),
-            locations__display_name=StringAgg(
-                'geo_locations__display_name',
-                EXTERNAL_ARRAY_SEPARATOR,
-                output_field=models.CharField()
-            ),
-            locations__accuracy=ArrayAgg(
-                Cast('geo_locations__accuracy', models.IntegerField()),
-                filter=Q(geo_locations__accuracy__isnull=False)
-            ),
-            locations__identifier=ArrayAgg(
-                Cast('geo_locations__identifier', models.IntegerField()),
-                filter=Q(geo_locations__accuracy__isnull=False)
-            ),
-            locations_lat_lon=StringAgg(
-                Concat(
-                    F('geo_locations__lat'),
-                    Value(EXTERNAL_TUPLE_SEPARATOR),
-                    F('geo_locations__lon'),
-                    output_field=models.CharField(),
-                    distinct=True
-                ),
-                EXTERNAL_ARRAY_SEPARATOR,
-                filter=models.Q(geo_locations__isnull=False),
-                output_field=models.CharField(),
-            ),
         ).order_by(
             'created_at',
-        ).values(*[header for header in headers.keys()])
+        ).values(*[header for header in headers.keys() if header not in exclude_headers])
 
         def transformer(datum):
 
@@ -1068,6 +1046,26 @@ class Figure(MetaInformationArchiveAbstractModel,
                 val = datum[key]
                 obj = Enum.get(val)
                 return getattr(obj, "label", val)
+
+            def extract_location_data(data):
+                names = []
+                lat_lon = []
+                accuracy = []
+                type_of_points = []
+                for loc in format_locations(data):
+                    names.append(loc[0])
+                    lat_lon.append(loc[1])
+                    accuracy.append(loc[2])
+                    type_of_points.append(loc[3])
+
+                return {
+                    'display_name': EXTERNAL_ARRAY_SEPARATOR.join(names),
+                    'lat_lon': EXTERNAL_ARRAY_SEPARATOR.join(lat_lon),
+                    'accuracy': EXTERNAL_ARRAY_SEPARATOR.join(accuracy),
+                    'type_of_points': EXTERNAL_ARRAY_SEPARATOR.join(type_of_points)
+                }
+
+            location_data = extract_location_data(datum['locations'])
 
             return {
                 **datum,
@@ -1117,13 +1115,11 @@ class Figure(MetaInformationArchiveAbstractModel,
                 ),
                 'is_disaggregated': 'Yes' if datum['is_disaggregated'] else 'No',
                 'event_codes': format_event_codes(datum['event_codes']),
-                'locations': format_locations(datum['locations']),
-                'locations__accuracy': get_string_from_list([
-                    OSMName.OSM_ACCURACY(item).label for item in datum['locations__accuracy']
-                ]),
-                'locations__identifier': get_string_from_list([
-                    OSMName.IDENTIFIER(item).label for item in datum['locations__identifier']
-                ]),
+                'locations': format_locations_as_string(datum['locations']),
+                'location_display_name': location_data['display_name'],
+                'loc_lat_lon': location_data['lat_lon'],
+                'accuracy': location_data['accuracy'],
+                'type_of_points': location_data['type_of_points'],
             }
 
         readme_data = [
