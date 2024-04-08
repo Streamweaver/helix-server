@@ -207,6 +207,7 @@ class DisasterViewSet(ListOnlyViewSetMixin):
         response = HttpResponse(content=save_virtual_workbook(wb))
         filename = 'IDMC_GIDD_Disasters_Internal_Displacement_Data.xlsx'
         response['Content-Disposition'] = f'attachment; filename={filename}'
+        response['Content-Type'] = 'application/octet-stream'
         return response
 
 
@@ -577,6 +578,7 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
         response = HttpResponse(content=save_virtual_workbook(wb))
         filename = 'IDMC_Internal_Displacement_Conflict-Violence_Disasters.xlsx'
         response['Content-Disposition'] = f'attachment; filename={filename}'
+        response['Content-Type'] = 'application/octet-stream'
         return response
 
 
