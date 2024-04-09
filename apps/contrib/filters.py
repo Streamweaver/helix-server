@@ -1,4 +1,5 @@
 import django_filters
+from django.db.models import Q
 
 from utils.filters import StringListFilter, MultipleInputFilter, generate_type_for_filter_set
 from apps.contrib.models import ExcelDownload, ClientTrackInfo, Client, BulkApiOperation
@@ -37,21 +38,26 @@ class ExcelExportFilter(django_filters.FilterSet):
 
 class ClientFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(method='filter_name')
-    is_active = django_filters.BooleanFilter(method='filter_is_active')
+    is_active = django_filters.BooleanFilter()
+    use_cases = StringListFilter(method='filter_use_cases')
 
     class Meta:
         model = Client
         fields = ()
 
     def filter_name(self, queryset, name, value):
-        return queryset.filter(name__icontains=value)
+        if not value:
+            return queryset
+        return queryset.filter(
+            Q(name__unaccent__icontains=value) |
+            Q(acronym__icontains=value) |
+            Q(contact_name__icontains=value) |
+            Q(contact_email__icontains=value)
+        ).distinct()
 
-    def filter_is_active(self, queryset, name, value):
-        if value is True:
-            return queryset.filter(is_active=True)
-        if value is False:
-            return queryset.filter(is_active=False)
-        return queryset
+    def filter_use_cases(self, qs, name, value):
+        enum_values = [Client.USE_CASE_TYPES[use_case].value for use_case in value]
+        return qs.filter(use_cases__overlap=enum_values)
 
     @property
     def qs(self):
