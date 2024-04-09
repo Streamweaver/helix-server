@@ -653,9 +653,9 @@ class FigureReadOnlySerializer(serializers.ModelSerializer):
     sources = serializers.CharField(source='sources_name')
     source_url = serializers.CharField(source='entry_url_or_document_url')
     locations_name = serializers.CharField()
-    locations = serializers.CharField()
+    locations_coordinates = serializers.CharField()
     locations_accuracy = serializers.CharField()
-    type_of_point = serializers.CharField()
+    locations_type = serializers.CharField()
     displacement_occurred = serializers.CharField(source='displacement_occurred_transformed')
 
     class Meta:
@@ -689,9 +689,9 @@ class FigureReadOnlySerializer(serializers.ModelSerializer):
             'sources',
             'source_url',
             'locations_name',
-            'locations',
+            'locations_coordinates',
             'locations_accuracy',
-            'type_of_point',
+            'locations_type',
             'displacement_occurred',
             'created_at',
         )

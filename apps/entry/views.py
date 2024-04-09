@@ -330,9 +330,9 @@ def get_idu_data(filters=None):
         yield {
             **figure_data,
             'locations_name': location_parse['display_name'],
-            'locations': location_parse['lat_lon'],
+            'locations_coordinates': location_parse['lat_lon'],
             'locations_accuracy': location_parse['accuracy'],
-            'type_of_point': location_parse['type_of_points'],
+            'locations_type': location_parse['type_of_points'],
         }
 
 
