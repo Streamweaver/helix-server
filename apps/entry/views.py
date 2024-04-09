@@ -136,8 +136,8 @@ def get_idu_data(filters=None):
             ),
         ),
         displacement_occurred_transformed=Case(
-            When(displacement_occurred=0, then=Value("Displacement due to preventive evacuation reported")),
-            When(displacement_occurred__in=[1, 2, 3], then=Value("Displacement without preventive evacuation reported")),
+            When(displacement_occurred=0, then=Value("Displacement reporting preventive evacuations")),
+            When(displacement_occurred__in=[1, 2, 3], then=Value("Displacement without preventive evacuations reported")),
             output_field=CharField()
         ),
         custom_figure_text=Case(
