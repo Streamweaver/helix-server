@@ -25,6 +25,7 @@ from apps.contrib.enums import (
     ExcelGenerationStatusGrapheneEnum,
     BulkApiOperationActionEnum,
     BulkApiOperationStatusEnum,
+    ClientUseCaseEnum,
 )
 from apps.contrib.bulk_operations.serializers import BulkApiOperationPayloadSerializer
 from apps.extraction.filters import FigureExtractionBulkOperationFilterDataType
@@ -63,6 +64,9 @@ class ExcelExportsListType(CustomDjangoListObjectType):
 
 
 class ClientType(DjangoObjectType):
+    use_cases = graphene.List(graphene.NonNull(ClientUseCaseEnum), description="List of use cases for the client.")
+    use_cases_display = graphene.List(graphene.String, description="Display string for the client's use case.")
+
     class Meta:
         model = Client
         fields = (
@@ -70,9 +74,26 @@ class ClientType(DjangoObjectType):
             'name',
             'is_active',
             'code',
+            'acronym',
+            'contact_name',
+            'contact_email',
+            'contact_website',
             'created_by',
+            'created_at',
+            'other_notes',
+            'opted_out_of_emails',
             'last_modified_by',
+            'modified_at',
         )
+
+    def resolve_use_cases_display(self, info):
+        """
+        Resolve method for use_case_display field. Returns a list of labels for the client's use cases.
+        """
+        return [
+            Client.USE_CASE_TYPES(use_case).label
+            for use_case in self.use_cases
+        ]
 
 
 class ClientListType(CustomDjangoListObjectType):

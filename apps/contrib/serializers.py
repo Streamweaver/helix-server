@@ -1,4 +1,6 @@
 import magic
+import random
+import string
 from datetime import timedelta
 from django.utils import timezone
 
@@ -145,14 +147,72 @@ class ClientSerializer(
     MetaInformationSerializerMixin,
     serializers.ModelSerializer
 ):
+    """
+    Serializer for Client objects, including custom validation and creation logic.
+    """
+    contact_name = serializers.CharField(required=True)
+    contact_email = serializers.EmailField(required=True)
+    use_cases = serializers.ListField(
+        child=serializers.ChoiceField(choices=Client.USE_CASE_TYPES.choices()),
+        required=True,
+    )
+
     class Meta:
         model = Client
         fields = (
             'id',
             'name',
-            'code',
             'is_active',
+            'acronym',
+            'contact_name',
+            'contact_email',
+            'contact_website',
+            'use_cases',
+            'other_notes',
+            'opted_out_of_emails',
         )
+
+    def validate(self, attrs):
+        """
+        Ensures 'other_notes' is provided when 'Other' is selected in use_cases.
+        """
+        attrs = super().validate(attrs)
+        use_cases = attrs.get('use_cases', [])
+        if Client.USE_CASE_TYPES.OTHER.value in use_cases and not attrs.get('other_notes'):
+            raise serializers.ValidationError({"other_notes": "Required when 'Other' is selected in use cases."})
+        return attrs
+
+    def create(self, validated_data):
+        """
+        Generates a unique client code before creating a new Client instance.
+        """
+        validated_data['code'] = self._generate_unique_client_code()
+        return super().create(validated_data)
+
+    def _generate_unique_client_code(self, code_length=16, max_attempts=5):
+        """
+        Generates a unique client code consisting of uppercase letters and digits.
+
+        This method attempts to generate a unique code by combining random uppercase letters and digits.
+        It checks the uniqueness of the generated code against existing client codes in the database.
+        If a unique code is found within the specified number of attempts, it is returned.
+        Otherwise, an exception is raised indicating the failure to generate a unique code.
+
+        Parameters:
+        - code_length (int): The length of the code to be generated. Defaults to 16.
+        - max_attempts (int): The maximum number of attempts to generate a unique code. Defaults to 5.
+
+        Returns:
+        - str: A unique client code.
+
+        Raises:
+        - Exception: If a unique code cannot be generated after the specified number of attempts.
+        """
+        for _ in range(max_attempts):
+            code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=code_length))
+            if not Client.objects.filter(code=code).exists():
+                return code
+        raise Exception("Failed to generate a unique code after several attempts.")
 
 
 class ClientUpdateSerializer(UpdateSerializerMixin, ClientSerializer):
