@@ -71,6 +71,11 @@ services:
       context: ./
       dockerfile: worker.Dockerfile
     command: python manage.py run_celery_dev
+    # Fix 100% CPU usage on archlinux (https://github.com/goauthentik/authentik/pull/7762)
+    ulimits:
+      nofile:
+        soft: 10240
+        hard: 10240
 
 volumes:
   helix-db-13-data:

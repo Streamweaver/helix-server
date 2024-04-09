@@ -641,6 +641,7 @@ SPECTACULAR_SETTINGS = {
     'CONTACT': {'email': 'info@idmc.ch'},
     "SWAGGER_UI_SETTINGS": {
         "deepLinking": True,
+        "syntaxHighlight": False,  # Disabling syntax highlighting as it takes considerable time to load
         "persistAuthorization": True,
         "displayOperationId": True,
     },
