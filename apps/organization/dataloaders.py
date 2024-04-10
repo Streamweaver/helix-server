@@ -15,7 +15,7 @@ class OrganizationCountriesLoader(DataLoader):
         _map = defaultdict(list)
         for organization in qs:
             _map[organization.organization_id].append(organization.country)
-        return Promise.resolve([_map.get(key) for key in keys])
+        return Promise.resolve([_map.get(key, []) for key in keys])
 
 
 class OrganizationOrganizationKindLoader(DataLoader):
