@@ -915,11 +915,11 @@ class Figure(MetaInformationArchiveAbstractModel,
             created_by__full_name='Created by',
             last_modified_by__full_name='Updated by',
             event_codes='Event codes (Code:Type)',
-            locations='Locations (Name:Lat, Lon:Accuracy:Type)',
             location_display_name='Locations name',
             loc_lat_lon='Locations coordinates',
             accuracy='Locations accuracy',
             type_of_points='Locations type',
+            locations='Locations (Name:Lat, Lon:Accuracy:Type)',
         )
         exclude_headers = ['location_display_name', 'loc_lat_lon', 'accuracy', 'type_of_points']
 
