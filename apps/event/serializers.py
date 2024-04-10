@@ -233,10 +233,23 @@ class EventSerializer(MetaInformationSerializerMixin,
         if violence_sub_type:
             attrs['violence'] = violence_sub_type.violence
 
+    def validate_dates(self, attrs):
+        start_date = attrs.get('start_date', getattr(self.instance, 'start_date', None))
+        end_date = attrs.get('end_date', getattr(self.instance, 'end_date', None))
+
+        if start_date and end_date and end_date < start_date:
+            raise serializers.ValidationError({
+                'start_date': gettext('Start date should be on or before the end date.'),
+                'end_date': gettext('End date should be on or after the start date.')
+            })
+
+        return attrs
+
     def validate(self, attrs: dict) -> dict:
         attrs = super().validate(attrs)
         self._update_parent_fields(attrs)
         errors = OrderedDict()
+        self.validate_dates(attrs)
         crisis = attrs.get('crisis')
         if crisis:
             errors.update(is_child_parent_dates_valid(
