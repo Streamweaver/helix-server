@@ -257,6 +257,7 @@ input ClientCreateInputType {
 input ClientFilterDataInputType {
   name: String
   isActive: Boolean
+  useCases: [String!]
 }
 
 type ClientListType {
