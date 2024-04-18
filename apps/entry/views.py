@@ -15,6 +15,7 @@ from apps.common.utils import (
     EXTERNAL_TUPLE_SEPARATOR,
     EXTERNAL_ARRAY_SEPARATOR,
     format_locations,
+    get_attr_str_from_event_codes,
 )
 from apps.gidd.views import client_id
 from utils.common import track_gidd
@@ -74,6 +75,15 @@ def get_idu_data(filters=None):
         displacement_end_date=F('end_date'),
         year=Coalesce(ExtractYear('start_date', 'year'), ExtractYear('end_date', 'year')),
         event_name=F('event__name'),
+        event_codes=ArrayAgg(
+            Array(
+                F('event__event_code__event_code'),
+                Cast(F('event__event_code__event_code_type'), CharField()),
+                output_field=ArrayField(CharField()),
+            ),
+            distinct=True,
+            filter=Q(event__event_code__country__id=F('country__id')),
+        ),
         event_start_date=F('event__start_date'),
         event_end_date=F('event__end_date'),
         disaster_category_name=F('disaster_category__name'),
@@ -326,6 +336,7 @@ def get_idu_data(filters=None):
     for figure_data in base_query.values():
         locations_data = figure_data.pop('locations', None)
         location_parse = extract_location_data(locations_data)
+        event_codes = figure_data.pop('event_codes', None)
 
         yield {
             **figure_data,
@@ -333,6 +344,8 @@ def get_idu_data(filters=None):
             'locations_coordinates': location_parse['lat_lon'],
             'locations_accuracy': location_parse['accuracy'],
             'locations_type': location_parse['type_of_points'],
+            'event_codes': get_attr_str_from_event_codes(event_codes, 'code') or "",
+            'event_code_types': get_attr_str_from_event_codes(event_codes, 'code_type') or "",
         }
 
 

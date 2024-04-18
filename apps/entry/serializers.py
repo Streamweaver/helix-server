@@ -640,6 +640,8 @@ class FigureReadOnlySerializer(serializers.ModelSerializer):
     displacement_end_date = serializers.CharField()
     displacement_date = serializers.CharField()
     event_name = serializers.CharField()
+    event_codes = serializers.CharField()
+    event_code_types = serializers.CharField()
     event_start_date = serializers.CharField()
     event_end_date = serializers.CharField()
     category = serializers.CharField(source='disaster_category_name')
@@ -677,6 +679,8 @@ class FigureReadOnlySerializer(serializers.ModelSerializer):
             'year',
             'event_id',
             'event_name',
+            'event_codes',
+            'event_code_types',
             'event_start_date',
             'event_end_date',
             'category',
