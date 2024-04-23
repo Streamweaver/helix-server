@@ -243,14 +243,14 @@ class Figure(MetaInformationArchiveAbstractModel,
     from apps.crisis.models import Crisis
 
     class QUANTIFIER(enum.Enum):
-        MORE_THAN = 0
-        LESS_THAN = 1
+        MORE_THAN_OR_EQUAL = 0
+        LESS_THAN_OR_EQUAL = 1
         EXACT = 2
         APPROXIMATELY = 3
 
         __labels__ = {
-            MORE_THAN: _("More than"),
-            LESS_THAN: _("Less than"),
+            MORE_THAN_OR_EQUAL: _("More than or equal to"),
+            LESS_THAN_OR_EQUAL: _("Less than or equal to"),
             EXACT: _("Exact"),
             APPROXIMATELY: _("Approximately"),
         }
