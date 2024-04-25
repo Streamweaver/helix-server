@@ -10,8 +10,10 @@ class MissingCaptchaException(Exception):
 
 
 def is_child_parent_dates_valid(
-    c_start_date, c_end_date,
-    p_start_date, p_name
+    c_start_date,
+    c_end_date,
+    p_start_date,
+    p_name
 ) -> OrderedDict:
     """
     c = child
@@ -25,7 +27,7 @@ def is_child_parent_dates_valid(
         return errors
     if c_start_date and p_start_date and p_start_date > c_start_date:
         errors['start_date'] = gettext('Choose your start date after %s start date: %s.') % (
-            p_name,
+            p_name or 'parent',
             p_start_date
         )
     return errors

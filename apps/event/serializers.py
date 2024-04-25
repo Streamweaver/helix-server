@@ -233,34 +233,24 @@ class EventSerializer(MetaInformationSerializerMixin,
         if violence_sub_type:
             attrs['violence'] = violence_sub_type.violence
 
-    def validate_dates(self, attrs):
-        start_date = attrs.get('start_date', getattr(self.instance, 'start_date', None))
-        end_date = attrs.get('end_date', getattr(self.instance, 'end_date', None))
-
-        if start_date and end_date and end_date < start_date:
-            raise serializers.ValidationError({
-                'start_date': gettext('Start date should be on or before the end date.'),
-                'end_date': gettext('End date should be on or after the start date.')
-            })
-
-        return attrs
-
     def validate(self, attrs: dict) -> dict:
         attrs = super().validate(attrs)
         self._update_parent_fields(attrs)
+
         errors = OrderedDict()
-        self.validate_dates(attrs)
         crisis = attrs.get('crisis')
+
+        errors.update(is_child_parent_dates_valid(
+            attrs.get('start_date', getattr(self.instance, 'start_date', None)),
+            attrs.get('end_date', getattr(self.instance, 'end_date', None)),
+            crisis.start_date if crisis else None,
+            'crisis' if crisis else None,
+        ))
         if crisis:
-            errors.update(is_child_parent_dates_valid(
-                attrs.get('start_date', getattr(self.instance, 'start_date', None)),
-                attrs.get('end_date', getattr(self.instance, 'end_date', None)),
-                crisis.start_date,
-                'crisis',
-            ))
             errors.update(
                 is_child_parent_inclusion_valid(attrs, self.instance, field='countries', parent_field='crisis.countries')
             )
+
         errors.update(self.validate_event_type_with_crisis_type(attrs))
         if attrs.get('event_type') == Crisis.CRISIS_TYPE.DISASTER:
             errors.update(self.validate_disaster_disaster_sub_type(attrs))
