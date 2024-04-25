@@ -96,8 +96,8 @@ def get_idu_data(filters=None):
             output_field=CharField()
         ),
         quantifier_label=Case(
-            When(quantifier=0, then=Lower(Value(Figure.QUANTIFIER.MORE_THAN.label))),
-            When(quantifier=1, then=Lower(Value(Figure.QUANTIFIER.LESS_THAN.label))),
+            When(quantifier=0, then=Lower(Value(Figure.QUANTIFIER.MORE_THAN_OR_EQUAL.label))),
+            When(quantifier=1, then=Lower(Value(Figure.QUANTIFIER.LESS_THAN_OR_EQUAL.label))),
             When(quantifier=2, then=Value('total')),
             When(quantifier=3, then=Lower(Value(Figure.QUANTIFIER.APPROXIMATELY.label))),
             output_field=CharField()
