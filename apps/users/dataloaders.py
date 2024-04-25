@@ -14,6 +14,12 @@ PORTFOLIO_ROLES_ORDER = [
 
 
 class UserPortfoliosMetadataLoader(DataLoader):
+    """
+    DataLoader for aggregating user portfolio metadata.
+
+    This loader batches and caches the loading of user portfolio roles from the database,
+    minimizing the number of queries needed to fetch user portfolio data across different requests.
+    """
     def batch_load_fn(self, keys):
         qs = Portfolio.objects.filter(
             user__in=keys,
@@ -40,5 +46,13 @@ class UserPortfoliosMetadataLoader(DataLoader):
             }
 
         return Promise.resolve([
-            _map[key] for key in keys
+            # For default, using GUEST role
+            _map.get(key, {
+                'is_admin': False,
+                'is_directors_office': False,
+                'is_reporting_team': False,
+                'portfolio_role': USER_ROLE.GUEST.value,
+                'portfolio_role_display': USER_ROLE.GUEST.label,
+            })
+            for key in keys
         ])
