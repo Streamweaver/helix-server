@@ -38,8 +38,8 @@ from apps.parking_lot.models import ParkedItem
 from apps.common.enums import GENDER_TYPE
 from apps.notification.models import Notification
 from apps.common.utils import (
-    format_event_codes,
-    format_locations,
+    format_event_codes_as_string,
+    extract_location_data,
     format_locations_as_string,
     EXTERNAL_ARRAY_SEPARATOR,
     EXTERNAL_TUPLE_SEPARATOR,
@@ -1047,24 +1047,6 @@ class Figure(MetaInformationArchiveAbstractModel,
                 obj = Enum.get(val)
                 return getattr(obj, "label", val)
 
-            def extract_location_data(data):
-                names = []
-                lat_lon = []
-                accuracy = []
-                type_of_points = []
-                for loc in format_locations(data):
-                    names.append(loc[0])
-                    lat_lon.append(loc[1])
-                    accuracy.append(loc[2])
-                    type_of_points.append(loc[3])
-
-                return {
-                    'display_name': EXTERNAL_ARRAY_SEPARATOR.join(names),
-                    'lat_lon': EXTERNAL_ARRAY_SEPARATOR.join(lat_lon),
-                    'accuracy': EXTERNAL_ARRAY_SEPARATOR.join(accuracy),
-                    'type_of_points': EXTERNAL_ARRAY_SEPARATOR.join(type_of_points)
-                }
-
             location_data = extract_location_data(datum['locations'])
 
             return {
@@ -1114,7 +1096,7 @@ class Figure(MetaInformationArchiveAbstractModel,
                     'review_status', Figure.FIGURE_REVIEW_STATUS
                 ),
                 'is_disaggregated': 'Yes' if datum['is_disaggregated'] else 'No',
-                'event_codes': format_event_codes(datum['event_codes']),
+                'event_codes': format_event_codes_as_string(datum['event_codes']),
                 'locations': format_locations_as_string(datum['locations']),
                 'location_display_name': location_data['display_name'],
                 'loc_lat_lon': location_data['lat_lon'],

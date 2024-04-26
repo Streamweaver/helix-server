@@ -14,25 +14,12 @@ from django.shortcuts import redirect
 from apps.common.utils import (
     EXTERNAL_TUPLE_SEPARATOR,
     EXTERNAL_ARRAY_SEPARATOR,
-    format_locations,
-    get_attr_str_from_event_codes,
+    extract_location_data,
+    extract_event_code_data,
 )
 from apps.gidd.views import client_id
 from utils.common import track_gidd
 from utils.db import Array
-
-
-def extract_location_data(data):
-    # Split the formatted location data into individual components
-    location_components = format_locations(data)
-
-    transposed_components = zip(*location_components)
-    return {
-        'display_name': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, [])),
-        'lat_lon': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, [])),
-        'accuracy': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, [])),
-        'type_of_points': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, []))
-    }
 
 
 def get_idu_data(filters=None):
@@ -334,9 +321,11 @@ def get_idu_data(filters=None):
         base_query = base_query.filter(**filters)
 
     for figure_data in base_query.values():
-        locations_data = figure_data.pop('locations', None)
+        locations_data = figure_data.pop('locations', [])
         location_parse = extract_location_data(locations_data)
-        event_codes = figure_data.pop('event_codes', None)
+
+        event_codes_data = figure_data.pop('event_codes', [])
+        event_code_parse = extract_event_code_data(event_codes_data)
 
         yield {
             **figure_data,
@@ -344,8 +333,8 @@ def get_idu_data(filters=None):
             'locations_coordinates': location_parse['lat_lon'],
             'locations_accuracy': location_parse['accuracy'],
             'locations_type': location_parse['type_of_points'],
-            'event_codes': get_attr_str_from_event_codes(event_codes, 'code') or "",
-            'event_code_types': get_attr_str_from_event_codes(event_codes, 'code_type') or "",
+            'event_codes': event_code_parse['code'],
+            'event_code_types': event_code_parse['code_type'],
         }
 
 

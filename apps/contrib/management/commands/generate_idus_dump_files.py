@@ -14,7 +14,5 @@ class Command(BaseCommand):
             generate_idus_all_dump_file()
             generate_idus_all_disaster_dump_file()
             logger.info('IDUS dump files generated successfully')
-
-        except Exception as exception:
-            logger.error(f'Error generating IDUS dump files: {exception}', exc_info=True)
-            raise exception
+        except Exception:
+            logger.error('Error generating IDUS dump files:', exc_info=True)

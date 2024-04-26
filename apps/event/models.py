@@ -21,7 +21,7 @@ from apps.crisis.models import Crisis
 from apps.contrib.commons import DATE_ACCURACY
 from apps.entry.models import Figure
 from apps.users.models import User, USER_ROLE
-from apps.common.utils import format_event_codes, EXTERNAL_ARRAY_SEPARATOR
+from apps.common.utils import format_event_codes_as_string, EXTERNAL_ARRAY_SEPARATOR
 
 
 class NameAttributedModels(models.Model):
@@ -484,7 +484,7 @@ class Event(MetaInformationArchiveAbstractModel, models.Model):
                     event_type=getattr(Crisis.CRISIS_TYPE.get(datum['event_type']), 'label', ''),
                     start_date_accuracy=getattr(DATE_ACCURACY.get(datum['start_date_accuracy']), 'label', ''),
                     end_date_accuracy=getattr(DATE_ACCURACY.get(datum['end_date_accuracy']), 'label', ''),
-                    event_codes=format_event_codes(datum['event_codes']),
+                    event_codes=format_event_codes_as_string(datum['event_codes']),
                 )
             }
 
