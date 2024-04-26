@@ -14,24 +14,12 @@ from django.shortcuts import redirect
 from apps.common.utils import (
     EXTERNAL_TUPLE_SEPARATOR,
     EXTERNAL_ARRAY_SEPARATOR,
-    format_locations,
+    extract_location_data,
+    extract_event_code_data,
 )
 from apps.gidd.views import client_id
 from utils.common import track_gidd
 from utils.db import Array
-
-
-def extract_location_data(data):
-    # Split the formatted location data into individual components
-    location_components = format_locations(data)
-
-    transposed_components = zip(*location_components)
-    return {
-        'display_name': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, [])),
-        'lat_lon': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, [])),
-        'accuracy': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, [])),
-        'type_of_points': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, []))
-    }
 
 
 def get_idu_data(filters=None):
@@ -74,6 +62,15 @@ def get_idu_data(filters=None):
         displacement_end_date=F('end_date'),
         year=Coalesce(ExtractYear('start_date', 'year'), ExtractYear('end_date', 'year')),
         event_name=F('event__name'),
+        event_codes=ArrayAgg(
+            Array(
+                F('event__event_code__event_code'),
+                Cast(F('event__event_code__event_code_type'), CharField()),
+                output_field=ArrayField(CharField()),
+            ),
+            distinct=True,
+            filter=Q(event__event_code__country__id=F('country__id')),
+        ),
         event_start_date=F('event__start_date'),
         event_end_date=F('event__end_date'),
         disaster_category_name=F('disaster_category__name'),
@@ -96,8 +93,8 @@ def get_idu_data(filters=None):
             output_field=CharField()
         ),
         quantifier_label=Case(
-            When(quantifier=0, then=Lower(Value(Figure.QUANTIFIER.MORE_THAN.label))),
-            When(quantifier=1, then=Lower(Value(Figure.QUANTIFIER.LESS_THAN.label))),
+            When(quantifier=0, then=Lower(Value(Figure.QUANTIFIER.MORE_THAN_OR_EQUAL.label))),
+            When(quantifier=1, then=Lower(Value(Figure.QUANTIFIER.LESS_THAN_OR_EQUAL.label))),
             When(quantifier=2, then=Value('total')),
             When(quantifier=3, then=Lower(Value(Figure.QUANTIFIER.APPROXIMATELY.label))),
             output_field=CharField()
@@ -324,8 +321,11 @@ def get_idu_data(filters=None):
         base_query = base_query.filter(**filters)
 
     for figure_data in base_query.values():
-        locations_data = figure_data.pop('locations', None)
+        locations_data = figure_data.pop('locations', [])
         location_parse = extract_location_data(locations_data)
+
+        event_codes_data = figure_data.pop('event_codes', [])
+        event_code_parse = extract_event_code_data(event_codes_data)
 
         yield {
             **figure_data,
@@ -333,6 +333,8 @@ def get_idu_data(filters=None):
             'locations_coordinates': location_parse['lat_lon'],
             'locations_accuracy': location_parse['accuracy'],
             'locations_type': location_parse['type_of_points'],
+            'event_codes': event_code_parse['code'],
+            'event_code_types': event_code_parse['code_type'],
         }
 
 

@@ -146,7 +146,7 @@ class TestEntrySerializer(HelixTestCase):
         entry = entry_serializer.save()
         figures = [{
             "uuid": "4298b36f-572b-48a4-aa13-a54a3938370f",
-            "quantifier": Figure.QUANTIFIER.MORE_THAN.value,
+            "quantifier": Figure.QUANTIFIER.MORE_THAN_OR_EQUAL.value,
             "reported": 10,
             "category": flow.value,
             "country": str(self.country.id),
@@ -322,7 +322,7 @@ class TestFigureSerializer(HelixTestCase):
         self.data = {
             "uuid": str(uuid4()),
             "entry": self.entry.id,
-            "quantifier": Figure.QUANTIFIER.MORE_THAN.value,
+            "quantifier": Figure.QUANTIFIER.MORE_THAN_OR_EQUAL.value,
             "reported": 100,
             "unit": Figure.UNIT.PERSON.value,
             "term": Figure.FIGURE_TERMS.EVACUATED.value,

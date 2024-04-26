@@ -25,7 +25,7 @@ from .models import (
 )
 from apps.country.models import Country
 from apps.report.models import Report
-from apps.common.utils import get_attr_list_from_event_codes
+from apps.common.utils import extract_event_code_data_list
 from utils.db import Array
 
 
@@ -286,9 +286,11 @@ def update_conflict_and_disaster_data():
                     iso3=item['country__iso3'],
                     country_id=item['country'],
                     country_name=item['country__idmc_short_name'],
-                    event_codes=get_attr_list_from_event_codes(item['event_codes'], 'code') or [],
-                    event_codes_type=get_attr_list_from_event_codes(item['event_codes'], 'code_type') or [],
-                ) for item in disasters
+                    event_codes=event_code['code'],
+                    event_codes_type=event_code['code_type']
+                )
+                for item in disasters
+                for event_code in [extract_event_code_data_list(item['event_codes'])]
             ]
         )
 

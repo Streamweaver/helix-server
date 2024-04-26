@@ -286,7 +286,7 @@ class TestEventReviewGraphQLTestCase(HelixGraphQLTestCase):
             {
                 "uuid": str(uuid4()),
                 "country": self.country.id,
-                "quantifier": Figure.QUANTIFIER.MORE_THAN.name,
+                "quantifier": Figure.QUANTIFIER.MORE_THAN_OR_EQUAL.name,
                 "reported": 10,
                 "unit": Figure.UNIT.HOUSEHOLD.name,  # missing household_size
                 "term": Figure.FIGURE_TERMS.EVACUATED.name,
