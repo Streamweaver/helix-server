@@ -2,7 +2,7 @@ from rest_framework import serializers
 from apps.country.models import Country
 from .models import (
     Conflict, Disaster, StatusLog, ReleaseMetadata,
-    DisplacementData, PublicFigureAnalysis
+    DisplacementData, PublicFigureAnalysis, IdpsSaddEstimate,
 )
 from apps.crisis.models import Crisis
 from apps.entry.models import Figure
@@ -128,3 +128,21 @@ class ReleaseMetadataSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         validated_data['modified_by'] = user
         return ReleaseMetadata.objects.create(**validated_data)
+
+
+class IdpsSaddEstimateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for validating and processing data from IdpsSaddEstimate CSV files.
+    Automatically computes 'iso3' and 'country_name' from the associated country.
+    """
+
+    class Meta:
+        model = IdpsSaddEstimate
+        exclude = ['iso3', 'country_name']  # This are calculated by country
+
+    def validate(self, validated_data):
+        validated_data = super().validate(validated_data)
+        country = validated_data['country']
+        validated_data['country_name'] = country.name
+        validated_data['iso3'] = country.iso3
+        return validated_data

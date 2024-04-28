@@ -1,11 +1,14 @@
+import typing
 import csv
+import os
+from functools import cached_property
 import logging
-import datetime
+from requests.structures import CaseInsensitiveDict
 from django.core.management.base import BaseCommand
-from apps.country.models import Country
-from apps.crisis.models import Crisis
+from django.db import transaction
+from apps.country.models import Country, Crisis
 from apps.gidd.models import IdpsSaddEstimate
-
+from apps.gidd.serializers import IdpsSaddEstimateSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -14,55 +17,109 @@ class Command(BaseCommand):
 
     help = "Update idps sadd estimates"
 
+    @cached_property
+    def iso3_to_country(self) -> typing.Dict[str, Country]:
+        """
+        Creates a dictionary mapping ISO3 country codes to country data, with error handling and optimized fetching.
+
+        Returns:
+            Dict[str, CountryDataType]: A case-insensitive dictionary where keys are ISO3 codes and values are country data.
+        """
+        countries = Country.objects.filter(iso3__isnull=False)
+        return CaseInsensitiveDict({
+            country.iso3: country
+            for country in countries
+        })
+
     def add_arguments(self, parser):
-        parser.add_argument('csv_file')
+        parser.add_argument('csv_file_path', type=str, help="Path to the CSV file containing the data.")
 
+    @classmethod
+    def map_cause(cls, cause_string: str) -> int:
+        """
+        Maps a cause string to its corresponding enum value using the Crisis.CRISIS_TYPE enum.
+        """
+        if cause_string == Crisis.CRISIS_TYPE.CONFLICT.label:
+            return Crisis.CRISIS_TYPE.CONFLICT.value
+        elif cause_string == Crisis.CRISIS_TYPE.DISASTER.label:
+            return Crisis.CRISIS_TYPE.DISASTER.value
+
+    @transaction.atomic()
     def handle(self, *args, **kwargs):
-        def _format_cause(cause_string):
-            if cause_string == Crisis.CRISIS_TYPE.CONFLICT.label:
-                return Crisis.CRISIS_TYPE.CONFLICT.value
-            elif cause_string == Crisis.CRISIS_TYPE.DISASTER.label:
-                return Crisis.CRISIS_TYPE.DISASTER.value
+        """
+        Handles the command execution.
 
-        def format_number(number):
-            return number.strip() or None
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        """
+        csv_file_path = kwargs['csv_file_path']
+        if not os.path.exists(csv_file_path):
+            logger.error(f"CSV file path does not exist: {csv_file_path}")
+            return
+        try:
+            self.process_file(csv_file_path)
+            logger.info("IDPS SADD estimates updated successfully.")
+        except FileNotFoundError:
+            logger.error(f"CSV file at {csv_file_path} not found.")
+        except Exception:
+            logger.error("Failed to update IDPS SADD estimates:", exc_info=True)
 
-        csv_file = kwargs['csv_file']
+    def process_file(self, file_path):
+        """
+        Processes the CSV file and updates IDPS SADD estimates.
 
-        iso3_to_country_id_map = {
-            item['iso3']: item['id'] for item in Country.objects.values('iso3', 'id')
-        }
-        iso3_to_country_name_map = {
-            item['iso3']: item['idmc_short_name'] for item in Country.objects.values('iso3', 'idmc_short_name')
-        }
-
-        with open(csv_file, 'r') as csv_file:
-            reader = csv.DictReader(csv_file)
-            objects_to_create = []
-            for obj in reader:
-                # Remove keys spaces
-                item = {k.strip(): v for (k, v) in obj.items()}
-                objects_to_create.append(
-                    IdpsSaddEstimate(
-                        iso3=item['ISO3'],
-                        country_name=iso3_to_country_name_map.get(item['ISO3']),
-                        country_id=iso3_to_country_id_map.get(item['ISO3']),
-                        year=datetime.datetime.strptime(item['Date'], "%d/%m/%Y").date().year,
-                        sex=item['Sex'],
-                        cause=_format_cause(item['Cause']),
-                        zero_to_one=format_number(item['0-1']),
-                        zero_to_four=format_number(item['0-4']),
-                        zero_to_forteen=format_number(item['0-14']),
-                        zero_to_sventeen=format_number(item['0-17']),
-                        zero_to_twenty_four=format_number(item['0-24']),
-                        five_to_elaven=format_number(item['5-11']),
-                        five_to_fourteen=format_number(item['5-14']),
-                        twelve_to_fourteen=format_number(item['12-14']),
-                        twelve_to_sixteen=format_number(item['12-16']),
-                        fifteen_to_seventeen=format_number(item['15-17']),
-                        fifteen_to_twentyfour=format_number(item['15-24']),
-                        twenty_five_to_sixty_four=format_number(item['25-64']),
-                        sixty_five_plus=format_number(item['65+']),
-                    )
+        Args:
+            file_path (str): The path to the CSV file.
+        """
+        with open(file_path, 'r') as file:
+            reader = csv.DictReader(file)
+            processed_rows = []
+            for row in reader:
+                processed_rows.append(
+                    self.process_row(row)
                 )
-            IdpsSaddEstimate.objects.bulk_create(objects_to_create)
+            serializer = IdpsSaddEstimateSerializer(data=processed_rows, many=True)
+            if serializer.is_valid():
+                self.create_estimates(serializer.validated_data)
+            else:
+                for i, errors in enumerate(serializer.errors):
+                    for field, error in errors.items():
+                        logger.error(f"Error in row {i + 1}, column '{field}': {error}. Row data: {processed_rows[i]}")
+
+    def process_row(self, row: dict) -> dict:
+        """
+        Processes a single row of CSV data, ensuring it contains necessary ISO3 code and
+        retrieves corresponding country data.
+
+        Args:
+            row (dict): A dictionary representing a single row of CSV data.
+
+        Returns:
+            dict: The updated row with additional country ID and name based on the ISO3 code.
+
+        Raises:
+            ValueError: If the 'iso3' key is missing in the row.
+            LookupError: If no country data is found for the provided ISO3 code.
+        """
+        iso3 = row.get('iso3')
+        country = self.iso3_to_country.get(iso3)
+        return {
+            **row,
+            'country': country.id,
+            'cause': self.map_cause(row.get('cause'))
+        }
+
+    def create_estimates(self, validated_data: typing.List[dict]):
+        """
+        Within a database transaction, it deletes all existing IdpsSaddEstimate records and then
+        bulk creates new records from the validated CSV data.
+
+        Args:
+            validated_data (list): A list of validated data dictionaries to be saved to the database.
+        """
+        IdpsSaddEstimate.objects.all().delete()
+        IdpsSaddEstimate.objects.bulk_create(
+            [IdpsSaddEstimate(**item) for item in validated_data]
+        )
+        logger.info(f"Processed {len(validated_data)} new entries.")
