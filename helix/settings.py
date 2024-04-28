@@ -695,14 +695,14 @@ if DEBUG:
                 app: {
                     'handlers': ['colored_console'],
                     'level': 'INFO',
-                    'propagate': True,
+                    'propagate': False,
                 }
                 for app in ['apps', 'helix', 'utils', 'celery', 'django']
             },
             'profiling': {
                 'handlers': ['colored_console'],
                 'level': 'DEBUG',
-                'propagate': True,
+                'propagate': False,
             },
         },
     }

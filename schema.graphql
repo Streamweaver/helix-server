@@ -658,9 +658,19 @@ input CountryFilterDataInputType {
 type CountryHouseholdSizeType {
   id: ID!
   oldId: String
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdBy: UserType
+  lastModifiedBy: UserType
+  versionId: String
   country: CountryType!
   year: Int!
   size: Float!
+  dataSourceCategory: String!
+  source: String!
+  sourceLink: String!
+  notes: String
+  isActive: Boolean!
 }
 
 type CountryListType {
