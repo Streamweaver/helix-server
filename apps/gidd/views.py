@@ -1,4 +1,5 @@
 import typing
+import json
 from datetime import datetime
 from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
@@ -16,7 +17,7 @@ from apps.entry.models import Figure
 from apps.common.utils import EXTERNAL_ARRAY_SEPARATOR, EXTERNAL_FIELD_SEPARATOR
 
 from .models import (
-    Conflict, Disaster, DisplacementData, IdpsSaddEstimate,
+    Conflict, Disaster, DisplacementData, GiddFigure, IdpsSaddEstimate,
     StatusLog, PublicFigureAnalysis
 )
 from .serializers import (
@@ -581,6 +582,41 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
         filename = 'IDMC_Internal_Displacement_Conflict-Violence_Disasters.xlsx'
         response['Content-Disposition'] = f'attachment; filename={filename}'
         response['Content-Type'] = 'application/octet-stream'
+        return response
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="disaggregated-geojson",
+        permission_classes=[AllowAny],
+    )
+    def disaggregated_geojson(self, request):
+        """
+        Export the disaggregated data in geojson format file
+        """
+
+        qs = GiddFigure.objects.all().order_by(
+            '-year',
+        )
+        feature_collection = {
+            "type": "FeatureCollection",
+            "features": []
+        }
+
+        for item in qs:
+            feature = {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Multipoint",
+                    "coordinates": item['locations_coordinates'],
+                },
+                "properties": {}
+            }
+            feature_collection['features'].append(feature)
+
+        feature_collection = json.dumps(feature_collection)
+        response = HttpResponse(content=feature_collection, content_type='application/json')
+        response['Content-Disposition'] = 'attachment; filename="IDMC_Internal_Displacement_Disaggregated.geojson"'
         return response
 
 

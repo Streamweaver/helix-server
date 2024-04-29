@@ -1,5 +1,6 @@
 import datetime
 import logging
+from entry.views import extract_location_data
 from helix.celery import app as celery_app
 from django.utils import timezone
 from django.db import models
@@ -14,6 +15,8 @@ from utils.common import round_and_remove_zero
 from apps.entry.models import Figure
 from apps.event.models import Crisis
 from .models import (
+    GiddEvent,
+    GiddFigure,
     StatusLog,
     DisasterLegacy,
     ConflictLegacy,
@@ -23,6 +26,7 @@ from .models import (
     DisplacementData,
     IdpsSaddEstimate,
 )
+from apps.event.models import Event
 from apps.country.models import Country
 from apps.report.models import Report
 from apps.common.utils import extract_event_code_data_list
@@ -479,6 +483,150 @@ def update_idps_sadd_estimates_country_names():
         obj.save()
 
 
+def update_gidd_event_and_gidd_figure_data():
+    # Update GIDD event and figure data
+    map_event_to_gidd_event = {
+        item['event_id']: item['id'] for item in GiddEvent.objects.values('event_id', 'id')
+    }
+
+    for year in get_gidd_years():
+        event_queryset = Event.objects.filter(
+            start_date=datetime.datetime(year=year, month=1, day=1),
+            end_date=datetime.datetime(year=year, month=12, day=31),
+        ).values(
+            'name',
+            'event_type',
+            'start_date',
+            'start_date_accuracy',
+            'end_date',
+            'end_date_accuracy',
+            'violence',
+            'violence_sub_type',
+            'disaster_category',
+            'disaster_sub_category',
+            'disaster_type',
+            'disaster_sub_type',
+            'disaster_category__name',
+            'disaster_sub_category__name',
+            'disaster_type__name',
+            'disaster_sub_type__name',
+            'other_event_sub_type',
+            'other_event_sub_type_name',
+            'country',
+            'country__iso3',
+            'country__idmc_short_name',
+            'event_codes',
+        )
+
+        # Create new Gidd Event
+        GiddEvent.objects.bulk_create(
+            [
+                GiddEvent(
+                    event_id=item['id'],
+                    name=item['name'],
+                    cause=item['event_type'],
+
+                    start_date=item['start_date'],
+                    start_date_accuracy=item['start_date_accuracy'],
+                    end_date=item['end_date'],
+                    end_date_accuracy=item['end_date_accuracy'],
+
+                    violence=item['violence'],
+                    violence_sub_type=item['violence_sub_type'],
+
+                    hazard_category_id=item['disaster_category'],
+                    hazard_sub_category_id=item['disaster_sub_category'],
+                    hazard_type_id=item['disaster_type'],
+                    hazard_sub_type_id=item['disaster_sub_type'],
+
+                    hazard_category_name=item['disaster_category__name'],
+                    hazard_sub_category_name=item['disaster_sub_category__name'],
+                    hazard_type_name=item['disaster_type__name'],
+                    hazard_sub_type_name=item['disaster_sub_type__name'],
+
+                    other_event_sub_type=item['other_event_sub_type'],
+                    other_event_sub_type_name=item['other_event_sub_type_name'],
+                    glide_numbers=item['glide_numbers'] or list(),
+
+                    country_id=item['country'],
+                    country_name=item['country__idmc_short_name'],
+                    event_codes=get_attr_list_from_event_codes(item['event_codes'], 'code') or [],
+                    event_codes_type=get_attr_list_from_event_codes(item['event_codes'], 'code_type') or [],
+                ) for item in event_queryset
+            ]
+        )
+
+        # Create GiddFigure
+        figure_queryset = Figure.objects.filter(
+            start_date=datetime.datetime(year=year, month=1, day=1),
+            end_date=datetime.datetime(year=year, month=12, day=31),
+        )
+        qs = figure_queryset.annotate(
+            sources=Array(
+                F('source__name'),
+                F('sources__organization_kind__name'),
+                output_field=ArrayField(models.CharField()),
+            ),
+            locations=ArrayAgg(
+                Array(
+                    F('geo_locations__display_name'),
+                    Cast('geo_locations__accuracy', models.CharField()),
+                    Cast('geo_locations__identifier', models.CharField()),
+                    output_field=ArrayField(models.CharField()),
+                ),
+                distinct=True,
+                filter=~Q(
+                    Q(geo_locations__display_name__isnull=True) | Q(geo_locations__display_name='')
+                ),
+            ),
+            geo_location=Array(
+                F('geo_locations__lat'),
+                F('geo_locations__lon'),
+            )
+        ).values(
+            'country',
+            'country__iso3',
+            'country__idmc_short_name',
+            'country__geographical_group__name',
+            'sources',
+            'locations',
+        )
+
+        GiddFigure.objects.bulk_create(
+            [
+                GiddFigure(
+                    iso3=item['country__iso3'],
+                    country_id=item['country'],
+                    gidd_event_id=map_event_to_gidd_event(item['event__id']),
+                    country_name=item['country__idmc_short_name'],
+                    geographoical_region=item['country__geographical_group__name'],
+                    geo_locations=item['geo_location'],
+                    year=year,
+                    unit=item['unit'],
+                    category=item['category'],
+                    cause=item['cause'],
+                    role=item['role'],
+                    total_figures=item['total_figures'],
+                    start_date=item['start_date'],
+                    start_date_accuracy=item['start_date_accuracy'],
+                    end_date=item['end_date'],
+                    end_date_accuracy=item['end_date_accuracy'],
+                    stock_date=item['stock_date'],
+                    stock_date_accuracy=item['stock_date_accuracy'],
+                    stock_reporting_date=item['stock_reporting_date'],
+                    is_housing_destruction='Yes' if item['is_housing_destruction'] else 'No',
+                    include_idu='Yes' if item['include_idu'] else 'No',
+                    excerpt_idu=item['excerpt_idu'],
+                    displacement_occurred=item['displacement_occurred'],
+                    location_names=location_data['location_names'],
+                    locations_accuracy=location_data['location_accuracy'],
+                    locations_type=location_data['location_type_of_points'],
+                ) for item in qs
+                for location_data in [extract_location_data(item['locations'])]
+            ]
+        )
+
+
 @celery_app.task
 def update_gidd_data(log_id):
     # Delete all the conflicts TODO: Find way to update records
@@ -493,6 +641,7 @@ def update_gidd_data(log_id):
         update_public_figure_analysis()
         update_displacement_data()
         update_idps_sadd_estimates_country_names()
+        update_gidd_event_and_gidd_figure_data()
         StatusLog.objects.filter(id=log_id).update(
             status=StatusLog.Status.SUCCESS,
             completed_at=timezone.now()
