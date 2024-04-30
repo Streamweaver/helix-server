@@ -584,20 +584,7 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
         response['Content-Type'] = 'application/octet-stream'
         return response
 
-    @action(
-        detail=False,
-        methods=["get"],
-        url_path="disaggregated-geojson",
-        permission_classes=[AllowAny],
-    )
-    def disaggregated_geojson(self, request):
-        """
-        Export the disaggregated data in geojson format file
-        """
-
-        qs = GiddFigure.objects.all().order_by(
-            '-year',
-        )
+    def export_disaggregated_geojson(qs):
         feature_collection = {
             "type": "FeatureCollection",
             "features": []
@@ -607,7 +594,7 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
             feature = {
                 "type": "Feature",
                 "geometry": {
-                    "type": "Multipoint",
+                    "type": "Point",
                     "coordinates": item['locations_coordinates'],
                 },
                 "properties": {}
@@ -618,6 +605,125 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
         response = HttpResponse(content=feature_collection, content_type='application/json')
         response['Content-Disposition'] = 'attachment; filename="IDMC_Internal_Displacement_Disaggregated.geojson"'
         return response
+
+    def export_disaggregated_excel(qs):
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "1_Disaggregated_data"
+        ws.append([
+            'ID',
+            'ISO3',
+            'Country',
+            'Region',
+            'Geographical region',
+            'Figure cause',
+            'Year',
+            'Figure category',
+            'Figure crle',
+            'Total figure',
+            'Hazard category',
+            'Hazard sub Category',
+            'Hazard type',
+            'Hazard sub type',
+            'Other svent sub type',
+            'Start date',
+            'Start date accuracy',
+            'End date',
+            'End date accuracy',
+            'Stock date',
+            'Stock date accuracy',
+            'Stock reporting date',
+            'Publishers',
+            'Sources',
+            'Sources type',
+            'Event ID',
+            'Event name',
+            'Event cause',
+            'Event main trigger',
+            'Event start date',
+            'Event end date',
+            'Event start date accuracy',
+            'Event end date accuracy',
+            'Is housing destruction',
+            'Include in IDU',
+            'Excerpt IDU',
+            'Violence type',
+            'Event codes (Code:Type)',
+            'Location name',
+            'Location accuracy',
+            'Location type',
+            'Displacement occurred'
+        ])
+        for item in qs:
+            ws.append([
+                item.id,
+                item.iso3,
+                item.country_name,
+                item.region,
+                item.geographical_region,
+                item.figure_cause,
+                item.year,
+                item.figure_category,
+                item.figure_crle,
+                item.total_figure,
+                item.hazard_category,
+                item.hazard_sub_category,
+                item.hazard_type,
+                item.hazard_sub_type,
+                item.other_svent_sub_type,
+                item.start_date,
+                item.start_date_accuracy,
+                item.end_date,
+                item.end_date_accuracy,
+                item.stock_date,
+                item.stock_date_accuracy,
+                item.stock_reporting_date,
+                item.publishers,
+                item.sources,
+                item.sources_type,
+                item.event_id,
+                item.event_name,
+                item.event_cause,
+                item.event_main_trigger,
+                item.event_start_date,
+                item.event_end_date,
+                item.event_start_date_accuracy,
+                item.event_end_date_accuracy,
+                item.is_housing_destruction,
+                item.include_in_idu,
+                item.excerpt_idu,
+                item.violence_type,
+                EXTERNAL_ARRAY_SEPARATOR.join(
+                    [f"{key}{EXTERNAL_FIELD_SEPARATOR}{value}" for key, value in zip(
+                        item.event_codes,
+                        item.event_codes_type
+                    )]
+                ),
+                item.location_name,
+                item.location_accuracy,
+                item.location_type,
+                item.displacement_occurred,
+            ])
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="export-disaggregated",
+        permission_classes=[AllowAny],
+    )
+    def disaggregated_geojson(self, request):
+        """
+        Export the disaggregated data in geojson format file
+        """
+        # @TODO
+        qs = GiddFigure.objects.all().order_by(
+            '-year',
+        )
+        type = request.GET.get('export_type')
+        if type == 'geojson':
+            return self.export_disaggregated_geojson(qs)
+        elif type == 'excel':
+            return self.export_disaggregated_excel(qs)
 
 
 class PublicFigureAnalysisViewSet(ListOnlyViewSetMixin):

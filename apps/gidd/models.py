@@ -315,13 +315,9 @@ class IdpsSaddEstimate(models.Model):
 
 class GiddEvent(models.Model):
     name = models.CharField(verbose_name=_('Event Name'), max_length=256)
-    country = models.ForeignKey(
-        'country.Country', related_name='gidd_events_country', on_delete=models.PROTECT,
-        verbose_name=_('Country')
-    )
     event = models.ForeignKey(
         'event.Event', verbose_name=_('Event'),
-        related_name='gidd_event', on_delete=models.SET_NULL, null=True, blank=True
+        related_name='+', on_delete=models.SET_NULL, null=True, blank=True
     )
     cause = enum.EnumField(Crisis.CRISIS_TYPE, verbose_name=_('Cause'))
     # Dates
@@ -351,40 +347,40 @@ class GiddEvent(models.Model):
     violence = models.ForeignKey(
         'event.Violence', verbose_name=_('Figure Violence'),
         blank=False, null=True,
-        related_name='gidd_figures', on_delete=models.SET_NULL
+        related_name='+', on_delete=models.SET_NULL
     )
     violence_sub_type = models.ForeignKey(
         'event.ViolenceSubType', verbose_name=_('Figure Violence Sub Type'),
         blank=True, null=True,
-        related_name='gidd_figures', on_delete=models.SET_NULL
+        related_name='+', on_delete=models.SET_NULL
     )
     hazard_category = models.ForeignKey(
         'event.DisasterCategory', verbose_name=_('Figure Hazard Category'),
         blank=True, null=True,
-        related_name='gidd_figures', on_delete=models.SET_NULL
+        related_name='+', on_delete=models.SET_NULL
     )
     hazard_sub_category = models.ForeignKey(
         'event.DisasterSubCategory', verbose_name=_('Figure Hazard Sub Category'),
         blank=True, null=True,
-        related_name='gidd_figures', on_delete=models.SET_NULL
+        related_name='+', on_delete=models.SET_NULL
     )
     hazard_type = models.ForeignKey(
         'event.DisasterType', verbose_name=_('Figure Hazard Type'),
         blank=True, null=True,
-        related_name='gidd_figures', on_delete=models.SET_NULL
+        related_name='+', on_delete=models.SET_NULL
     )
     hazard_sub_type = models.ForeignKey(
         'event.DisasterSubType', verbose_name=_('Figure Hazard Sub Type'),
         blank=True, null=True,
-        related_name='gidd_figures', on_delete=models.SET_NULL
+        related_name='+', on_delete=models.SET_NULL
     )
     other_event_sub_type = models.ForeignKey(
         'event.OtherSubType', verbose_name=_('Other sub type'),
         blank=True, null=True,
-        related_name='gidd_figures', on_delete=models.SET_NULL)
+        related_name='+', on_delete=models.SET_NULL)
     osv_sub_type = models.ForeignKey(
         'event.OsvSubType', verbose_name=_('Figure OSV sub type'),
-        blank=True, null=True, related_name='gidd_figures',
+        blank=True, null=True, related_name='+',
         on_delete=models.SET_NULL
     )
     # Timestamps
@@ -445,8 +441,8 @@ class GiddFigure(models.Model):
         default=list,
     )
     gidd_event = models.ForeignKey(
-        GiddEvent, verbose_name=_('Event'),
-        related_name='gidd_figures', on_delete=models.SET_NULL, null=True, blank=True
+        'gidd.GiddEvent', verbose_name=_('GIDD Event'),
+        related_name='gidd_figures', on_delete=models.PROTECT
     )
     is_housing_destruction = models.BooleanField(verbose_name=_('Is Housing Destruction'), default=False)
     include_idu = models.BooleanField(verbose_name=_('Include in IDU'))
