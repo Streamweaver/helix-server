@@ -169,8 +169,6 @@ class Command(BaseCommand):
         bulk_mgr = BulkUpdateManager(['household_size', 'total_figures'], chunk_size=1000)
         figures = Figure.objects.filter(
             unit=Figure.UNIT.HOUSEHOLD,
-            # FIXME: We need to update figures for both triangulation and recommended figures
-            role=Figure.ROLE.TRIANGULATION,
             # Year can be calculated from the end_date (for both flow and stock figures)
             end_date__year=2024
         )
