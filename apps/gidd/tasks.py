@@ -249,6 +249,11 @@ def update_conflict_and_disaster_data():
                 distinct=True,
                 filter=models.Q(event__event_code__country__id=F('country__id')),
             ),
+            _displacement_occurred=ArrayAgg(
+                F('displacement_occurred'),
+                distinct=True,
+                filter=Q(displacement_occurred__isnull=False),
+            ),
         ).filter(
             year__gte=2016,
         )
@@ -286,6 +291,7 @@ def update_conflict_and_disaster_data():
                     iso3=item['country__iso3'],
                     country_id=item['country'],
                     country_name=item['country__idmc_short_name'],
+                    displacement_occurred=item['_displacement_occurred'] or [],
                     event_codes=event_code['code'],
                     event_codes_type=event_code['code_type']
                 )

@@ -90,6 +90,14 @@ class Disaster(models.Model):
     hazard_sub_type_name = models.CharField(max_length=256, blank=True)
     hazard_type_name = models.CharField(max_length=256, blank=True)
 
+    displacement_occurred = ArrayField(
+        base_field=enum.EnumField(
+            Figure.DISPLACEMENT_OCCURRED,
+            verbose_name=_('Displacement occurred'),
+        ),
+        default=list,
+    )
+
     # Deprecated
     glide_numbers = ArrayField(
         models.CharField(

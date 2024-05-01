@@ -1,3 +1,4 @@
+import typing
 from datetime import datetime
 from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
@@ -11,6 +12,7 @@ from rest_framework import mixins
 from drf_spectacular.utils import extend_schema
 
 from apps.country.models import Country
+from apps.entry.models import Figure
 from apps.common.utils import EXTERNAL_ARRAY_SEPARATOR, EXTERNAL_FIELD_SEPARATOR
 
 from .models import (
@@ -85,6 +87,13 @@ class DisasterViewSet(ListOnlyViewSetMixin):
         )
         return Disaster.objects.select_related('country')
 
+    def get_displacement_status(self, displacement_occurred: typing.List[int]) -> str:
+        if not displacement_occurred:
+            return ""
+        elif Figure.DISPLACEMENT_OCCURRED.BEFORE.value in displacement_occurred:
+            return "Displacement reporting preventive evacuations"
+        return "Displacement without preventive evacuations reported"
+
     @extend_schema(responses=DisasterSerializer(many=True))
     @action(
         detail=False,
@@ -112,6 +121,8 @@ class DisasterViewSet(ListOnlyViewSetMixin):
             'Hazard Type',
             'Hazard Sub Type',
             'Event Codes (Code:Type)',
+            'Event ID',
+            'Displacement occurred',
         ])
 
         for disaster in qs:
@@ -137,6 +148,8 @@ class DisasterViewSet(ListOnlyViewSetMixin):
                     ) or EXTERNAL_ARRAY_SEPARATOR.join(
                         [f"{key}{EXTERNAL_FIELD_SEPARATOR}Glide Number" for key in disaster.glide_numbers]
                     ),
+                    disaster.event_id,
+                    self.get_displacement_status(disaster.displacement_occurred),
                 ]
             )
 
