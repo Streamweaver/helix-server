@@ -35,7 +35,7 @@ class Command(BaseCommand):
         parser.add_argument('csv_file_path', type=str, help="Path to the CSV file containing the data.")
 
     @cached_property
-    def household_sizes(self) -> CaseInsensitiveDict:
+    def iso3_to_household_sizes_for_2024(self) -> CaseInsensitiveDict:
         """
         Retrieves active household sizes for the year 2024, mapped by their respective countries.
         Returns:
@@ -45,7 +45,7 @@ class Command(BaseCommand):
         return CaseInsensitiveDict({size.country.iso3: size for size in household_sizes})
 
     @cached_property
-    def iso3_to_country_id(self) -> typing.Dict[str, int]:
+    def iso3_to_country_id(self) -> CaseInsensitiveDict:
         """
         Map ISO3 country codes to Country objects.
         Returns:
@@ -58,29 +58,60 @@ class Command(BaseCommand):
         })
 
     @cached_property
-    def created_by(self) -> User:
-        # XXX: Are we sure about this?
+    def admin_user(self) -> User:
+        # NOTE: allochi is the OG admin user
         return User.objects.get(email='allochi@gmail.com')
 
-    @transaction.atomic()
-    def handle(self, *args, **kwargs):
-        """
-        Entry point for processing the CSV file to update Household Size.
-        """
-        csv_file_path = kwargs['csv_file_path']
-        if not os.path.exists(csv_file_path):
-            logger.error(f"CSV file path does not exist: {csv_file_path}")
-            return
-        try:
-            self.process_file(csv_file_path)
-            self.update_figures()
-            logger.info("2024 AHHS data updated successfully.")
-        except FileNotFoundError:
-            logger.error(f"CSV file at {csv_file_path} not found.")
-        except Exception:
-            logger.error("Failed to update 2024 AHHS data:", exc_info=True)
+    def create_household_size(self, validated_data: typing.List[dict]):
+        for item in validated_data:
+            new_ahhs = HouseholdSize.objects.create(
+                **item,
+            )
+            # NOTE: Because of this we haven't used bulk_create
+            HouseholdSize.objects.filter(pk=new_ahhs.pk).update(
+                created_at=item['created_at'],
+                modified_at=item['modified_at'],
+            )
+        logger.info(f"Processed {len(validated_data)} new entries.")
 
-    def process_file(self, file_path):
+    def process_household_size_row(self, row: dict) -> typing.Optional[dict]:
+        """
+        Convert a CSV row into a dictionary suitable for serialization.
+        Args:
+            row (Dict[str, str]): The row from CSV file.
+        Returns:
+            Dict[str, any]: The processed row with country ID.
+        """
+        country_id = None
+        if iso3 := row.get('ISO3'):
+            country_id = self.iso3_to_country_id.get(iso3)
+
+        extract_data = {
+            'size': row['AHHS'],
+            'data_source_category': row['Data source category'],
+            'source': row['Source'],
+            'source_link': row['Source link'],
+        }
+        if not all(extract_data.values()):
+            logger.warning(f'Skipping due to empty dataset: {row}')
+            return
+
+        created_at = format_date(row['Reference date'])
+        modified_at = format_date(row['IDMC update date']) or created_at
+        return {
+            # Data from csv
+            **extract_data,
+            'country': country_id,
+            'year': row['Year'],
+            'notes': row['Notes'],
+            # Additional metadata
+            'created_by': self.admin_user,
+            'created_at': created_at,
+            'modified_at': modified_at,
+            'is_active': True,
+        }
+
+    def updates_household_sizes_from_csv(self, file_path):
         """
         Processes the CSV file and updates the database.
         """
@@ -90,7 +121,7 @@ class Command(BaseCommand):
             total = 0
             for row in reader:
                 total += 1
-                if processed_row := self.process_row(row):
+                if processed_row := self.process_household_size_row(row):
                     processed_rows.append(processed_row)
             self.stdout.write(self.style.NOTICE(f"Processed {len(processed_rows)} out of {total}"))
             serializer = HouseholdSizeSerializer(data=processed_rows, many=True)
@@ -116,7 +147,7 @@ class Command(BaseCommand):
             figure (Figure): The figure object to update.
         """
         logger.debug(f"Updating figure with new household size for {figure.country.iso3}")
-        new_household_size = self.household_sizes.get(figure.country.iso3)
+        new_household_size = self.iso3_to_household_sizes_for_2024.get(figure.country.iso3)
         if new_household_size is None:
             logger.error(f"No household size found for country {figure.country.iso3}")
             return
@@ -127,15 +158,17 @@ class Command(BaseCommand):
             figure.total_figures = round_half_up(figure.reported * Decimal(str(figure.household_size)))
             bulk_mgr.add(figure)
 
-    def update_figures(self):
-        # Clear out household_sizes
-        if hasattr(self, 'household_sizes'):
-            del self.household_sizes
+    def update_figures_for_2024(self):
+        if hasattr(self, 'iso3_to_household_sizes_for_2024'):
+            # Clear out household_sizes cache before updating the figures
+            del self.iso3_to_household_sizes_for_2024
 
         bulk_mgr = BulkUpdateManager(['household_size', 'total_figures'], chunk_size=1000)
         figures = Figure.objects.filter(
             unit=Figure.UNIT.HOUSEHOLD,
+            # FIXME: We need to update figures for both triangulation and recommended figures
             role=Figure.ROLE.TRIANGULATION,
+            # Year can be calculated from the end_date (for both flow and stock figures)
             end_date__year=2024
         )
         for figure in figures:
@@ -144,51 +177,21 @@ class Command(BaseCommand):
         bulk_mgr.done()
         self.stdout.write(self.style.SUCCESS(f'Bulk update summary: {bulk_mgr.summary()}'))
 
-    def process_row(self, row: dict) -> typing.Optional[dict]:
+    @transaction.atomic()
+    def handle(self, *args, **kwargs):
         """
-        Convert a CSV row into a dictionary suitable for serialization.
-        Args:
-            row (Dict[str, str]): The row from CSV file.
-        Returns:
-            Dict[str, any]: The processed row with country ID.
+        Entry point for processing the CSV file to update Household Size.
         """
-        country_id = None
-        if iso3 := row.get('ISO3'):
-            country_id = self.iso3_to_country_id.get(iso3)
-
-        # TODO: Check which fields we absolutely need
-        extract_data = {
-            'size': row['AHHS'],
-            'data_source_category': row['Data source category'],
-            'source': row['Source'],
-            'source_link': row['Source link'],
-        }
-        if not all(extract_data.values()):
-            logger.warning(f'Skipping due to empty dataset: {extract_data}')
+        csv_file_path = kwargs['csv_file_path']
+        if not os.path.exists(csv_file_path):
+            logger.error(f"CSV file path does not exist: {csv_file_path}")
             return
+        try:
+            self.updates_household_sizes_from_csv(csv_file_path)
+            self.update_figures_for_2024()
+            logger.info("2024 AHHS data updated successfully.")
+        except FileNotFoundError:
+            logger.error(f"CSV file at {csv_file_path} not found.")
+        except Exception:
+            logger.error("Failed to update 2024 AHHS data:", exc_info=True)
 
-        created_at = format_date(row['Reference date'])
-        return {
-            # Data from csv
-            **extract_data,
-            'country': country_id,
-            'year': row['Year'],
-            'notes': row['Notes'],
-            # Additional metadata
-            'created_by': self.created_by,
-            'created_at': created_at,
-            'modified_at': format_date(row['IDMC update date']) or created_at,
-            'is_active': True,
-        }
-
-    def create_household_size(self, validated_data: typing.List[dict]):
-        for item in validated_data:
-            new_ahhs = HouseholdSize.objects.create(
-                **item,
-            )
-            # NOTE: Because of this we haven't used bulk_create
-            HouseholdSize.objects.filter(pk=new_ahhs.pk).update(
-                created_at=item['created_at'],
-                modified_at=item['modified_at'],
-            )
-        logger.info(f"Processed {len(validated_data)} new entries.")
