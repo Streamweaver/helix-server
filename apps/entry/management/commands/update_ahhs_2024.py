@@ -11,9 +11,10 @@ from django.db import transaction
 from requests.structures import CaseInsensitiveDict
 
 from apps.country.models import Country, HouseholdSize
-from apps.country.serializers import HouseholdSizeSerializer
+from apps.country.serializers import HouseholdSizeCliImportSerializer
 from apps.entry.models import Figure
 from apps.users.models import User
+from apps.users.utils import HelixInternalBot
 from helix.managers import BulkUpdateManager
 from utils.common import round_half_up
 
@@ -59,8 +60,7 @@ class Command(BaseCommand):
 
     @cached_property
     def admin_user(self) -> User:
-        # NOTE: allochi is the OG admin user
-        return User.objects.get(email='allochi@gmail.com')
+        return HelixInternalBot().user
 
     def create_household_size(self, validated_data: typing.List[dict]):
         for item in validated_data:
@@ -70,6 +70,7 @@ class Command(BaseCommand):
             # NOTE: Because of this we haven't used bulk_create
             HouseholdSize.objects.filter(pk=new_ahhs.pk).update(
                 created_at=item['created_at'],
+                last_modified_by=item['last_modified_by'],
                 modified_at=item['modified_at'],
             )
         logger.info(f"Processed {len(validated_data)} new entries.")
@@ -105,7 +106,8 @@ class Command(BaseCommand):
             'year': row['Year'],
             'notes': row['Notes'],
             # Additional metadata
-            'created_by': self.admin_user,
+            'created_by': self.admin_user.pk,
+            'last_modified_by': self.admin_user.pk,
             'created_at': created_at,
             'modified_at': modified_at,
             'is_active': True,
@@ -124,7 +126,8 @@ class Command(BaseCommand):
                 if processed_row := self.process_household_size_row(row):
                     processed_rows.append(processed_row)
             self.stdout.write(self.style.NOTICE(f"Processed {len(processed_rows)} out of {total}"))
-            serializer = HouseholdSizeSerializer(data=processed_rows, many=True)
+
+            serializer = HouseholdSizeCliImportSerializer(data=processed_rows, many=True)
             if serializer.is_valid():
                 self.create_household_size(serializer.validated_data)
             else:

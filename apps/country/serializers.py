@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from apps.users.models import User
 from apps.contrib.serializers import MetaInformationSerializerMixin
 from apps.country.models import Summary, ContextualAnalysis, HouseholdSize
 
@@ -16,9 +17,11 @@ class ContextualAnalysisSerializer(MetaInformationSerializerMixin, serializers.M
         fields = '__all__'
 
 
-class HouseholdSizeSerializer(MetaInformationSerializerMixin, serializers.ModelSerializer):
+class HouseholdSizeCliImportSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField()
     modified_at = serializers.DateTimeField()
+    created_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    last_modified_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
     class Meta:
         model = HouseholdSize
