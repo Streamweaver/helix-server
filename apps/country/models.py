@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django_enumfield import enum
 
-from apps.contrib.models import MetaInformationArchiveAbstractModel, ArchiveAbstractModel
+from apps.contrib.models import MetaInformationArchiveAbstractModel, ArchiveAbstractModel, MetaInformationAbstractModel
 from apps.entry.models import Entry, Figure
 from apps.crisis.models import Crisis
 from apps.users.models import User, Portfolio
@@ -489,7 +489,7 @@ class Summary(MetaInformationArchiveAbstractModel, models.Model):
     summary = models.TextField(verbose_name=_('Summary'), blank=False)
 
 
-class HouseholdSize(ArchiveAbstractModel):
+class HouseholdSize(ArchiveAbstractModel, MetaInformationAbstractModel):
     country = models.ForeignKey('Country',
                                 related_name='household_sizes', on_delete=models.CASCADE)
     year = models.PositiveSmallIntegerField(verbose_name=_('Year'))
@@ -497,10 +497,16 @@ class HouseholdSize(ArchiveAbstractModel):
                              validators=[
                                  MinValueValidator(0, message="Should be positive")])
 
-    country_id: int
+    data_source_category = models.CharField(verbose_name=_('Data Source Category'), max_length=255)
+    source = models.CharField(verbose_name=_('Source'), max_length=255)
+    source_link = models.CharField(verbose_name=_('Source Link'), max_length=255)
+    notes = models.TextField(verbose_name=_('Notes'), blank=True, null=True)
+    is_active = models.BooleanField(
+        verbose_name=_('Is active?'),
+        default=False
+    )
 
-    class Meta:
-        unique_together = (('country', 'year'),)
+    country_id: int
 
     def __str__(self):
         return f'PK:{self.pk}-Country-ID:{self.country_id}-Year:{self.year}'
