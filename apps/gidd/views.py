@@ -351,8 +351,10 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
             'Figures rounded',
         ])
         pfa_qs = PublicFigureAnalysisFilterSet(
-            data=self.request.query_params, queryset=PublicFigureAnalysis.objects.all()
-        ).qs
+            data=self.request.query_params,
+            queryset=PublicFigureAnalysis.objects.all()
+        ).qs.order_by('iso3', 'year')
+        # FIXME: sort this and filter this
         for item in pfa_qs:
             ws2.append([
                 item.iso3,
@@ -378,8 +380,9 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
             '60+',
         ])
         idps_sadd_qs = IdpsSaddEstimateFilter(
-            data=self.request.query_params, queryset=IdpsSaddEstimate.objects.all()
-        ).qs
+            data=self.request.query_params,
+            queryset=IdpsSaddEstimate.objects.all(),
+        ).qs.order_by('iso3', 'year')
         for item in idps_sadd_qs:
             ws3.append([
                 item.iso3,
