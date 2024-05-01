@@ -270,6 +270,7 @@ class Query:
 
     def resolve_household_size(root, info, country, year):
         try:
-            return HouseholdSize.objects.get(country=country, year=year)
+            # TODO: Update this query to support dynamic filtering of HouseholdSize in the future
+            return HouseholdSize.objects.filter(country=country, year=year, is_active=True).order_by('modified_at').first()
         except HouseholdSize.DoesNotExist:
             return None

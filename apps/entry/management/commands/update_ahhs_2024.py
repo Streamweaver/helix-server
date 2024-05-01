@@ -194,4 +194,3 @@ class Command(BaseCommand):
             logger.error(f"CSV file at {csv_file_path} not found.")
         except Exception:
             logger.error("Failed to update 2024 AHHS data:", exc_info=True)
-
