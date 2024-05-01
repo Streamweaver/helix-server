@@ -331,6 +331,7 @@ def update_public_figure_analysis():
             return report_country_aggregation['total_flow_disaster']
 
     # FIXME: only update the gidd_published_date when the report is stale
+    # FIXME: gidd_published_date update looks redundant
     Report.objects.filter(
         is_gidd_report=True,
     ).update(gidd_published_date=timezone.now())

@@ -340,8 +340,34 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
         else:
             self.export_displacements(ws, qs)
         # Tab 2
-        ws2 = wb.create_sheet('2_IDPs_SADD_estimates')
+        ws2 = wb.create_sheet('2_Context_Displacement_data')
         ws2.append([
+            'ISO3',
+            'Year',
+            'Figure cause',
+            'Figure category',
+            'Description',
+            'Figures',
+            'Figures rounded',
+        ])
+        pfa_qs = PublicFigureAnalysisFilterSet(
+            data=self.request.query_params,
+            queryset=PublicFigureAnalysis.objects.all()
+        ).qs.order_by('iso3', 'year')
+        # FIXME: sort this and filter this
+        for item in pfa_qs:
+            ws2.append([
+                item.iso3,
+                item.year,
+                item.figure_cause.label,
+                item.figure_category.label,
+                item.description,
+                item.figures,
+                item.figures_rounded,
+            ])
+        # Tab 3
+        ws3 = wb.create_sheet('3_IDPs_SADD_estimates')
+        ws3.append([
             'ISO3',
             'Country',
             'Year',
@@ -354,10 +380,11 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
             '60+',
         ])
         idps_sadd_qs = IdpsSaddEstimateFilter(
-            data=self.request.query_params, queryset=IdpsSaddEstimate.objects.all()
-        ).qs
+            data=self.request.query_params,
+            queryset=IdpsSaddEstimate.objects.all(),
+        ).qs.order_by('iso3', 'year')
         for item in idps_sadd_qs:
-            ws2.append([
+            ws3.append([
                 item.iso3,
                 item.country_name,
                 item.year,
@@ -369,8 +396,8 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
                 item.eighteen_to_fiftynine,
                 item.sixty_plus,
             ])
-        # Tab 3
-        ws3 = wb.create_sheet('README')
+        # Tab 4
+        ws4 = wb.create_sheet('README')
         readme_text = [
             ['Title: Global Internal Displacement Database (GIDD)'],
             ['File name: IDMC_Internal_Displacement_Conflict-Violence_Disasters'],
@@ -433,7 +460,7 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
         ]
 
         for item in readme_text:
-            ws3.append(item)
+            ws4.append(item)
 
         table = [
             ['Country', 'Year', 'Displacement category'],
@@ -451,12 +478,12 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
             ['South Africa', '2020', 'Internal Displacements'],
         ]
         for item in table:
-            ws3.append(item)
+            ws4.append(item)
 
-        ws3.append([])
-        ws3.append([])
+        ws4.append([])
+        ws4.append([])
 
-        ws3.append([
+        ws4.append([
             '− As part of a methodological revision and our ongoing commitment to providing '
             'the most accurate and reliable information on internal displacement, IDMC is '
             'pleased to announce the publication of IDP total figures and Internal '
@@ -465,7 +492,7 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
             'to ensure the highest standards of quality.'
 
         ])
-        ws3.append([])
+        ws4.append([])
 
         table2 = [
             ['Country', 'Year', 'Displacement category'],
@@ -480,18 +507,18 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
         ]
 
         for item in table2:
-            ws3.append(item)
+            ws4.append(item)
 
-        ws3.append([])
-        ws3.append([
+        ws4.append([])
+        ws4.append([
             '− As part of a methodological revision some figures published may differ from '
             'previous publications due to retroactive changes or the inclusion of previously '
             'unavailable data. We encourage our data users to refer to the latest version of '
             'our publications for the most up-to-date information.'
         ])
-        ws3.append([])
-        ws3.append(['1_ Displacement data (Tab table description):'])
-        ws3.append([])
+        ws4.append([])
+        ws4.append(['1_ Displacement data (Tab table description):'])
+        ws4.append([])
         readme_text_2 = [
             ['Where (raw) means “not rounded”.'],
             ['ISO3: ISO 3166-1 alpha-3. The ISO3 “AB9” was assigned to the Abyei Area'],
@@ -534,10 +561,10 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
                 'the end of the reporting year.'
             ],
         ]
-        ws3.append([])
+        ws4.append([])
         for item in readme_text_2:
-            ws3.append(item)
-        ws3.append([])
+            ws4.append(item)
+        ws4.append([])
 
         readme_text3 = [
             ['ISO3: ISO 3166-1 alpha-3. The ISO3 “AB9” was assigned to the Abyei Area'],
@@ -550,21 +577,21 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
                 '12-14, 12-16, 15-17, 15-24, 25-64, 65+'
             ],
         ]
-        ws3.append([])
-        ws3.append([
+        ws4.append([])
+        ws4.append([
             '2_IDPs_SADD_estimates (Tab table description):'
         ])
-        ws3.append([])
+        ws4.append([])
         for item in readme_text3:
-            ws3.append(item)
-        ws3.append([])
+            ws4.append(item)
+        ws4.append([])
 
-        ws3.append([])
-        ws3.append([
+        ws4.append([])
+        ws4.append([
             'Disaggregating IDMC’s IDP Figures by Sex and Age methodological notes:'
         ])
-        ws3.append([])
-        ws3.append([
+        ws4.append([])
+        ws4.append([
             'Sex and Age Disaggregated Data (SADD) for displacement associated with conflict or '
             'disasters is often scarce. One way to estimate it is to use SADD available at the national '
             'level. IDMC employs United Nations Population Estimates and Projections to break down the '

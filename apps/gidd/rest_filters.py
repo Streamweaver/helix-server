@@ -101,21 +101,13 @@ class IdpsSaddEstimateFilter(ReleaseMetadataFilter):
 
 
 class PublicFigureAnalysisFilterSet(ReleaseMetadataFilter):
-    start_year = django_filters.NumberFilter(field_name='start_year', method='filter_start_year')
-    end_year = django_filters.NumberFilter(field_name='end_year', method='filter_end_year')
     cause = django_filters.CharFilter(method='filter_cause')
 
     class Meta:
         model = PublicFigureAnalysis
         fields = {
-            'iso3': ['in'],
+            'iso3': ['iexact'],
         }
-
-    def filter_start_year(self, queryset, name, value):
-        return queryset.filter(year__gte=value)
-
-    def filter_end_year(self, queryset, name, value):
-        return queryset.filter(year__lte=value)
 
     def filter_cause(self, queryset, name, value):
         # NOTE: this filter is used inside displacement export
