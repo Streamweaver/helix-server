@@ -594,18 +594,11 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
         return response
 
 
-class DisaggregationViewSet(ListOnlyViewSetMixin):
+@client_id
+class DisaggregationViewSet(viewsets.GenericViewSet):
     serializer_class = DisaggregationSerializer
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter)
     filterset_class = DisaggregationFilterst
-
-    def get_queryset(self):
-        track_gidd(
-            self.request.GET.get('client_id'),
-            ExternalApiDump.ExternalApiType.GIDD_DISAGGREGATION_REST,
-            viewset=self,
-        )
-        return GiddFigure.objects.all()
 
     def _get_term(self, term):
         return Figure.FIGURE_TERMS.get(term).name if term else None

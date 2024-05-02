@@ -1551,7 +1551,6 @@ class ExternalApiDump(models.Model):
         GIDD_PUBLIC_FIGURE_ANALYSIS_REST = 'gidd-public-figure-analysis-rest', _(
             '/external-api/gidd/public-figure-analyses/'
         )
-        GIDD_DISAGGREGATION_REST = 'gidd-disaggregation-rest', _('/external-api/gidd/disaggregations/')
         GIDD_DISAGGREGATION_EXPORT_GEOJSON = 'gidd-disaggregation-export-geojson-rest', _(
             '/external-api/gidd/disaggregations/disaggregated-geojson/'
         )
@@ -1792,16 +1791,6 @@ class ExternalApiDump(models.Model):
             ),
             description='',
             example_request='',
-        ),
-        ExternalApiType.GIDD_DISAGGREGATION_REST: Metadata(
-            response_type='REST - JSON',
-            usage='External',
-            description='Disaggregated data',
-            example_request=(
-                lambda request, client_code: request.build_absolute_uri(
-                    ExternalApiDump.ExternalApiType.GIDD_DISAGGREGATION_REST.label + f'?client_id={client_code}'
-                )
-            ),
         ),
         ExternalApiType.GIDD_DISAGGREGATION_EXPORT_GEOJSON: Metadata(
             response_type='REST - GeoJSON',
