@@ -19,8 +19,8 @@ from django.db.models import (
 
 from apps.country.models import Country
 from apps.entry.models import ExternalApiDump, Figure
-from apps.common.utils import EXTERNAL_ARRAY_SEPARATOR, EXTERNAL_FIELD_SEPARATOR, extract_publisher_data_as_string, \
-    format_event_codes_as_string, format_locations_as_string, extract_source_data_as_string
+from apps.common.utils import EXTERNAL_ARRAY_SEPARATOR, EXTERNAL_FIELD_SEPARATOR, \
+    format_event_codes_as_string, extract_source_data_as_string
 from apps.crisis.models import Crisis
 
 from .models import (
@@ -96,7 +96,8 @@ class DisasterViewSet(ListOnlyViewSetMixin):
         )
         return Disaster.objects.select_related('country')
 
-    def get_displacement_status(self, displacement_occurred: typing.List[int]) -> str:
+    @staticmethod
+    def get_displacement_status(displacement_occurred: typing.List[int]) -> str:
         if not displacement_occurred:
             return ""
         elif Figure.DISPLACEMENT_OCCURRED.BEFORE.value in displacement_occurred:
@@ -615,10 +616,15 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
     def _get_cause(self, cause):
         return Crisis.CRISIS_TYPE.get(cause).name if cause else None
 
-    def _get_displacement_occurred(self, displacement_occurred):
-        return Figure.DISPLACEMENT_OCCURRED.get(displacement_occurred).name if displacement_occurred else None
+    def _get_displacement_occurred(self, displacement_occurred) -> str:
+        if displacement_occurred:
+            return DisasterViewSet.get_displacement_status([displacement_occurred])
+        return ""
 
-    def export_disaggregated_geojson(self, qs):
+    def _get_unit(self, unit):
+        return Figure.UNIT.get(unit).name if unit else None
+
+    def _export_disaggregated_geojson(self, qs):
 
         def format_coordinate(coordinate: str) -> typing.Tuple[float, float]:
             lat, lng = coordinate.split(', ')
@@ -633,7 +639,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             event_main_trigger=Case(
                 When(
                     gidd_event__cause=Crisis.CRISIS_TYPE.CONFLICT,
-                    then=F('gidd_event__violence_sub_type__name')
+                    then=F('gidd_event__violence__name')
                 ),
                 When(
                     gidd_event__cause=Crisis.CRISIS_TYPE.DISASTER,
@@ -667,7 +673,8 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     "Year": item.year,
                     "Figure category": self._get_category(item.category),
                     "Figure term": self._get_term(item.term),
-                    "Total figure": item.total_figures,
+                    "Figure unit": self._get_unit(item.unit),
+                    "Total figures": item.total_figures,
                     "Household size": item.household_size,
                     "Reported figures": item.reported,
                     "Hazard category": item.gidd_event.hazard_category_name,
@@ -708,7 +715,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         response['Content-Disposition'] = 'attachment; filename="IDMC_Internal_Displacement_Disaggregated.geojson"'
         return response
 
-    def export_disaggregated_excel(self, qs):
+    def _export_disaggregated_excel(self, qs):
         wb = Workbook()
         ws = wb.active
         ws.title = "1_Disaggregated_Data"
@@ -721,7 +728,10 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             'Year',
             'Figure category',
             'Figure term',
-            'Total figure',
+            'Figure unit',
+            'Total figures',
+            'Reported figures'
+            'Household size',
             'Hazard category'
             'Hazard sub cateogry',
             'Hazard type',
@@ -759,7 +769,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             event_main_trigger=Case(
                 When(
                     gidd_event__cause=Crisis.CRISIS_TYPE.CONFLICT,
-                    then=F('gidd_event__violence_sub_type__name')
+                    then=F('gidd_event__violence__name')
                 ),
                 When(
                     gidd_event__cause=Crisis.CRISIS_TYPE.DISASTER,
@@ -782,6 +792,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 item.year,
                 self._get_category(item.category),
                 self._get_term(item.term),
+                self._get_unit(item.unit),
                 item.total_figures,
                 item.gidd_event.hazard_category_name,
                 item.gidd_event.hazard_sub_category_name,
@@ -795,7 +806,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 item.stock_date,
                 item.stock_date_accuracy,
                 item.stock_reporting_date,
-                extract_publisher_data_as_string(item.publishers),
+                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.publishers if i is not None]),
                 extract_source_data_as_string(item.sources),
                 extract_source_data_as_string(item.sources_type),
                 item.gidd_event_id,
@@ -813,9 +824,9 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     item.gidd_event.event_codes_type,
                     item.gidd_event.event_codes_iso3
                 ),
-                format_locations_as_string(item.locations_names),
-                format_locations_as_string(item.locations_accuracy),
-                format_locations_as_string(item.locations_type),
+                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.locations_names if i is not None]),
+                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.locations_accuracy if i is not None]),
+                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.locations_type if i is not None]),
                 self._get_displacement_occurred(item.displacement_occurred),
             ])
         response = HttpResponse(content=save_virtual_workbook(wb))
@@ -831,7 +842,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         url_path="disaggregated-geojson",
         permission_classes=[AllowAny],
     )
-    def export(self, request):
+    def export_disaggregated_geojson(self, request):
         """
         Export the disaggregated data in geojson format file
         """
@@ -844,7 +855,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             '-year',
             'iso3',
         )
-        return self.export_disaggregated_geojson(queryset)
+        return self._export_disaggregated_geojson(queryset)
 
     @extend_schema(responses=DisaggregationSerializer(many=True))
     @action(
@@ -866,7 +877,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             '-year',
             'iso3',
         )
-        return self.export_disaggregated_excel(queryset)
+        return self._export_disaggregated_excel(queryset)
 
 
 class PublicFigureAnalysisViewSet(ListOnlyViewSetMixin):

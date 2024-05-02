@@ -1,7 +1,5 @@
-import typing
 import datetime
 import logging
-from apps.entry.views import extract_location_data
 from helix.celery import app as celery_app
 from django.utils import timezone
 from django.db import models
@@ -30,7 +28,10 @@ from .models import (
 from apps.event.models import Event
 from apps.country.models import Country
 from apps.report.models import Report
-from apps.common.utils import EXTERNAL_TUPLE_SEPARATOR, extract_event_code_data_list, extract_source_data
+from apps.common.utils import (
+    EXTERNAL_TUPLE_SEPARATOR, extract_event_code_data_list, extract_location_data_list,
+    extract_source_data
+)
 from utils.db import Array
 
 
@@ -676,7 +677,7 @@ def update_gidd_event_and_gidd_figure_data():
                     locations_accuracy=location_data['accuracy'],
                     locations_type=location_data['type_of_points'],
                 ) for item in qs
-                for location_data in [extract_location_data(item['locations'])]
+                for location_data in [extract_location_data_list(item['locations'])]
                 for source_data in [extract_source_data(item['sources_data'])]
             ]
         )
@@ -691,11 +692,11 @@ def update_gidd_data(log_id):
     Disaster.objects.all().delete()
 
     try:
-        # update_gidd_legacy_data()
-        # update_conflict_and_disaster_data()
-        # update_public_figure_analysis()
-        # update_displacement_data()
-        # update_idps_sadd_estimates_country_names()
+        update_gidd_legacy_data()
+        update_conflict_and_disaster_data()
+        update_public_figure_analysis()
+        update_displacement_data()
+        update_idps_sadd_estimates_country_names()
         update_gidd_event_and_gidd_figure_data()
         StatusLog.objects.filter(id=log_id).update(
             status=StatusLog.Status.SUCCESS,

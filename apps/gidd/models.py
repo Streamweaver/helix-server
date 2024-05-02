@@ -391,9 +391,6 @@ class GiddEvent(MetaInformationAbstractModel):
         blank=True, null=True, related_name='+',
         on_delete=models.SET_NULL
     )
-    # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     violence_name = models.CharField(max_length=256, blank=True, null=True)
     violence_sub_type_name = models.CharField(max_length=256, blank=True, null=True)
@@ -463,7 +460,7 @@ class GiddFigure(MetaInformationAbstractModel):
         models.CharField(
             verbose_name=_('Sources'), max_length=256
         ),
-        default=list,   
+        default=list,
     )
     sources_type = ArrayField(
         models.CharField(

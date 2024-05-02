@@ -1,4 +1,3 @@
-import typing
 from rest_framework import viewsets
 from django.db.models import F, When, Case, Value, CharField, Avg, Q, Func
 from django.db.models.functions import Concat, Coalesce, ExtractYear, Lower, Cast
@@ -15,19 +14,12 @@ from django.shortcuts import redirect
 from apps.common.utils import (
     EXTERNAL_TUPLE_SEPARATOR,
     EXTERNAL_ARRAY_SEPARATOR,
+    extract_location_data,
     extract_event_code_data,
-    extract_location_data
 )
 from apps.gidd.views import client_id
 from utils.common import track_gidd
 from utils.db import Array
-
-
-class ExtractLocationData(typing.TypedDict):
-    display_name: typing.List[str]
-    lat_lon: typing.List[str]
-    accuracy: typing.List[str]
-    type_of_points: typing.List[str]
 
 
 def get_idu_data(filters=None):

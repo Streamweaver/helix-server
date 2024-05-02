@@ -137,7 +137,7 @@ class DisaggregationSerializer(serializers.ModelSerializer):
             'iso3',
             'figure',
             'country_name',
-            'geographical_region',
+            'geographical_region_name',
             'year',
             'locations_coordinates',
             'unit',
