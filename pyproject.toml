@@ -3,6 +3,7 @@ name = "helix-server"
 version = "0.1.0"
 description = "Helix Server"
 authors = ["Dev <dev@togglecorp.io>"]
+package-mode = false
 
 [tool.poetry.dependencies]
 Django = "3.2"
@@ -42,7 +43,7 @@ six = "1.15"
 turfpy = "0.0.6"
 uWSGI = "*"
 django-environ = "^0.8.1"
-drf-spectacular = "*"
+drf-spectacular = {version = "*", extras = ["sidecar"]}
 django-admin-autocomplete-filter = "*"
 colorlog = "*"
 
