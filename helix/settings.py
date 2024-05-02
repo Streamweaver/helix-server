@@ -146,6 +146,7 @@ THIRD_PARTY_APPS = [
     'django_otp.plugins.otp_totp',
     'django_otp.plugins.otp_hotp',
     'drf_spectacular',
+    'drf_spectacular_sidecar',  # required for Django collectstatic discovery
 ]
 
 INSTALLED_APPS = [
@@ -646,6 +647,9 @@ SPECTACULAR_SETTINGS = {
         "displayOperationId": True,
     },
     'ENABLE_LIST_MECHANICS_ON_NON_2XX': True,
+    'SWAGGER_UI_DIST': 'SIDECAR',  # shorthand to use the sidecar instead
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
 }
 
 if DEBUG:

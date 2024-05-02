@@ -90,10 +90,10 @@ class PublicFigureAnalysisSerializer(serializers.ModelSerializer):
     figure_category_name = serializers.SerializerMethodField('get_figure_category_name')
 
     def get_figure_cause_name(self, obj):
-        return Crisis.CRISIS_TYPE.get(obj.figure_cause).name
+        return Crisis.CRISIS_TYPE.get(obj.figure_cause).label
 
     def get_figure_category_name(self, obj):
-        return Figure.FIGURE_CATEGORY_TYPES.get(obj.figure_category).name
+        return Figure.FIGURE_CATEGORY_TYPES.get(obj.figure_category).label
 
     class Meta:
         model = PublicFigureAnalysis
