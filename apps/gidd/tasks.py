@@ -528,12 +528,15 @@ def update_gidd_event_and_gidd_figure_data():
         'disaster_sub_type__name',
         'other_sub_type',
         'other_sub_type__name',
+        'osv_sub_type',
+        'osv_sub_type__name',
         'event_codes',
     )
 
     # Create new GiddEvent
     GiddEvent.objects.bulk_create(
         [
+            # NOTE: We are copying all the events
             GiddEvent(
                 id=item['id'],  # NOTE: GiddEvent ID is same as Event ID
                 event_id=item['id'],
@@ -548,19 +551,21 @@ def update_gidd_event_and_gidd_figure_data():
                 violence_id=item['violence'],
                 violence_sub_type_id=item['violence_sub_type'],
 
-                hazard_category_id=item['disaster_category'],
-                hazard_sub_category_id=item['disaster_sub_category'],
-                hazard_type_id=item['disaster_type'],
-                hazard_sub_type_id=item['disaster_sub_type'],
+                disaster_category_id=item['disaster_category'],
+                disaster_sub_category_id=item['disaster_sub_category'],
+                disaster_type_id=item['disaster_type'],
+                disaster_sub_type_id=item['disaster_sub_type'],
                 other_sub_type_id=item['other_sub_type'],
+                osv_sub_type_id=item['osv_sub_type'],
 
                 violence_name=item['violence__name'],
                 violence_sub_type_name=item['violence_sub_type__name'],
-                hazard_category_name=item['disaster_category__name'],
-                hazard_sub_category_name=item['disaster_sub_category__name'],
-                hazard_type_name=item['disaster_type__name'],
-                hazard_sub_type_name=item['disaster_sub_type__name'],
+                disaster_category_name=item['disaster_category__name'],
+                disaster_sub_category_name=item['disaster_sub_category__name'],
+                disaster_type_name=item['disaster_type__name'],
+                disaster_sub_type_name=item['disaster_sub_type__name'],
                 other_sub_type_name=item['other_sub_type__name'],
+                osv_sub_type_name=item['osv_sub_type__name'],
 
                 event_codes=event_code['code'],
                 event_codes_type=event_code['code_type'],
@@ -623,7 +628,6 @@ def update_gidd_event_and_gidd_figure_data():
             'term',
             'category',
             'figure_cause',
-            'role',
             'total_figures',
             'household_size',
             'reported',
@@ -638,6 +642,22 @@ def update_gidd_event_and_gidd_figure_data():
             'include_idu',
             'excerpt_idu',
             'displacement_occurred',
+            'violence',
+            'violence__name',
+            'violence_sub_type',
+            'violence_sub_type__name',
+            'disaster_category',
+            'disaster_category__name',
+            'disaster_sub_category',
+            'disaster_sub_category__name',
+            'disaster_type',
+            'disaster_type__name',
+            'disaster_sub_type',
+            'disaster_sub_type__name',
+            'other_sub_type',
+            'other_sub_type__name',
+            'osv_sub_type',
+            'osv_sub_type__name',
         )
 
         GiddFigure.objects.bulk_create(
@@ -653,7 +673,6 @@ def update_gidd_event_and_gidd_figure_data():
                     unit=item['unit'],
                     category=item['category'],
                     cause=item['figure_cause'],
-                    role=item['role'],
                     term=item['term'],
                     sources=source_data['sources'],
                     publishers=item['publishers_data'],
@@ -669,13 +688,28 @@ def update_gidd_event_and_gidd_figure_data():
                     stock_date_accuracy=item['stock_date_accuracy'],
                     stock_reporting_date=item['stock_reporting_date'],
                     is_housing_destruction=item['is_housing_destruction'],
-                    include_idu=item['include_idu'],
-                    excerpt_idu=item['excerpt_idu'],
                     displacement_occurred=item['displacement_occurred'],
+
                     locations_names=location_data['display_name'],
                     locations_coordinates=location_data['lat_lon'],
                     locations_accuracy=location_data['accuracy'],
                     locations_type=location_data['type_of_points'],
+
+                    disaster_category_id=item['disaster_category'],
+                    disaster_sub_category_id=item['disaster_sub_category'],
+                    disaster_type_id=item['disaster_type'],
+                    disaster_sub_type_id=item['disaster_sub_type'],
+                    other_sub_type_id=item['other_sub_type'],
+                    osv_sub_type_id=item['osv_sub_type'],
+
+                    violence_name=item['violence__name'],
+                    violence_sub_type_name=item['violence_sub_type__name'],
+                    disaster_category_name=item['disaster_category__name'],
+                    disaster_sub_category_name=item['disaster_sub_category__name'],
+                    disaster_type_name=item['disaster_type__name'],
+                    disaster_sub_type_name=item['disaster_sub_type__name'],
+                    other_sub_type_name=item['other_sub_type__name'],
+                    osv_sub_type_name=item['osv_sub_type__name'],
                 ) for item in qs
                 for location_data in [extract_location_data_list(item['locations'])]
                 for source_data in [extract_source_data(item['sources_data'])]

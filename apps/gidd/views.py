@@ -14,7 +14,7 @@ from rest_framework import mixins
 from drf_spectacular.utils import extend_schema
 from django.db import models
 from django.db.models import (
-    F, Case, When,
+    F, Case, When, Q
 )
 
 from apps.country.models import Country
@@ -634,7 +634,8 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             return [format_coordinate(x) for x in coordinates]
 
         qs = qs.filter(
-            locations_coordinates__isnull=False,
+            Q(locations_coordinates__isnull=False) |
+            Q(locations_coordinates__len__gt=0)
         ).annotate(
             event_main_trigger=Case(
                 When(
@@ -643,7 +644,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 ),
                 When(
                     gidd_event__cause=Crisis.CRISIS_TYPE.DISASTER,
-                    then=F('gidd_event__hazard_sub_type__name')
+                    then=F('gidd_event__disaster_sub_type__name')
                 ),
                 When(
                     gidd_event__cause=Crisis.CRISIS_TYPE.OTHER,
@@ -677,11 +678,12 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     "Total figures": item.total_figures,
                     "Household size": item.household_size,
                     "Reported figures": item.reported,
-                    "Hazard category": item.gidd_event.hazard_category_name,
-                    "Hazard sub category": item.gidd_event.hazard_sub_category_name,
-                    "Hazard type": item.gidd_event.hazard_type_name,
-                    "Hazard sub type": item.gidd_event.hazard_sub_type_name,
-                    "Other event sub type": item.gidd_event.other_sub_type_name,
+                    "Hazard category": item.disaster_category_name,
+                    "Hazard sub category": item.disaster_sub_category_name,
+                    "Hazard type": item.disaster_type_name,
+                    "Hazard sub type": item.disaster_sub_type_name,
+                    "Violence type": item.violence_name,
+                    "Other event sub type": item.other_sub_type_name,
                     "Start date": item.start_date,
                     "Start date accuracy": item.start_date_accuracy,
                     "End date": item.end_date,
@@ -689,8 +691,8 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     "Stock date": item.stock_date,
                     "Stock date accuracy": item.stock_date_accuracy,
                     "Stock reporting date": item.stock_reporting_date,
-                    "Sources": item.sources,
                     "Publishers": item.publishers,
+                    "Sources": item.sources,
                     "Sources type": item.sources_type,
                     "Event ID": item.gidd_event_id,
                     "Event name": item.gidd_event.name,
@@ -701,7 +703,6 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     "Event start date accuracy": item.gidd_event.start_date_accuracy,
                     "Event end date accuracy": item.gidd_event.end_date_accuracy,
                     "Is housing destruction": "Yes" if item.is_housing_destruction else "No",
-                    "Violence type": item.gidd_event.violence_name,
                     "Location name": item.locations_names,
                     "Location accuracy": item.locations_accuracy,
                     "Location type": item.locations_type,
@@ -736,7 +737,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             'Hazard sub cateogry',
             'Hazard type',
             'Hazard sub type',
-            'Other svent sub type',
+            'Other event sub type',
             'Start date',
             'Start date accuracy',
             'End date',
@@ -773,7 +774,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 ),
                 When(
                     gidd_event__cause=Crisis.CRISIS_TYPE.DISASTER,
-                    then=F('gidd_event__hazard_sub_type__name')
+                    then=F('gidd_event__disaster_sub_type__name')
                 ),
                 When(
                     gidd_event__cause=Crisis.CRISIS_TYPE.OTHER,
@@ -794,11 +795,11 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 self._get_term(item.term),
                 self._get_unit(item.unit),
                 item.total_figures,
-                item.gidd_event.hazard_category_name,
-                item.gidd_event.hazard_sub_category_name,
-                item.gidd_event.hazard_type_name,
-                item.gidd_event.hazard_sub_type_name,
-                item.gidd_event.other_sub_type_name,
+                item.disaster_category_name,
+                item.disaster_sub_category_name,
+                item.disaster_type_name,
+                item.disaster_sub_type_name,
+                item.other_sub_type_name,
                 item.start_date,
                 item.start_date_accuracy,
                 item.end_date,
@@ -818,7 +819,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 item.gidd_event.start_date_accuracy,
                 item.gidd_event.end_date_accuracy,
                 "Yes" if item.is_housing_destruction else "No",
-                item.gidd_event.violence_name,
+                item.violence_name,
                 format_event_codes_as_string(
                     item.gidd_event.event_codes,
                     item.gidd_event.event_codes_type,
@@ -846,11 +847,11 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         """
         Export the disaggregated data in geojson format file
         """
-        track_gidd(
-            self.request.GET.get('client_id'),
-            ExternalApiDump.ExternalApiType.GIDD_DISAGGREGATION_EXPORT_GEOJSON,
-            viewset=self,
-        )
+        # track_gidd(
+        #     self.request.GET.get('client_id'),
+        #     ExternalApiDump.ExternalApiType.GIDD_DISAGGREGATION_EXPORT_GEOJSON,
+        #     viewset=self,
+        # )
         queryset = GiddFigure.objects.order_by(
             '-year',
             'iso3',

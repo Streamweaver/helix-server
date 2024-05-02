@@ -353,32 +353,32 @@ class GiddEvent(MetaInformationAbstractModel):
         default=list,
     )
     violence = models.ForeignKey(
-        'event.Violence', verbose_name=_('Figure Violence'),
+        'event.Violence', verbose_name=_('Violence'),
         blank=False, null=True,
         related_name='+', on_delete=models.SET_NULL
     )
     violence_sub_type = models.ForeignKey(
-        'event.ViolenceSubType', verbose_name=_('Figure Violence Sub Type'),
+        'event.ViolenceSubType', verbose_name=_('Violence Sub Type'),
         blank=True, null=True,
         related_name='+', on_delete=models.SET_NULL
     )
-    hazard_category = models.ForeignKey(
-        'event.DisasterCategory', verbose_name=_('Figure Hazard Category'),
+    disaster_category = models.ForeignKey(
+        'event.DisasterCategory', verbose_name=_('Hazard Category'),
         blank=True, null=True,
         related_name='+', on_delete=models.SET_NULL
     )
-    hazard_sub_category = models.ForeignKey(
-        'event.DisasterSubCategory', verbose_name=_('Figure Hazard Sub Category'),
+    disaster_sub_category = models.ForeignKey(
+        'event.DisasterSubCategory', verbose_name=_('Hazard Sub Category'),
         blank=True, null=True,
         related_name='+', on_delete=models.SET_NULL
     )
-    hazard_type = models.ForeignKey(
-        'event.DisasterType', verbose_name=_('Figure Hazard Type'),
+    disaster_type = models.ForeignKey(
+        'event.DisasterType', verbose_name=_('Hazard Type'),
         blank=True, null=True,
         related_name='+', on_delete=models.SET_NULL
     )
-    hazard_sub_type = models.ForeignKey(
-        'event.DisasterSubType', verbose_name=_('Figure Hazard Sub Type'),
+    disaster_sub_type = models.ForeignKey(
+        'event.DisasterSubType', verbose_name=_('Hazard Sub Type'),
         blank=True, null=True,
         related_name='+', on_delete=models.SET_NULL
     )
@@ -387,17 +387,17 @@ class GiddEvent(MetaInformationAbstractModel):
         blank=True, null=True,
         related_name='+', on_delete=models.SET_NULL)
     osv_sub_type = models.ForeignKey(
-        'event.OsvSubType', verbose_name=_('Figure OSV sub type'),
+        'event.OsvSubType', verbose_name=_('OSV sub type'),
         blank=True, null=True, related_name='+',
         on_delete=models.SET_NULL
     )
 
     violence_name = models.CharField(max_length=256, blank=True, null=True)
     violence_sub_type_name = models.CharField(max_length=256, blank=True, null=True)
-    hazard_category_name = models.CharField(max_length=256, blank=True, null=True)
-    hazard_sub_category_name = models.CharField(max_length=256, blank=True, null=True)
-    hazard_sub_type_name = models.CharField(max_length=256, blank=True, null=True)
-    hazard_type_name = models.CharField(max_length=256, blank=True, null=True)
+    disaster_category_name = models.CharField(max_length=256, blank=True, null=True)
+    disaster_sub_category_name = models.CharField(max_length=256, blank=True, null=True)
+    disaster_type_name = models.CharField(max_length=256, blank=True, null=True)
+    disaster_sub_type_name = models.CharField(max_length=256, blank=True, null=True)
     other_sub_type_name = models.CharField(max_length=256, blank=True, null=True)
     osv_sub_type_name = models.CharField(max_length=256, blank=True, null=True)
 
@@ -434,11 +434,6 @@ class GiddFigure(MetaInformationAbstractModel):
     cause = enum.EnumField(
         enum=Crisis.CRISIS_TYPE,
         verbose_name=_('Figure Cause'),
-        blank=True, null=True
-    )
-    role = enum.EnumField(
-        enum=Figure.ROLE,
-        verbose_name=_('Role'),
         blank=True, null=True
     )
     total_figures = models.PositiveIntegerField(verbose_name=_('Total Figures'))
@@ -484,11 +479,6 @@ class GiddFigure(MetaInformationAbstractModel):
         null=True,
         blank=True,
     )
-    include_idu = models.BooleanField(verbose_name=_('Include in IDU'))
-    excerpt_idu = models.TextField(
-        verbose_name=_('Excerpt for IDU'),
-        blank=True, null=True
-    )
     locations_coordinates = ArrayField(
         models.CharField(
             verbose_name=_('Location Coordinates'), max_length=256
@@ -519,6 +509,54 @@ class GiddFigure(MetaInformationAbstractModel):
         verbose_name=_('Displacement Occurred'),
         blank=True, null=True
     )
+    violence = models.ForeignKey(
+        'event.Violence', verbose_name=_('Figure Violence'),
+        blank=False, null=True,
+        related_name='+', on_delete=models.SET_NULL
+    )
+    violence_sub_type = models.ForeignKey(
+        'event.ViolenceSubType', verbose_name=_('Figure Violence Sub Type'),
+        blank=True, null=True,
+        related_name='+', on_delete=models.SET_NULL
+    )
+    disaster_category = models.ForeignKey(
+        'event.DisasterCategory', verbose_name=_('Figure Hazard Category'),
+        blank=True, null=True,
+        related_name='+', on_delete=models.SET_NULL
+    )
+    disaster_sub_category = models.ForeignKey(
+        'event.DisasterSubCategory', verbose_name=_('Figure Hazard Sub Category'),
+        blank=True, null=True,
+        related_name='+', on_delete=models.SET_NULL
+    )
+    disaster_type = models.ForeignKey(
+        'event.DisasterType', verbose_name=_('Figure Hazard Type'),
+        blank=True, null=True,
+        related_name='+', on_delete=models.SET_NULL
+    )
+    disaster_sub_type = models.ForeignKey(
+        'event.DisasterSubType', verbose_name=_('Figure Hazard Sub Type'),
+        blank=True, null=True,
+        related_name='+', on_delete=models.SET_NULL
+    )
+    other_sub_type = models.ForeignKey(
+        'event.OtherSubType', verbose_name=_('Other sub type'),
+        blank=True, null=True,
+        related_name='+', on_delete=models.SET_NULL)
+    osv_sub_type = models.ForeignKey(
+        'event.OsvSubType', verbose_name=_('Figure OSV sub type'),
+        blank=True, null=True, related_name='+',
+        on_delete=models.SET_NULL
+    )
+
+    violence_name = models.CharField(max_length=256, blank=True, null=True)
+    violence_sub_type_name = models.CharField(max_length=256, blank=True, null=True)
+    disaster_category_name = models.CharField(max_length=256, blank=True, null=True)
+    disaster_sub_category_name = models.CharField(max_length=256, blank=True, null=True)
+    disaster_type_name = models.CharField(max_length=256, blank=True, null=True)
+    disaster_sub_type_name = models.CharField(max_length=256, blank=True, null=True)
+    other_sub_type_name = models.CharField(max_length=256, blank=True, null=True)
+    osv_sub_type_name = models.CharField(max_length=256, blank=True, null=True)
 
     def __str__(self):
         return self.iso3
