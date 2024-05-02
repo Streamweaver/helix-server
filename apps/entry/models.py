@@ -1564,6 +1564,7 @@ class ExternalApiDump(models.Model):
         GIDD_COMBINED_STAT_GRAPHQL = 'gidd-combined-stat-graphql', _('query.giddPublicCombinedStatistics')
         GIDD_RELEASE_META_DATA_GRAPHQL = 'gidd-release-meta-data-graphql', _('query.giddPublicReleaseMetaData')
         GIDD_PUBLIC_COUNTRIES_GRAPHQL = 'gidd-public-countries-graphql', _('query.giddPublicCountries')
+        GIDD_DISAGGREGATION_EXPORT_REST = 'gidd-disaggregation-export-rest', _('/external-api/gidd/disaggregations/export/')
 
     class Status(models.IntegerChoices):
         PENDING = 0, 'Pending'
@@ -1785,6 +1786,16 @@ class ExternalApiDump(models.Model):
             ),
             description='',
             example_request='',
+        ),
+        ExternalApiType.GIDD_DISAGGREGATION_EXPORT_REST: Metadata(
+            response_type='REST - XLSX/GEOJSON',
+            usage='External',
+            description='Excel export of disaggregation data',
+            example_request=(
+                lambda request, client_code: request.build_absolute_uri(
+                    ExternalApiDump.ExternalApiType.GIDD_DISAGGREGATION_EXPORT_REST.label + f'?client_id={client_code}'
+                )
+            ),
         ),
     }
 

@@ -222,6 +222,7 @@ class DisasterLegacy(models.Model):
 
 class ReleaseMetadata(models.Model):
     class ReleaseEnvironment(enum.Enum):
+        # XXX: Changing the attribute name will break external systems
         PRE_RELEASE = 0
         RELEASE = 1
 
@@ -374,7 +375,7 @@ class GiddEvent(models.Model):
         blank=True, null=True,
         related_name='+', on_delete=models.SET_NULL
     )
-    other_event_sub_type = models.ForeignKey(
+    other_sub_type = models.ForeignKey(
         'event.OtherSubType', verbose_name=_('Other sub type'),
         blank=True, null=True,
         related_name='+', on_delete=models.SET_NULL)
@@ -387,12 +388,25 @@ class GiddEvent(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    violence_name = models.CharField(max_length=256, blank=True, null=True)
+    violence_sub_type_name = models.CharField(max_length=256, blank=True, null=True)
+    hazard_category_name = models.CharField(max_length=256, blank=True, null=True)
+    hazard_sub_category_name = models.CharField(max_length=256, blank=True, null=True)
+    hazard_sub_type_name = models.CharField(max_length=256, blank=True, null=True)
+    hazard_type_name = models.CharField(max_length=256, blank=True, null=True)
+    other_sub_type_name = models.CharField(max_length=256, blank=True, null=True)
+    osv_sub_type_name = models.CharField(max_length=256, blank=True, null=True)
+
     def __str__(self):
         return self.name
 
 
 class GiddFigure(models.Model):
     iso3 = models.CharField(verbose_name=_('ISO3'), max_length=5)
+    figure = models.ForeignKey(
+        Figure,
+        related_name='+', on_delete=models.SET_NULL, null=True, blank=True,
+    )
     country_name = models.CharField(verbose_name=_('Country name'), max_length=256)
     country = models.ForeignKey(
         'country.Country', related_name='gidd_figures', on_delete=models.PROTECT,
@@ -401,7 +415,12 @@ class GiddFigure(models.Model):
     geographical_region = models.CharField(
         verbose_name=_('Geographical Region'), max_length=256, blank=True, null=True
     )
-    geo_locations = ArrayField(
+    term = enum.EnumField(
+        enum=Figure.FIGURE_TERMS,
+        verbose_name=_('Figure Term'),
+        blank=True, null=True
+    )
+    locations_coordinates = ArrayField(
         models.CharField(
             verbose_name=_('Geo Locations'), max_length=256
         ),
@@ -440,25 +459,51 @@ class GiddFigure(models.Model):
         ),
         default=list,
     )
+    sources_type = ArrayField(
+        models.CharField(
+            verbose_name=_('Sources Type'), max_length=256
+        ),
+        default=list,
+    )
+    publishers = ArrayField(
+        models.CharField(
+            verbose_name=_('Publishers'), max_length=256
+        ),
+        default=list,
+    )
     gidd_event = models.ForeignKey(
         'gidd.GiddEvent', verbose_name=_('GIDD Event'),
         related_name='gidd_figures', on_delete=models.PROTECT
     )
-    is_housing_destruction = models.BooleanField(verbose_name=_('Is Housing Destruction'), default=False)
+    is_housing_destruction = models.BooleanField(
+        verbose_name=_('Is Housing Destruction'),
+        default=False,
+        null=True,
+        blank=True,
+    )
     include_idu = models.BooleanField(verbose_name=_('Include in IDU'))
     excerpt_idu = models.TextField(
         verbose_name=_('Excerpt for IDU'),
         blank=True, null=True
     )
 
-    locations_names = models.CharField(
-        verbose_name=_('Location Names'), max_length=256, blank=True, null=True
+    locations_names = ArrayField(
+        models.CharField(
+            verbose_name=_('Location Names'), max_length=256
+        ),
+        default=list,
     )
-    locations_accuracy = models.TextField(
-        verbose_name=_('Location Accuracy'), blank=True, null=True
+    locations_accuracy = ArrayField(
+        models.CharField(
+            verbose_name=_('Location Accuracy'), max_length=256
+        ),
+        default=list,
     )
-    locations_type = models.CharField(
-        verbose_name=_('Location Type'), max_length=256, blank=True, null=True
+    locations_type = ArrayField(
+        models.CharField(
+            verbose_name=_('Location Type'), max_length=256
+        ),
+        default=list,
     )
     displacement_occurred = enum.EnumField(
         enum=Figure.DISPLACEMENT_OCCURRED,

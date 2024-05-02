@@ -1,3 +1,4 @@
+import typing
 from rest_framework import viewsets
 from django.db.models import F, When, Case, Value, CharField, Avg, Q, Func
 from django.db.models.functions import Concat, Coalesce, ExtractYear, Lower, Cast
@@ -14,12 +15,45 @@ from django.shortcuts import redirect
 from apps.common.utils import (
     EXTERNAL_TUPLE_SEPARATOR,
     EXTERNAL_ARRAY_SEPARATOR,
-    extract_location_data,
+    format_locations,
     extract_event_code_data,
 )
 from apps.gidd.views import client_id
 from utils.common import track_gidd
 from utils.db import Array
+
+
+class ExtractLocationData(typing.TypedDict):
+    display_name: typing.List[str]
+    lat_lon: typing.List[str]
+    accuracy: typing.List[str]
+    type_of_points: typing.List[str]
+
+
+def extract_location_data_as_string(data):
+    # Split the formatted location data into individual components
+    location_components = format_locations(data)
+
+    transposed_components = zip(*location_components)
+    return {
+        'display_name': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, [])),
+        'lat_lon': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, [])),
+        'accuracy': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, [])),
+        'type_of_points': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, []))
+    }
+
+
+def extract_location_data(data) -> ExtractLocationData:
+
+    location_components = format_locations(data)
+
+    transposed_components = zip(*location_components)
+    return {
+        'display_name': next(transposed_components, []),
+        'lat_lon': next(transposed_components, []),
+        'accuracy': next(transposed_components, []),
+        'type_of_points': next(transposed_components, []),
+    }
 
 
 def get_idu_data(filters=None):
@@ -322,7 +356,7 @@ def get_idu_data(filters=None):
 
     for figure_data in base_query.values():
         locations_data = figure_data.pop('locations', [])
-        location_parse = extract_location_data(locations_data)
+        location_parse = extract_location_data_as_string(locations_data)
 
         event_codes_data = figure_data.pop('event_codes', [])
         event_code_parse = extract_event_code_data(event_codes_data)

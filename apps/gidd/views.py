@@ -1,21 +1,29 @@
 import typing
 import json
+import typing
 from datetime import datetime
+from django.core.serializers.json import DjangoJSONEncoder
 from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import action
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from rest_framework import mixins
 from drf_spectacular.utils import extend_schema
+from django.db import models
+from django.db.models import (
+    F, Case, When,
+)
 
 from apps.country.models import Country
 from apps.entry.models import Figure
 from apps.common.utils import EXTERNAL_ARRAY_SEPARATOR, EXTERNAL_FIELD_SEPARATOR
+from apps.crisis.models import Crisis
 
+from .enums import DisaggregationExportTypeEnum
 from .models import (
     Conflict, Disaster, DisplacementData, GiddFigure, IdpsSaddEstimate,
     StatusLog, PublicFigureAnalysis
@@ -23,11 +31,13 @@ from .models import (
 from .serializers import (
     CountrySerializer,
     ConflictSerializer,
+    DisaggregationSerializer,
     DisasterSerializer,
     DisplacementDataSerializer,
     PublicFigureAnalysisSerializer,
 )
 from .rest_filters import (
+    DisaggregationFilterst,
     RestConflictFilterSet,
     RestDisasterFilterSet,
     RestDisplacementDataFilterSet,
@@ -35,7 +45,7 @@ from .rest_filters import (
     PublicFigureAnalysisFilterSet,
 )
 from utils.common import track_gidd, client_id
-from apps.entry.models import ExternalApiDump
+from apps.entry.models import ExternalApiDump, Figure
 
 
 @client_id
@@ -584,7 +594,60 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
         response['Content-Type'] = 'application/octet-stream'
         return response
 
-    def export_disaggregated_geojson(qs):
+
+class DisaggregationViewSet(ListOnlyViewSetMixin):
+    serializer_class = DisaggregationSerializer
+    filter_backends = (DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter)
+    filterset_class = DisaggregationFilterst
+
+    def get_queryset(self):
+        track_gidd(
+            self.request.GET.get('client_id'),
+            ExternalApiDump.ExternalApiType.GIDD_DISAGGREGATION_EXPORT_REST,
+            viewset=self,
+        )
+        return GiddFigure.objects.all()
+
+    def _get_term(self, term):
+        return Figure.FIGURE_TERMS.get(term).name if term else None
+
+    def _get_category(self, category):
+        return Figure.FIGURE_CATEGORY_TYPES.get(category).name if category else None
+
+    def _get_cause(self, cause):
+        return Crisis.CRISIS_TYPE.get(cause).name if cause else None
+
+    def _get_displacement_occurred(self, displacement_occurred):
+        return Figure.DISPLACEMENT_OCCURRED.get(displacement_occurred).name if displacement_occurred else None
+
+    def export_disaggregated_geojson(self, qs):
+
+        def format_coordinate(coordinate: str) -> typing.Tuple[float, float]:
+            lat, lng = coordinate.split(', ')
+            return (float(lng), float(lat))
+
+        def format_coordinates(coordinates: typing.List[str]):
+            return [format_coordinate(x) for x in coordinates]
+
+        qs = qs.filter(
+            locations_coordinates__isnull=False,
+        ).annotate(
+            event_main_trigger=Case(
+                When(
+                    gidd_event__cause=Crisis.CRISIS_TYPE.CONFLICT,
+                    then=F('gidd_event__violence_sub_type__name')
+                ),
+                When(
+                    gidd_event__cause=Crisis.CRISIS_TYPE.DISASTER,
+                    then=F('gidd_event__hazard_sub_type__name')
+                ),
+                When(
+                    gidd_event__cause=Crisis.CRISIS_TYPE.OTHER,
+                    then=F('gidd_event__other_sub_type__name')
+                ),
+                output_field=models.CharField()
+            ),
+        )
         feature_collection = {
             "type": "FeatureCollection",
             "features": []
@@ -594,35 +657,71 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
             feature = {
                 "type": "Feature",
                 "geometry": {
-                    "type": "Point",
-                    "coordinates": item['locations_coordinates'],
+                    "type": "MultiPoint",
+                    "coordinates": format_coordinates(item.locations_coordinates),
                 },
-                "properties": {}
+                "properties": {
+                    "ID": item.id,
+                    "ISO3": item.iso3,
+                    "Country": item.country_name,
+                    "Geographical region": item.geographical_region,
+                    "Figure cause": self._get_cause(item.cause),
+                    "Year": item.year,
+                    "Figure category": self._get_category(item.category),
+                    "Figure term": self._get_term(item.term),
+                    "Total figure": item.total_figures,
+                    "Hazard category": item.gidd_event.hazard_category_name,
+                    "Hazard type": item.gidd_event.hazard_type_name,
+                    "Hazard sub type": item.gidd_event.hazard_sub_type_name,
+                    "Other event sub type": item.gidd_event.other_sub_type_name,
+                    "Start date": item.start_date,
+                    "Start date accuracy": item.start_date_accuracy,
+                    "End date": item.end_date,
+                    "End date accuracy": item.end_date_accuracy,
+                    "Stock date": item.stock_date,
+                    "Stock date accuracy": item.stock_date_accuracy,
+                    "Stock reporting date": item.stock_reporting_date,
+                    "Sources": item.sources,
+                    "Publishers": item.publishers,
+                    "Sources type": item.sources_type,
+                    "Event ID": item.gidd_event_id,
+                    "Event name": item.gidd_event.name,
+                    "Event cause": self._get_cause(item.gidd_event.cause),
+                    "Event main trigger": item.event_main_trigger,
+                    "Event start date": item.gidd_event.start_date,
+                    "Event end date": item.gidd_event.end_date,
+                    "Event start date accuracy": item.gidd_event.start_date_accuracy,
+                    "Event end date accuracy": item.gidd_event.end_date_accuracy,
+                    "Is housing destruction": "Yes" if item.is_housing_destruction else "No",
+                    "Violence type": item.gidd_event.violence_name,
+                    "Location name": item.locations_names,
+                    "Location accuracy": item.locations_accuracy,
+                    "Location type": item.locations_type,
+                    "Displacement occurred": self._get_displacement_occurred(item.displacement_occurred),
+                }
             }
             feature_collection['features'].append(feature)
 
-        feature_collection = json.dumps(feature_collection)
+        feature_collection = json.dumps(feature_collection, cls=DjangoJSONEncoder)
         response = HttpResponse(content=feature_collection, content_type='application/json')
         response['Content-Disposition'] = 'attachment; filename="IDMC_Internal_Displacement_Disaggregated.geojson"'
         return response
 
-    def export_disaggregated_excel(qs):
+    def export_disaggregated_excel(self, qs):
         wb = Workbook()
         ws = wb.active
-        ws.title = "1_Disaggregated_data"
+        ws.title = "1_Disaggregated_Data"
         ws.append([
             'ID',
             'ISO3',
             'Country',
-            'Region',
             'Geographical region',
             'Figure cause',
             'Year',
             'Figure category',
-            'Figure crle',
+            'Figure term',
             'Total figure',
             'Hazard category',
-            'Hazard sub Category',
             'Hazard type',
             'Hazard sub type',
             'Other svent sub type',
@@ -633,7 +732,7 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
             'Stock date',
             'Stock date accuracy',
             'Stock reporting date',
-            'Publishers',
+            'Publishers'
             'Sources',
             'Sources type',
             'Event ID',
@@ -645,8 +744,6 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
             'Event start date accuracy',
             'Event end date accuracy',
             'Is housing destruction',
-            'Include in IDU',
-            'Excerpt IDU',
             'Violence type',
             'Event codes (Code:Type)',
             'Location name',
@@ -654,23 +751,40 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
             'Location type',
             'Displacement occurred'
         ])
+        qs = qs.filter(
+            locations_coordinates__isnull=False,
+        ).annotate(
+            event_main_trigger=Case(
+                When(
+                    gidd_event__cause=Crisis.CRISIS_TYPE.CONFLICT,
+                    then=F('gidd_event__violence_sub_type__name')
+                ),
+                When(
+                    gidd_event__cause=Crisis.CRISIS_TYPE.DISASTER,
+                    then=F('gidd_event__hazard_sub_type__name')
+                ),
+                When(
+                    gidd_event__cause=Crisis.CRISIS_TYPE.OTHER,
+                    then=F('gidd_event__other_sub_type__name')
+                ),
+                output_field=models.CharField()
+            ),
+        )
         for item in qs:
             ws.append([
                 item.id,
                 item.iso3,
                 item.country_name,
-                item.region,
                 item.geographical_region,
-                item.figure_cause,
+                self._get_cause(item.cause),
                 item.year,
-                item.figure_category,
-                item.figure_crle,
-                item.total_figure,
-                item.hazard_category,
-                item.hazard_sub_category,
-                item.hazard_type,
-                item.hazard_sub_type,
-                item.other_svent_sub_type,
+                self._get_category(item.category),
+                self._get_term(item.term),
+                item.total_figures,
+                item.gidd_event.hazard_category_name,
+                item.gidd_event.hazard_type_name,
+                item.gidd_event.hazard_sub_type_name,
+                item.gidd_event.other_sub_type_name,
                 item.start_date,
                 item.start_date_accuracy,
                 item.end_date,
@@ -678,52 +792,57 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
                 item.stock_date,
                 item.stock_date_accuracy,
                 item.stock_reporting_date,
-                item.publishers,
-                item.sources,
-                item.sources_type,
-                item.event_id,
-                item.event_name,
-                item.event_cause,
+                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.publishers if i is not None]),
+                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.sources if i is not None]),
+                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.sources_type if i is not None]),
+                item.gidd_event_id,
+                item.gidd_event.name,
+                self._get_cause(item.gidd_event.cause),
                 item.event_main_trigger,
-                item.event_start_date,
-                item.event_end_date,
-                item.event_start_date_accuracy,
-                item.event_end_date_accuracy,
-                item.is_housing_destruction,
-                item.include_in_idu,
-                item.excerpt_idu,
-                item.violence_type,
+                item.gidd_event.start_date,
+                item.gidd_event.end_date,
+                item.gidd_event.start_date_accuracy,
+                item.gidd_event.end_date_accuracy,
+                "Yes" if item.is_housing_destruction else "No",
+                item.gidd_event.violence_name,
                 EXTERNAL_ARRAY_SEPARATOR.join(
                     [f"{key}{EXTERNAL_FIELD_SEPARATOR}{value}" for key, value in zip(
-                        item.event_codes,
-                        item.event_codes_type
+                        item.gidd_event.event_codes,
+                        item.gidd_event.event_codes_type
                     )]
                 ),
-                item.location_name,
-                item.location_accuracy,
-                item.location_type,
-                item.displacement_occurred,
+                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.locations_names if i is not None]),
+                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.locations_accuracy if i is not None]),
+                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.locations_type if i is not None]),
+                self._get_displacement_occurred(item.displacement_occurred),
             ])
+        response = HttpResponse(content=save_virtual_workbook(wb))
+        filename = 'IDMC_Internal_Displacement_Disaggregated.xlsx'
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        response['Content-Type'] = 'application/octet-stream'
+        return response
 
+    @extend_schema(responses=DisaggregationSerializer(many=True))
     @action(
         detail=False,
         methods=["get"],
-        url_path="export-disaggregated",
+        url_path="export",
         permission_classes=[AllowAny],
     )
-    def disaggregated_geojson(self, request):
+    def export(self, request):
         """
         Export the disaggregated data in geojson format file
         """
-        # @TODO
-        qs = GiddFigure.objects.all().order_by(
+        queryset = self.filter_queryset(self.get_queryset()).order_by(
             '-year',
+            'iso3',
         )
-        type = request.GET.get('export_type')
-        if type == 'geojson':
-            return self.export_disaggregated_geojson(qs)
-        elif type == 'excel':
-            return self.export_disaggregated_excel(qs)
+        _type = request.query_params.get('export_type', DisaggregationExportTypeEnum.EXCEL.value)  # Default to Excel
+        if _type == DisaggregationExportTypeEnum.GEO_JSON.value:
+            return self.export_disaggregated_geojson(queryset)
+        elif _type == DisaggregationExportTypeEnum.EXCEL.value:
+            return self.export_disaggregated_excel(queryset)
+        return HttpResponseBadRequest('Please provide a export type')
 
 
 class PublicFigureAnalysisViewSet(ListOnlyViewSetMixin):

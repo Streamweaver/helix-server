@@ -1,14 +1,16 @@
 import django_filters
 from django.db.models import Q
-from .filters import ReleaseMetadataFilter
+from .filters import ReleaseMetadataFilter, get_name_choices
 from .models import (
     Conflict,
     Disaster,
     DisplacementData,
+    GiddFigure,
     IdpsSaddEstimate,
     PublicFigureAnalysis,
 )
 from apps.crisis.models import Crisis
+from .enums import DisaggregationExportTypeEnum
 
 
 class RestConflictFilterSet(ReleaseMetadataFilter):
@@ -117,6 +119,35 @@ class PublicFigureAnalysisFilterSet(ReleaseMetadataFilter):
             )
 
         elif value == 'disaster':
+            return queryset.filter(
+                cause=Crisis.CRISIS_TYPE.DISASTER.value,
+            )
+        return queryset
+
+
+class DisaggregationFilterst(ReleaseMetadataFilter):
+    cause = django_filters.ChoiceFilter(
+        method='filter_cause',
+        choices=get_name_choices(Crisis.CRISIS_TYPE),
+    )
+    export_type = django_filters.ChoiceFilter(method='no_op', choices=DisaggregationExportTypeEnum.choices)
+
+    class Meta:
+        model = GiddFigure
+        fields = {
+            'iso3': ['in'],
+        }
+
+    def no_op(self, queryset, name, value):
+        return queryset
+
+    def filter_cause(self, queryset, name, value):
+        if value == Crisis.CRISIS_TYPE.CONFLICT.name:
+            return queryset.filter(
+                cause=Crisis.CRISIS_TYPE.CONFLICT.value,
+            )
+
+        elif value == Crisis.CRISIS_TYPE.DISASTER.name:
             return queryset.filter(
                 cause=Crisis.CRISIS_TYPE.DISASTER.value,
             )

@@ -8,6 +8,7 @@ from apps.entry.views import (
 from apps.gidd.views import (
     CountryViewSet,
     ConflictViewSet,
+    DisaggregationViewSet,
     DisasterViewSet,
     DisplacementDataViewSet,
     PublicFigureAnalysisViewSet,
@@ -20,6 +21,7 @@ router.register("conflicts", ConflictViewSet, "conflicts-view")
 router.register("disasters", DisasterViewSet, "diasters-view")
 router.register("displacements", DisplacementDataViewSet, "displacements-view")
 router.register("public-figure-analyses", PublicFigureAnalysisViewSet, "public-figure-analysis-view-set")
+router.register("disaggregation", DisaggregationViewSet, "disaggregations-view")
 
 urlpatterns = [
     path('idus/last-180-days/', IdusFlatCachedView.as_view()),

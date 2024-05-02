@@ -1,4 +1,5 @@
 import graphene
+from django.db import models
 from utils.graphene.enums import (
     convert_enum_to_graphene_enum,
 )
@@ -19,3 +20,10 @@ enum_map = dict(
 
 class GiddEnumType(graphene.ObjectType):
     gidd_release_meta_data = graphene.Field(GiddReleaseEnvironmentsEnum)
+
+
+# -- Used by External-Endpoints
+
+class DisaggregationExportTypeEnum(models.TextChoices):
+    EXCEL = 'EXCEL', 'EXCEL'
+    GEO_JSON = 'GeoJSON', 'GeoJSON'

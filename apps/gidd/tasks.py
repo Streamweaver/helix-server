@@ -1,3 +1,4 @@
+import typing
 import datetime
 import logging
 from apps.entry.views import extract_location_data
@@ -35,6 +36,36 @@ from utils.db import Array
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+class ExtractSourceData(typing.TypedDict):
+    sources: typing.List[str]
+    sources_type: typing.List[str]
+
+
+class ExtractPublisherData(typing.TypedDict):
+    publishers: typing.List[str]
+
+
+def extract_source_data(data) -> ExtractSourceData:
+    sources = []
+    sources_type = []
+    for i in data:
+        sources.append(i[0])
+        sources_type.append(i[1])
+    return {
+        'sources': sources,
+        'sources_type': sources_type,
+    }
+
+
+def extract_publisher_data(data) -> ExtractPublisherData:
+    publishers = []
+    for i in data:
+        publishers.append(i[0])
+    return {
+        'publishers': publishers,
+    }
 
 
 def get_gidd_years():
@@ -488,95 +519,85 @@ def update_gidd_event_and_gidd_figure_data():
     Updates GiddEvent and GiddFigure data
     '''
 
-    # Delete all the GiddEvent objects
-    GiddEvent.objects.all().delete()
-
     # Delete all the GiddFigure objects
     GiddFigure.objects.all().delete()
 
-    map_event_to_gidd_event = {
-        item['event_id']: item['id'] for item in GiddEvent.objects.values('event_id', 'id')
-    }
+    # Delete all the GiddEvent objects
+    GiddEvent.objects.all().delete()
+
+    event_queryset = Event.objects.annotate(
+        event_codes=ArrayAgg(
+            Array(
+                models.F('event_code__event_code'),
+                Cast(models.F('event_code__event_code_type'), models.CharField()),
+                models.F('event_code__country__iso3'),
+                output_field=ArrayField(models.CharField()),
+            ),
+            distinct=True,
+        ),
+    ).values(
+        'id',
+        'name',
+        'event_type',
+        'start_date',
+        'start_date_accuracy',
+        'end_date',
+        'end_date_accuracy',
+        'violence',
+        'violence__name',
+        'violence_sub_type',
+        'violence_sub_type__name',
+        'disaster_category',
+        'disaster_category__name',
+        'disaster_sub_category',
+        'disaster_sub_category__name',
+        'disaster_type',
+        'disaster_type__name',
+        'disaster_sub_type',
+        'disaster_sub_type__name',
+        'other_sub_type',
+        'other_sub_type__name',
+        'event_codes',
+    )
+
+    # Create new GiddEvent
+    GiddEvent.objects.bulk_create(
+        [
+            GiddEvent(
+                id=item['id'],  # NOTE: GiddEvent ID is same as Event ID
+                event_id=item['id'],
+                name=item['name'],
+                cause=item['event_type'],
+
+                start_date=item['start_date'],
+                start_date_accuracy=item['start_date_accuracy'],
+                end_date=item['end_date'],
+                end_date_accuracy=item['end_date_accuracy'],
+
+                violence_id=item['violence'],
+                violence_sub_type_id=item['violence_sub_type'],
+
+                hazard_category_id=item['disaster_category'],
+                hazard_sub_category_id=item['disaster_sub_category'],
+                hazard_type_id=item['disaster_type'],
+                hazard_sub_type_id=item['disaster_sub_type'],
+                other_sub_type_id=item['other_sub_type'],
+
+                violence_name=item['violence__name'],
+                violence_sub_type_name=item['violence_sub_type__name'],
+                hazard_category_name=item['disaster_category__name'],
+                hazard_sub_category_name=item['disaster_sub_category__name'],
+                hazard_type_name=item['disaster_type__name'],
+                hazard_sub_type_name=item['disaster_sub_type__name'],
+                other_sub_type_name=item['other_sub_type__name'],
+
+                event_codes=get_attr_list_from_event_codes(item['event_codes'], 'code') or [],
+                event_codes_type=get_attr_list_from_event_codes(item['event_codes'], 'code_type') or [],
+            ) for item in event_queryset
+        ]
+    )
 
     for year in get_gidd_years():
-        event_queryset = Event.objects.filter(
-            start_date=datetime.datetime(year=year, month=1, day=1),
-            end_date=datetime.datetime(year=year, month=12, day=31),
-        ).annotate(
-            event_codes=Case(
-                When(
-                    Q(event_code__isnull=False),
-                    then=Array(
-                        F('event_code__event_code'),
-                        output_field=ArrayField(models.CharField()),
-                    )
-                ),
-                default=Value([]),
-            ),
-            event_codes_type=Case(
-                When(
-                    Q(event_code__isnull=False),
-                    then=Array(
-                        F('event_code__event_code_type'),
-                        output_field=ArrayField(models.CharField()),
-                    )
-                ),
-                default=Value([]),
-            )
-        ).values(
-            'id',
-            'name',
-            'event_type',
-            'start_date',
-            'start_date_accuracy',
-            'end_date',
-            'end_date_accuracy',
-            'violence',
-            'violence__name',
-            'violence_sub_type',
-            'violence_sub_type__name',
-            'disaster_category',
-            'disaster_sub_category',
-            'disaster_type',
-            'disaster_sub_type',
-            'disaster_category__name',
-            'disaster_sub_category__name',
-            'disaster_type__name',
-            'disaster_sub_type__name',
-            'other_sub_type',
-            'other_sub_type__name',
-            'event_codes',
-            'event_codes_type',
-        )
-
-        # Create new Gidd Event
-        GiddEvent.objects.bulk_create(
-            [
-                GiddEvent(
-                    event_id=item['id'],
-                    name=item['name'],
-                    cause=item['event_type'],
-
-                    start_date=item['start_date'],
-                    start_date_accuracy=item['start_date_accuracy'],
-                    end_date=item['end_date'],
-                    end_date_accuracy=item['end_date_accuracy'],
-
-                    violence_id=item['violence'],
-                    violence_sub_type_id=item['violence_sub_type'],
-
-                    hazard_category_id=item['disaster_category'],
-                    hazard_sub_category_id=item['disaster_sub_category'],
-                    hazard_type_id=item['disaster_type'],
-                    hazard_sub_type_id=item['disaster_sub_type'],
-                    other_event_sub_type_id=item['other_sub_type'],
-
-                    event_codes=item['event_codes'],
-                    event_codes_type=item['event_codes_type'],
-                ) for item in event_queryset
-            ]
-        )
-
         # Create GiddFigure
         figure_queryset = Figure.objects.filter(
             start_date=datetime.datetime(year=year, month=1, day=1),
@@ -584,10 +605,13 @@ def update_gidd_event_and_gidd_figure_data():
         )
         qs = figure_queryset.annotate(
             **Figure.annotate_stock_and_flow_dates(),
-            sources_data=Array(
-                F('sources__name'),
-                F('sources__organization_kind__name'),
-                output_field=ArrayField(models.CharField()),
+            sources_data=ArrayAgg(
+                Array(
+                    F('sources__name'),
+                    F('sources__organization_kind__name'),
+                    output_field=ArrayField(models.CharField()),
+                ),
+                distinct=True,
             ),
             locations=ArrayAgg(
                 Array(
@@ -607,15 +631,25 @@ def update_gidd_event_and_gidd_figure_data():
                     Q(geo_locations__display_name__isnull=True) | Q(geo_locations__display_name='')
                 ),
             ),
+            publishers_data=ArrayAgg(
+                Array(
+                    F('entry__publishers__name'),
+                    output_field=ArrayField(models.CharField()),
+                ),
+                distinct=True,
+            ),
         ).values(
+            'id',
             'event__id',
             'country',
             'country__iso3',
             'country__idmc_short_name',
             'country__geographical_group__name',
             'sources_data',
+            'publishers_data',
             'locations',
             'unit',
+            'term',
             'category',
             'figure_cause',
             'role',
@@ -637,16 +671,20 @@ def update_gidd_event_and_gidd_figure_data():
             [
                 GiddFigure(
                     iso3=item['country__iso3'],
-                    country_id=item['country'],
-                    gidd_event_id=map_event_to_gidd_event(item['event__id']),
+                    figure_id=item['id'],
                     country_name=item['country__idmc_short_name'],
-                    geographoical_region=item['country__geographical_group__name'],
-                    geo_locations=item['geo_location'],
+                    country_id=item['country'],
+                    gidd_event_id=item['event__id'],    # NOTE: GiddEvent ID is same as Event ID
+                    geographical_region=item['country__geographical_group__name'],
                     year=year,
                     unit=item['unit'],
                     category=item['category'],
                     cause=item['figure_cause'],
                     role=item['role'],
+                    term=item['term'],
+                    sources=source_data['sources'],
+                    publishers=publisher_data['publishers'],
+                    sources_type=source_data['sources_type'],
                     total_figures=item['total_figures'],
                     start_date=item['start_date'],
                     start_date_accuracy=item['start_date_accuracy'],
@@ -655,15 +693,18 @@ def update_gidd_event_and_gidd_figure_data():
                     stock_date=item['stock_date'],
                     stock_date_accuracy=item['stock_date_accuracy'],
                     stock_reporting_date=item['stock_reporting_date'],
-                    is_housing_destruction='Yes' if item['is_housing_destruction'] else 'No',
-                    include_idu='Yes' if item['include_idu'] else 'No',
+                    is_housing_destruction=item['is_housing_destruction'],
+                    include_idu=item['include_idu'],
                     excerpt_idu=item['excerpt_idu'],
                     displacement_occurred=item['displacement_occurred'],
-                    # location_names=location_data.get('location_names'), 
-                    # locations_accuracy=location_data.get('locations_accuracy'),
-                    # locations_type=location_data.get('locations_type'),
+                    locations_names=location_data['display_name'],
+                    locations_coordinates=location_data['lat_lon'],
+                    locations_accuracy=location_data['accuracy'],
+                    locations_type=location_data['type_of_points'],
                 ) for item in qs
                 for location_data in [extract_location_data(item['locations'])]
+                for source_data in [extract_source_data(item['sources_data'])]
+                for publisher_data in [extract_publisher_data(item['publishers_data'])]
             ]
         )
 
