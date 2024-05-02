@@ -157,7 +157,7 @@ class StatusLog(models.Model):
 
     @classmethod
     def last_release_date(cls):
-        return StatusLog.objects.last().completed_at.strftime("%d/%m/%Y")
+        return StatusLog.objects.last().completed_at.strftime("%B %d, %Y")
 
 
 class ConflictLegacy(models.Model):
