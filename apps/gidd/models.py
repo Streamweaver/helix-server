@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_enumfield import enum
 from django.contrib.postgres.fields import ArrayField
+from apps.contrib.models import MetaInformationAbstractModel
 from apps.crisis.models import Crisis
 from apps.entry.models import Figure
 
@@ -314,7 +315,7 @@ class IdpsSaddEstimate(models.Model):
         return self.iso3
 
 
-class GiddEvent(models.Model):
+class GiddEvent(MetaInformationAbstractModel):
     name = models.CharField(verbose_name=_('Event Name'), max_length=256)
     event = models.ForeignKey(
         'event.Event', verbose_name=_('Event'),
@@ -342,6 +343,12 @@ class GiddEvent(models.Model):
     event_codes_type = ArrayField(
         models.CharField(
             verbose_name=_('Event Code Types'), max_length=256
+        ),
+        default=list,
+    )
+    event_codes_iso3 = ArrayField(
+        models.CharField(
+            verbose_name=_('Event Code ISO3'), max_length=256
         ),
         default=list,
     )
@@ -401,7 +408,7 @@ class GiddEvent(models.Model):
         return self.name
 
 
-class GiddFigure(models.Model):
+class GiddFigure(MetaInformationAbstractModel):
     iso3 = models.CharField(verbose_name=_('ISO3'), max_length=5)
     figure = models.ForeignKey(
         Figure,
@@ -412,19 +419,13 @@ class GiddFigure(models.Model):
         'country.Country', related_name='gidd_figures', on_delete=models.PROTECT,
         verbose_name=_('Country')
     )
-    geographical_region = models.CharField(
+    geographical_region_name = models.CharField(
         verbose_name=_('Geographical Region'), max_length=256, blank=True, null=True
     )
     term = enum.EnumField(
         enum=Figure.FIGURE_TERMS,
         verbose_name=_('Figure Term'),
         blank=True, null=True
-    )
-    locations_coordinates = ArrayField(
-        models.CharField(
-            verbose_name=_('Geo Locations'), max_length=256
-        ),
-        default=list,
     )
     year = models.IntegerField()
     unit = enum.EnumField(enum=Figure.UNIT, verbose_name=_('Unit of Figure'))
@@ -444,6 +445,11 @@ class GiddFigure(models.Model):
         blank=True, null=True
     )
     total_figures = models.PositiveIntegerField(verbose_name=_('Total Figures'))
+    household_size = models.FloatField(
+        verbose_name=_('Household Size'),
+        blank=True, null=True
+    )
+    reported = models.PositiveIntegerField(verbose_name=_('Reported Figures'))
     # Dates
     start_date = models.DateField(blank=True, null=True)
     start_date_accuracy = models.TextField(blank=True, null=True)
@@ -457,7 +463,7 @@ class GiddFigure(models.Model):
         models.CharField(
             verbose_name=_('Sources'), max_length=256
         ),
-        default=list,
+        default=list,   
     )
     sources_type = ArrayField(
         models.CharField(
@@ -486,6 +492,12 @@ class GiddFigure(models.Model):
         verbose_name=_('Excerpt for IDU'),
         blank=True, null=True
     )
+    locations_coordinates = ArrayField(
+        models.CharField(
+            verbose_name=_('Location Coordinates'), max_length=256
+        ),
+        default=list,
+    )
 
     locations_names = ArrayField(
         models.CharField(
@@ -510,9 +522,6 @@ class GiddFigure(models.Model):
         verbose_name=_('Displacement Occurred'),
         blank=True, null=True
     )
-    # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.iso3

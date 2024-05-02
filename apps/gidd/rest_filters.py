@@ -10,7 +10,6 @@ from .models import (
     PublicFigureAnalysis,
 )
 from apps.crisis.models import Crisis
-from .enums import DisaggregationExportTypeEnum
 
 
 class RestConflictFilterSet(ReleaseMetadataFilter):
@@ -130,16 +129,12 @@ class DisaggregationFilterst(ReleaseMetadataFilter):
         method='filter_cause',
         choices=get_name_choices(Crisis.CRISIS_TYPE),
     )
-    export_type = django_filters.ChoiceFilter(method='no_op', choices=DisaggregationExportTypeEnum.choices)
 
     class Meta:
         model = GiddFigure
         fields = {
             'iso3': ['in'],
         }
-
-    def no_op(self, queryset, name, value):
-        return queryset
 
     def filter_cause(self, queryset, name, value):
         if value == Crisis.CRISIS_TYPE.CONFLICT.name:

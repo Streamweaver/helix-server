@@ -30,42 +30,12 @@ from .models import (
 from apps.event.models import Event
 from apps.country.models import Country
 from apps.report.models import Report
-from apps.common.utils import EXTERNAL_TUPLE_SEPARATOR, extract_event_code_data_list
+from apps.common.utils import EXTERNAL_TUPLE_SEPARATOR, extract_event_code_data_list, extract_source_data
 from utils.db import Array
 
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-
-class ExtractSourceData(typing.TypedDict):
-    sources: typing.List[str]
-    sources_type: typing.List[str]
-
-
-class ExtractPublisherData(typing.TypedDict):
-    publishers: typing.List[str]
-
-
-def extract_source_data(data) -> ExtractSourceData:
-    sources = []
-    sources_type = []
-    for i in data:
-        sources.append(i[0])
-        sources_type.append(i[1])
-    return {
-        'sources': sources,
-        'sources_type': sources_type,
-    }
-
-
-def extract_publisher_data(data) -> ExtractPublisherData:
-    publishers = []
-    for i in data:
-        publishers.append(i[0])
-    return {
-        'publishers': publishers,
-    }
 
 
 def get_gidd_years():
@@ -591,9 +561,11 @@ def update_gidd_event_and_gidd_figure_data():
                 hazard_sub_type_name=item['disaster_sub_type__name'],
                 other_sub_type_name=item['other_sub_type__name'],
 
-                event_codes=get_attr_list_from_event_codes(item['event_codes'], 'code') or [],
-                event_codes_type=get_attr_list_from_event_codes(item['event_codes'], 'code_type') or [],
+                event_codes=event_code['code'],
+                event_codes_type=event_code['code_type'],
+                event_codes_iso3=event_code['iso3']
             ) for item in event_queryset
+            for event_code in [extract_event_code_data_list(item['event_codes'])]
         ]
     )
 
@@ -632,12 +604,10 @@ def update_gidd_event_and_gidd_figure_data():
                 ),
             ),
             publishers_data=ArrayAgg(
-                Array(
-                    F('entry__publishers__name'),
-                    output_field=ArrayField(models.CharField()),
-                ),
+                F('entry__publishers__name'),
                 distinct=True,
-            ),
+                filter=~Q(entry__publishers__name__isnull=True),
+            )
         ).values(
             'id',
             'event__id',
@@ -654,6 +624,8 @@ def update_gidd_event_and_gidd_figure_data():
             'figure_cause',
             'role',
             'total_figures',
+            'household_size',
+            'reported',
             'start_date',
             'start_date_accuracy',
             'end_date',
@@ -675,7 +647,7 @@ def update_gidd_event_and_gidd_figure_data():
                     country_name=item['country__idmc_short_name'],
                     country_id=item['country'],
                     gidd_event_id=item['event__id'],    # NOTE: GiddEvent ID is same as Event ID
-                    geographical_region=item['country__geographical_group__name'],
+                    geographical_region_name=item['country__geographical_group__name'],
                     year=year,
                     unit=item['unit'],
                     category=item['category'],
@@ -683,9 +655,11 @@ def update_gidd_event_and_gidd_figure_data():
                     role=item['role'],
                     term=item['term'],
                     sources=source_data['sources'],
-                    publishers=publisher_data['publishers'],
+                    publishers=item['publishers_data'],
                     sources_type=source_data['sources_type'],
                     total_figures=item['total_figures'],
+                    household_size=item['household_size'],
+                    reported=item['reported'],
                     start_date=item['start_date'],
                     start_date_accuracy=item['start_date_accuracy'],
                     end_date=item['end_date'],
@@ -704,7 +678,6 @@ def update_gidd_event_and_gidd_figure_data():
                 ) for item in qs
                 for location_data in [extract_location_data(item['locations'])]
                 for source_data in [extract_source_data(item['sources_data'])]
-                for publisher_data in [extract_publisher_data(item['publishers_data'])]
             ]
         )
 
@@ -718,11 +691,11 @@ def update_gidd_data(log_id):
     Disaster.objects.all().delete()
 
     try:
-        update_gidd_legacy_data()
-        update_conflict_and_disaster_data()
-        update_public_figure_analysis()
-        update_displacement_data()
-        update_idps_sadd_estimates_country_names()
+        # update_gidd_legacy_data()
+        # update_conflict_and_disaster_data()
+        # update_public_figure_analysis()
+        # update_displacement_data()
+        # update_idps_sadd_estimates_country_names()
         update_gidd_event_and_gidd_figure_data()
         StatusLog.objects.filter(id=log_id).update(
             status=StatusLog.Status.SUCCESS,

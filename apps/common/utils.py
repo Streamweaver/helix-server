@@ -126,3 +126,41 @@ def extract_event_code_data(
         'code_type': EXTERNAL_ARRAY_SEPARATOR.join(extracted_data.get('code_type', [])),
         'iso3': EXTERNAL_ARRAY_SEPARATOR.join(extracted_data.get('iso3', [])),
     }
+
+
+class ExtractSourceData(typing.TypedDict):
+    sources: typing.List[str]
+    sources_type: typing.List[str]
+
+
+def extract_source_data(
+        data: typing.List[typing.Tuple[str, str]]
+) -> ExtractSourceData:
+
+    sources = []
+    sources_type = []
+    for i in data:
+        sources.append(i[0])
+        sources_type.append(i[1])
+    return {
+        'sources': sources,
+        'sources_type': sources_type,
+    }
+
+
+def extract_source_data_as_string(
+    data: typing.List[typing.Tuple[str, str]]
+) -> str:
+    return EXTERNAL_ARRAY_SEPARATOR.join(
+        EXTERNAL_FIELD_SEPARATOR.join(item)
+        for item in data
+    )
+
+
+def extract_publisher_data_as_string(
+    data: typing.List[typing.Tuple[str, str]]
+) -> str:
+    return EXTERNAL_ARRAY_SEPARATOR.join(
+        EXTERNAL_FIELD_SEPARATOR.join(item)
+        for item in data
+    )

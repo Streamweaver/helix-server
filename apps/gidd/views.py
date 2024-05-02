@@ -1,6 +1,5 @@
 import typing
 import json
-import typing
 from datetime import datetime
 from django.core.serializers.json import DjangoJSONEncoder
 from rest_framework import viewsets
@@ -8,7 +7,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import action
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from rest_framework import mixins
@@ -19,11 +18,11 @@ from django.db.models import (
 )
 
 from apps.country.models import Country
-from apps.entry.models import Figure
-from apps.common.utils import EXTERNAL_ARRAY_SEPARATOR, EXTERNAL_FIELD_SEPARATOR
+from apps.entry.models import ExternalApiDump, Figure
+from apps.common.utils import EXTERNAL_ARRAY_SEPARATOR, EXTERNAL_FIELD_SEPARATOR, extract_publisher_data_as_string, \
+    format_event_codes_as_string, format_locations_as_string, extract_source_data_as_string
 from apps.crisis.models import Crisis
 
-from .enums import DisaggregationExportTypeEnum
 from .models import (
     Conflict, Disaster, DisplacementData, GiddFigure, IdpsSaddEstimate,
     StatusLog, PublicFigureAnalysis
@@ -45,7 +44,6 @@ from .rest_filters import (
     PublicFigureAnalysisFilterSet,
 )
 from utils.common import track_gidd, client_id
-from apps.entry.models import ExternalApiDump, Figure
 
 
 @client_id
@@ -603,7 +601,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
     def get_queryset(self):
         track_gidd(
             self.request.GET.get('client_id'),
-            ExternalApiDump.ExternalApiType.GIDD_DISAGGREGATION_EXPORT_REST,
+            ExternalApiDump.ExternalApiType.GIDD_DISAGGREGATION_REST,
             viewset=self,
         )
         return GiddFigure.objects.all()
@@ -664,13 +662,16 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     "ID": item.id,
                     "ISO3": item.iso3,
                     "Country": item.country_name,
-                    "Geographical region": item.geographical_region,
+                    "Geographical region": item.geographical_region_name,
                     "Figure cause": self._get_cause(item.cause),
                     "Year": item.year,
                     "Figure category": self._get_category(item.category),
                     "Figure term": self._get_term(item.term),
                     "Total figure": item.total_figures,
+                    "Household size": item.household_size,
+                    "Reported figures": item.reported,
                     "Hazard category": item.gidd_event.hazard_category_name,
+                    "Hazard sub category": item.gidd_event.hazard_sub_category_name,
                     "Hazard type": item.gidd_event.hazard_type_name,
                     "Hazard sub type": item.gidd_event.hazard_sub_type_name,
                     "Other event sub type": item.gidd_event.other_sub_type_name,
@@ -721,7 +722,8 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             'Figure category',
             'Figure term',
             'Total figure',
-            'Hazard category',
+            'Hazard category'
+            'Hazard sub cateogry',
             'Hazard type',
             'Hazard sub type',
             'Other svent sub type',
@@ -775,13 +777,14 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 item.id,
                 item.iso3,
                 item.country_name,
-                item.geographical_region,
+                item.geographical_region_name,
                 self._get_cause(item.cause),
                 item.year,
                 self._get_category(item.category),
                 self._get_term(item.term),
                 item.total_figures,
                 item.gidd_event.hazard_category_name,
+                item.gidd_event.hazard_sub_category_name,
                 item.gidd_event.hazard_type_name,
                 item.gidd_event.hazard_sub_type_name,
                 item.gidd_event.other_sub_type_name,
@@ -792,9 +795,9 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 item.stock_date,
                 item.stock_date_accuracy,
                 item.stock_reporting_date,
-                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.publishers if i is not None]),
-                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.sources if i is not None]),
-                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.sources_type if i is not None]),
+                extract_publisher_data_as_string(item.publishers),
+                extract_source_data_as_string(item.sources),
+                extract_source_data_as_string(item.sources_type),
                 item.gidd_event_id,
                 item.gidd_event.name,
                 self._get_cause(item.gidd_event.cause),
@@ -805,15 +808,14 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 item.gidd_event.end_date_accuracy,
                 "Yes" if item.is_housing_destruction else "No",
                 item.gidd_event.violence_name,
-                EXTERNAL_ARRAY_SEPARATOR.join(
-                    [f"{key}{EXTERNAL_FIELD_SEPARATOR}{value}" for key, value in zip(
-                        item.gidd_event.event_codes,
-                        item.gidd_event.event_codes_type
-                    )]
+                format_event_codes_as_string(
+                    item.gidd_event.event_codes,
+                    item.gidd_event.event_codes_type,
+                    item.gidd_event.event_codes_iso3
                 ),
-                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.locations_names if i is not None]),
-                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.locations_accuracy if i is not None]),
-                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.locations_type if i is not None]),
+                format_locations_as_string(item.locations_names),
+                format_locations_as_string(item.locations_accuracy),
+                format_locations_as_string(item.locations_type),
                 self._get_displacement_occurred(item.displacement_occurred),
             ])
         response = HttpResponse(content=save_virtual_workbook(wb))
@@ -826,23 +828,45 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
     @action(
         detail=False,
         methods=["get"],
-        url_path="export",
+        url_path="disaggregated-geojson",
         permission_classes=[AllowAny],
     )
     def export(self, request):
         """
         Export the disaggregated data in geojson format file
         """
-        queryset = self.filter_queryset(self.get_queryset()).order_by(
+        track_gidd(
+            self.request.GET.get('client_id'),
+            ExternalApiDump.ExternalApiType.GIDD_DISAGGREGATION_EXPORT_GEOJSON,
+            viewset=self,
+        )
+        queryset = GiddFigure.objects.order_by(
             '-year',
             'iso3',
         )
-        _type = request.query_params.get('export_type', DisaggregationExportTypeEnum.EXCEL.value)  # Default to Excel
-        if _type == DisaggregationExportTypeEnum.GEO_JSON.value:
-            return self.export_disaggregated_geojson(queryset)
-        elif _type == DisaggregationExportTypeEnum.EXCEL.value:
-            return self.export_disaggregated_excel(queryset)
-        return HttpResponseBadRequest('Please provide a export type')
+        return self.export_disaggregated_geojson(queryset)
+
+    @extend_schema(responses=DisaggregationSerializer(many=True))
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="disaggregated-export",
+        permission_classes=[AllowAny],
+    )
+    def export_disaggregated(self, request):
+        """
+        Export the disaggregated data in excel format file
+        """
+        track_gidd(
+            self.request.GET.get('client_id'),
+            ExternalApiDump.ExternalApiType.GIDD_DISAGGREGATION_EXPORT_EXCEL,
+            viewset=self,
+        )
+        queryset = GiddFigure.objects.order_by(
+            '-year',
+            'iso3',
+        )
+        return self.export_disaggregated_excel(queryset)
 
 
 class PublicFigureAnalysisViewSet(ListOnlyViewSetMixin):

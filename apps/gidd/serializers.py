@@ -145,6 +145,8 @@ class DisaggregationSerializer(serializers.ModelSerializer):
             'cause',
             'term',
             'total_figures',
+            'household_size',
+            'reported',
             'start_date',
             'end_date',
             'start_date_accuracy',
