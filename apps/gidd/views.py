@@ -619,6 +619,43 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
     def _get_unit(self, unit):
         return Figure.UNIT.get(unit).label if unit is not None else None
 
+    def extract_event_data(
+        self,
+        event_code: typing.List[typing.Tuple[str]],
+        event_code_type: typing.List[typing.Tuple[str]],
+        event_code_iso3: typing.List[typing.Tuple[str]]
+    ) -> str:
+        event_code_components = [
+            event_code,
+            event_code_type,
+            event_code_iso3
+        ]
+        transposed_components = zip(*event_code_components)
+
+        return EXTERNAL_ARRAY_SEPARATOR.join(
+            EXTERNAL_FIELD_SEPARATOR.join(loc)
+            for loc in transposed_components
+        )
+
+    @staticmethod
+    def string_join(
+        separator: str,
+        data: typing.List[str],
+    ) -> str:
+        return separator.join([
+            str(item)
+            for item in data
+            if item is not None
+        ])
+
+    @staticmethod
+    def remove_null_from_dict(data: dict) -> dict:
+        return {
+            key: value
+            for key, value in data.items()
+            if value is not None
+        }
+
     def _export_disaggregated_geojson(self, qs):
 
         def format_coordinate(coordinate: str) -> typing.Tuple[float, float]:
@@ -628,9 +665,9 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         def format_coordinates(coordinates: typing.List[str]):
             return [format_coordinate(x) for x in coordinates]
 
-        qs = qs.filter(
-            Q(locations_coordinates__isnull=False) |
-            Q(locations_coordinates__len__gt=0)
+        qs = qs.exclude(
+            Q(locations_coordinates__isnull=True) |
+            Q(locations_coordinates=[])
         ).annotate(
             event_main_trigger=Case(
                 When(
@@ -660,7 +697,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     "type": "MultiPoint",
                     "coordinates": format_coordinates(item.locations_coordinates),
                 },
-                "properties": {
+                "properties": self.remove_null_from_dict({
                     "ID": item.id,
                     "ISO3": item.iso3,
                     "Country": item.country_name,
@@ -710,7 +747,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     "Location accuracy": item.locations_accuracy,
                     "Location type": item.locations_type,
                     "Displacement occurred": self._get_displacement_occurred(item.displacement_occurred),
-                }
+                })
             }
             feature_collection['features'].append(feature)
 
@@ -822,17 +859,14 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 item.gidd_event.end_date_accuracy,
                 "Yes" if item.is_housing_destruction else "No",
                 item.violence_name,
-                EXTERNAL_ARRAY_SEPARATOR.join([
-                    EXTERNAL_FIELD_SEPARATOR.join(data)
-                    for data in zip(*[
-                        item.gidd_event.event_codes,
-                        item.gidd_event.event_codes_type,
-                        item.gidd_event.event_codes_iso3
-                    ])
-                ]),
-                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.locations_names if i is not None]),
-                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.locations_accuracy if i is not None]),
-                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.locations_type if i is not None]),
+                self.extract_event_data(
+                    item.gidd_event.event_codes,
+                    item.gidd_event.event_codes_type,
+                    item.gidd_event.event_codes_iso3
+                ),
+                self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_names),
+                self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_accuracy),
+                self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_type),
                 self._get_displacement_occurred(item.displacement_occurred),
             ])
         response = HttpResponse(content=save_virtual_workbook(wb))
@@ -860,6 +894,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         queryset = GiddFigure.objects.select_related('gidd_event').order_by(
             '-year',
             'iso3',
+            'id',
         )
         return self._export_disaggregated_geojson(queryset)
 
@@ -882,6 +917,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         queryset = GiddFigure.objects.select_related('gidd_event').order_by(
             '-year',
             'iso3',
+            'id',
         )
         return self._export_disaggregated_excel(queryset)
 

@@ -134,13 +134,12 @@ class DisaggregationFilterSet(django_filters.FilterSet):
         method='no_op',
         choices=get_name_choices(ReleaseMetadata.ReleaseEnvironment),
     )
-    start_year = django_filters.NumberFilter(field_name='start_year', method='filter_start_year')
-    end_year = django_filters.NumberFilter(field_name='end_year', method='filter_end_year')
 
     class Meta:
         model = GiddFigure
         fields = {
             'iso3': ['in'],
+            'disaster_type': ['in'],
         }
 
     def filter_cause(self, queryset, name, value):
@@ -163,12 +162,6 @@ class DisaggregationFilterSet(django_filters.FilterSet):
         if value == ReleaseMetadata.ReleaseEnvironment.PRE_RELEASE.name:
             return qs.filter(year=release_meta_data.pre_release_year)
         return qs.filter(year=release_meta_data.release_year)
-
-    def filter_start_year(self, queryset, name, value):
-        return queryset.filter(year__gte=value)
-
-    def filter_end_year(self, queryset, name, value):
-        return queryset.filter(year__lte=value)
 
     @property
     def qs(self):
