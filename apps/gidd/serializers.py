@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from apps.country.models import Country
 from .models import (
-    Conflict, Disaster, StatusLog, ReleaseMetadata,
+    Conflict, Disaster, GiddFigure, StatusLog, ReleaseMetadata,
     DisplacementData, PublicFigureAnalysis, IdpsSaddEstimate,
 )
 from apps.crisis.models import Crisis
@@ -128,6 +128,41 @@ class ReleaseMetadataSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         validated_data['modified_by'] = user
         return ReleaseMetadata.objects.create(**validated_data)
+
+
+class DisaggregationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GiddFigure
+        fields = (
+            'iso3',
+            'figure',
+            'country_name',
+            'geographical_region_name',
+            'year',
+            'locations_coordinates',
+            'unit',
+            'category',
+            'cause',
+            'term',
+            'total_figures',
+            'household_size',
+            'reported',
+            'start_date',
+            'end_date',
+            'start_date_accuracy',
+            'end_date_accuracy',
+            'stock_date',
+            'stock_date_accuracy',
+            'stock_reporting_date',
+            'sources',
+            'publishers',
+            'gidd_event',
+            'is_housing_destruction',
+            'locations_names',
+            'locations_accuracy',
+            'locations_type',
+            'displacement_occurred',
+        )
 
 
 class IdpsSaddEstimateSerializer(serializers.ModelSerializer):

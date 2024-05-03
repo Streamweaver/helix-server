@@ -1,3 +1,4 @@
+import typing
 import django_filters
 from rest_framework import serializers
 from django.db.models import Q
@@ -13,8 +14,21 @@ from .models import (
 )
 
 
+def get_name_choices(enum_class) -> typing.List[typing.Tuple[str, str]]:
+    return [
+        (i.name, i.label)
+        for i in enum_class
+    ]
+
+
 class ReleaseMetadataFilter(django_filters.FilterSet):
-    release_environment = django_filters.CharFilter(method='filter_release_environment')
+    release_environment = django_filters.ChoiceFilter(
+        method='no_op',
+        choices=get_name_choices(ReleaseMetadata.ReleaseEnvironment),
+    )
+
+    def no_op(self, qs, name, value):
+        return qs
 
     def get_release_metadata(self):
         release_meta_data = ReleaseMetadata.objects.last()
@@ -22,7 +36,7 @@ class ReleaseMetadataFilter(django_filters.FilterSet):
             raise serializers.ValidationError('Release metadata is not configured.')
         return release_meta_data
 
-    def filter_release_environment(self, qs, name, value):
+    def filter_release_environment(self, qs, value):
         release_meta_data = self.get_release_metadata()
         if value == ReleaseMetadata.ReleaseEnvironment.PRE_RELEASE.name:
             return qs.filter(year__lte=release_meta_data.pre_release_year)
@@ -31,9 +45,11 @@ class ReleaseMetadataFilter(django_filters.FilterSet):
     @property
     def qs(self):
         qs = super().qs
-        if 'release_environment' not in self.data:
-            release_meta_data = self.get_release_metadata()
-            return qs.filter(year__lte=release_meta_data.release_year)
+        release_environment_name = self.data.get(
+            'release_environment',
+            ReleaseMetadata.ReleaseEnvironment.RELEASE.name,
+        )
+        qs = self.filter_release_environment(qs, release_environment_name)
         return qs
 
 

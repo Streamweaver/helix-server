@@ -1551,6 +1551,12 @@ class ExternalApiDump(models.Model):
         GIDD_PUBLIC_FIGURE_ANALYSIS_REST = 'gidd-public-figure-analysis-rest', _(
             '/external-api/gidd/public-figure-analyses/'
         )
+        GIDD_DISAGGREGATION_EXPORT_GEOJSON = 'gidd-disaggregation-export-geojson-rest', _(
+            '/external-api/gidd/disaggregations/disaggregated-geojson/'
+        )
+        GIDD_DISAGGREGATION_EXPORT_EXCEL = 'gidd-disaggregation-export-xlsx-rest', _(
+            '/external-api/gidd/disaggregations/disaggregated-export/'
+        )
 
         GIDD_CONFLICT_GRAPHQL = 'gidd-conflict-graphql', _('query.giddPublicConflicts')
         GIDD_DISASTER_GRAPHQL = 'gidd-disaster-graphql', _('query.giddPublicDisasters')
@@ -1785,6 +1791,26 @@ class ExternalApiDump(models.Model):
             ),
             description='',
             example_request='',
+        ),
+        ExternalApiType.GIDD_DISAGGREGATION_EXPORT_GEOJSON: Metadata(
+            response_type='REST - GeoJSON',
+            usage='External',
+            description='GeoJSON export of disaggregated data',
+            example_request=(
+                lambda request, client_code: request.build_absolute_uri(
+                    ExternalApiDump.ExternalApiType.GIDD_DISAGGREGATION_EXPORT_GEOJSON.label + f'?client_id={client_code}'
+                )
+            ),
+        ),
+        ExternalApiType.GIDD_DISAGGREGATION_EXPORT_EXCEL: Metadata(
+            response_type='REST - XLSX',
+            usage='External',
+            description='Excel export of disaggregated data',
+            example_request=(
+                lambda request, client_code: request.build_absolute_uri(
+                    ExternalApiDump.ExternalApiType.GIDD_DISAGGREGATION_EXPORT_EXCEL.label + f'?client_id={client_code}'
+                )
+            ),
         ),
     }
 

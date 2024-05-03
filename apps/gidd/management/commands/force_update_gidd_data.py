@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.db import transaction
 from django.utils import timezone
 
 from apps.gidd.models import StatusLog
@@ -14,7 +13,6 @@ class Command(BaseCommand):
     """
     help = "Force update GIDD data"
 
-    @transaction.atomic()
     def handle(self, *args, **kwargs):
         """
         Executes the command to force update GIDD data.

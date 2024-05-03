@@ -43,19 +43,46 @@ def format_locations_as_string(
     )
 
 
-def extract_location_data(
+class ExtractLocationData(typing.TypedDict):
+    display_name: typing.List[str]
+    lat_lon: typing.List[str]
+    accuracy: typing.List[str]
+    type_of_points: typing.List[str]
+
+
+class ExtractLocationDataAsString(typing.TypedDict):
+    display_name: str
+    lat_lon: str
+    accuracy: str
+    type_of_points: str
+
+
+def extract_location_data_list(
     data: typing.List[typing.Tuple[str, str, str, str]],
-):
+) -> ExtractLocationData:
     # Split the formatted location data into individual components
     location_components = format_locations(data)
 
     transposed_components = zip(*location_components)
 
     return {
-        'display_name': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, [])),
-        'lat_lon': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, [])),
-        'accuracy': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, [])),
-        'type_of_points': EXTERNAL_ARRAY_SEPARATOR.join(next(transposed_components, []))
+        'display_name': next(transposed_components, []),
+        'lat_lon': next(transposed_components, []),
+        'accuracy': next(transposed_components, []),
+        'type_of_points': next(transposed_components, [])
+    }
+
+
+def extract_location_data(
+    data: typing.List[typing.Tuple[str, str, str, str]],
+) -> ExtractLocationDataAsString:
+    location_components = extract_location_data_list(data)
+
+    return {
+        'display_name': EXTERNAL_ARRAY_SEPARATOR.join(location_components['display_name']),
+        'lat_lon': EXTERNAL_ARRAY_SEPARATOR.join(location_components['lat_lon']),
+        'accuracy': EXTERNAL_ARRAY_SEPARATOR.join(location_components['accuracy']),
+        'type_of_points': EXTERNAL_ARRAY_SEPARATOR.join(location_components['type_of_points'])
     }
 
 
@@ -126,3 +153,32 @@ def extract_event_code_data(
         'code_type': EXTERNAL_ARRAY_SEPARATOR.join(extracted_data.get('code_type', [])),
         'iso3': EXTERNAL_ARRAY_SEPARATOR.join(extracted_data.get('iso3', [])),
     }
+
+
+class ExtractSourceData(typing.TypedDict):
+    sources: typing.List[str]
+    sources_type: typing.List[str]
+
+
+def extract_source_data(
+        data: typing.List[typing.Tuple[str, str]]
+) -> ExtractSourceData:
+
+    sources = []
+    sources_type = []
+    for i in data:
+        sources.append(i[0])
+        sources_type.append(i[1])
+    return {
+        'sources': sources,
+        'sources_type': sources_type,
+    }
+
+
+def extract_source_data_as_string(
+    data: typing.List[typing.Tuple[str, str]]
+) -> str:
+    return EXTERNAL_ARRAY_SEPARATOR.join(
+        EXTERNAL_FIELD_SEPARATOR.join(item)
+        for item in data
+    )
