@@ -883,6 +883,34 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_type),
                 self._get_displacement_occurred(item.displacement_occurred),
             ])
+
+        # Tab 2
+        ws2 = wb.create_sheet('2_Context_Displacement_data')
+        ws2.append([
+            'ISO3',
+            'Year',
+            'Figure cause',
+            'Figure category',
+            'Description',
+            'Figures',
+            'Figures rounded',
+        ])
+        pfa_qs = PublicFigureAnalysisFilterSet(
+            data=self.request.query_params,
+            queryset=PublicFigureAnalysis.objects.all()
+        ).qs.order_by('iso3', 'year')
+        # FIXME: sort this and filter this
+        for item in pfa_qs:
+            ws2.append([
+                item.iso3,
+                item.year,
+                item.figure_cause.label,
+                item.figure_category.label,
+                item.description,
+                item.figures,
+                item.figures_rounded,
+            ])
+
         response = HttpResponse(content=save_virtual_workbook(wb))
         filename = 'IDMC_Internal_Displacement_Disaggregated.xlsx'
         response['Content-Disposition'] = f'attachment; filename={filename}'
