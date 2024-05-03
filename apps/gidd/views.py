@@ -601,21 +601,21 @@ class DisaggregationViewSet(viewsets.GenericViewSet):
     filterset_class = DisaggregationFilterst
 
     def _get_term(self, term):
-        return Figure.FIGURE_TERMS.get(term).name if term else None
+        return Figure.FIGURE_TERMS.get(term).label if term != None else None
 
     def _get_category(self, category):
-        return Figure.FIGURE_CATEGORY_TYPES.get(category).name if category else None
+        return Figure.FIGURE_CATEGORY_TYPES.get(category).label if category != None else None
 
     def _get_cause(self, cause):
-        return Crisis.CRISIS_TYPE.get(cause).name if cause else None
+        return Crisis.CRISIS_TYPE.get(cause).label if cause != None else None
 
     def _get_displacement_occurred(self, displacement_occurred) -> str:
-        if displacement_occurred:
+        if displacement_occurred != None:
             return DisasterViewSet.get_displacement_status([displacement_occurred])
         return ""
 
     def _get_unit(self, unit):
-        return Figure.UNIT.get(unit).name if unit else None
+        return Figure.UNIT.get(unit).label if unit != None else None
 
     def _export_disaggregated_geojson(self, qs):
 
@@ -801,11 +801,11 @@ class DisaggregationViewSet(viewsets.GenericViewSet):
                 item.stock_date_accuracy,
                 item.stock_reporting_date,
                 EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.publishers if i is not None]),
-                extract_source_data_as_string(item.sources),
-                extract_source_data_as_string(item.sources_type),
+                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.sources if i is not None]),
+                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.sources_type if i is not None]),
                 item.gidd_event_id,
                 item.gidd_event.name,
-                self._get_cause(item.gidd_event.cause),
+                # self._get_cause(item.gidd_event.cause),
                 item.event_main_trigger,
                 item.gidd_event.start_date,
                 item.gidd_event.end_date,
@@ -813,11 +813,14 @@ class DisaggregationViewSet(viewsets.GenericViewSet):
                 item.gidd_event.end_date_accuracy,
                 "Yes" if item.is_housing_destruction else "No",
                 item.violence_name,
-                format_event_codes_as_string(
-                    item.gidd_event.event_codes,
-                    item.gidd_event.event_codes_type,
-                    item.gidd_event.event_codes_iso3
-                ),
+                EXTERNAL_ARRAY_SEPARATOR.join([
+                    EXTERNAL_FIELD_SEPARATOR.join(xxx)
+                    for xxx in zip(*[
+                        item.gidd_event.event_codes,
+                        item.gidd_event.event_codes_type,
+                        item.gidd_event.event_codes_iso3
+                    ])
+                ]),
                 EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.locations_names if i is not None]),
                 EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.locations_accuracy if i is not None]),
                 EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.locations_type if i is not None]),

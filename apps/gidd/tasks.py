@@ -165,6 +165,7 @@ def update_conflict_and_disaster_data():
         # FIXME: Check if this should be
         # - Figure.filtered_nd_figures_for_listing
         # - Figure.filtered_idp_figures_for_listing
+        # NOTE: No we do not need to use the listing method as we are aggregating
         nd_figure_qs = Figure.filtered_nd_figures(
             qs=figure_queryset,
             start_date=datetime.datetime(year=year, month=1, day=1),
@@ -310,8 +311,6 @@ def update_conflict_and_disaster_data():
 def update_public_figure_analysis():
     # NOTE:- Exactly one aggregation should obtained for PFA
     # NOTE:- There must be exaclty one country
-    # Delete all the public figure analysis objects
-    PublicFigureAnalysis.objects.all().delete()
     data = []
 
     def _get_figures(figure_category, figure_cause, report_country_aggregation):
@@ -390,7 +389,6 @@ def update_public_figure_analysis():
 
 
 def update_displacement_data():
-    DisplacementData.objects.all().delete()
     start_year = min(
         Disaster.objects.order_by('year').first().year,
         Conflict.objects.order_by('year').first().year
@@ -490,12 +488,6 @@ def update_gidd_event_and_gidd_figure_data():
     Updates GiddEvent and GiddFigure data
     '''
 
-    # Delete all the GiddFigure objects
-    GiddFigure.objects.all().delete()
-
-    # Delete all the GiddEvent objects
-    GiddEvent.objects.all().delete()
-
     event_queryset = Event.objects.annotate(
         event_codes=ArrayAgg(
             Array(
@@ -576,12 +568,21 @@ def update_gidd_event_and_gidd_figure_data():
     )
 
     for year in get_gidd_years():
-        # Create GiddFigure
         figure_queryset = Figure.objects.filter(
+            role=Figure.ROLE.RECOMMENDED
+        )
+        nd_figure_qs = Figure.filtered_nd_figures_for_listing(
+            qs=figure_queryset,
             start_date=datetime.datetime(year=year, month=1, day=1),
             end_date=datetime.datetime(year=year, month=12, day=31),
         )
-        qs = figure_queryset.annotate(
+        stock_figure_qs = Figure.filtered_idp_figures_for_listing(
+            qs=figure_queryset,
+            start_date=datetime.datetime(year=year, month=1, day=1),
+            end_date=datetime.datetime(year=year, month=12, day=31),
+        )
+        figure_qs = nd_figure_qs | stock_figure_qs
+        qs = figure_qs.annotate(
             **Figure.annotate_stock_and_flow_dates(),
             sources_data=ArrayAgg(
                 Array(
@@ -724,6 +725,17 @@ def update_gidd_data(log_id):
 
     # Delete disasters
     Disaster.objects.all().delete()
+
+    # Delete all the public figure analysis objects
+    PublicFigureAnalysis.objects.all().delete()
+
+    DisplacementData.objects.all().delete()
+
+    # Delete all the GiddFigure objects
+    GiddFigure.objects.all().delete()
+
+    # Delete all the GiddEvent objects
+    GiddEvent.objects.all().delete()
 
     try:
         update_gidd_legacy_data()
