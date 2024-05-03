@@ -1,4 +1,5 @@
 import django_filters
+from rest_framework import serializers
 from django.db.models import Q
 from .filters import ReleaseMetadataFilter, get_name_choices
 from .models import (
@@ -156,6 +157,12 @@ class DisaggregationFilterSet(django_filters.FilterSet):
 
     def no_op(self, qs, name, value):
         return qs
+
+    def get_release_metadata(self):
+        release_meta_data = ReleaseMetadata.objects.last()
+        if not release_meta_data:
+            raise serializers.ValidationError('Release metadata is not configured.')
+        return release_meta_data
 
     def filter_release_environment(self, qs, value):
         release_meta_data = self.get_release_metadata()

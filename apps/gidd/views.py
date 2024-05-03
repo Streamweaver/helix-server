@@ -597,33 +597,42 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
 
 
 class DisaggregationViewSet(ListOnlyViewSetMixin):
+    queryset = GiddFigure.objects.all()
     serializer_class = DisaggregationSerializer
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter)
     filterset_class = DisaggregationFilterSet
-    queryset = GiddFigure.objects.all()
 
-    def _get_term(self, term):
-        return Figure.FIGURE_TERMS.get(term).label if term is not None else None
+    def _get_term(self, term) -> typing.Optional[str]:
+        if term is None:
+            return None
+        return Figure.FIGURE_TERMS.get(term).label
 
-    def _get_category(self, category):
-        return Figure.FIGURE_CATEGORY_TYPES.get(category).label if category is not None else None
+    def _get_category(self, category) -> typing.Optional[str]:
+        if category is None:
+            return
+        return Figure.FIGURE_CATEGORY_TYPES.get(category).label
 
-    def _get_cause(self, cause):
-        return Crisis.CRISIS_TYPE.get(cause).label if cause is not None else None
+    def _get_cause(self, cause) -> typing.Optional[str]:
+        if cause is None:
+            return
+        return Crisis.CRISIS_TYPE.get(cause).label
 
     def _get_displacement_occurred(self, displacement_occurred) -> str:
         if displacement_occurred is not None:
             return DisasterViewSet.get_displacement_status([displacement_occurred])
         return ""
 
-    def _get_unit(self, unit):
-        return Figure.UNIT.get(unit).label if unit is not None else None
+    def _get_unit(self, unit) -> typing.Optional[str]:
+        if unit is None:
+            return None
+        return Figure.UNIT.get(unit).label
 
     def extract_event_data(
         self,
         event_code: typing.List[typing.Tuple[str]],
         event_code_type: typing.List[typing.Tuple[str]],
-        event_code_iso3: typing.List[typing.Tuple[str]]
+        event_code_iso3: typing.List[typing.Tuple[str]],
+        filter_iso3: str
     ) -> str:
         event_code_components = [
             event_code,
@@ -633,8 +642,9 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         transposed_components = zip(*event_code_components)
 
         return EXTERNAL_ARRAY_SEPARATOR.join(
-            EXTERNAL_FIELD_SEPARATOR.join(loc)
+            EXTERNAL_FIELD_SEPARATOR.join([loc[0], loc[1]])
             for loc in transposed_components
+            if loc[2] == filter_iso3
         )
 
     @staticmethod
@@ -698,7 +708,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     "coordinates": format_coordinates(item.locations_coordinates),
                 },
                 "properties": self.remove_null_from_dict({
-                    "ID": item.id,
+                    "ID": item.figure_id,
                     "ISO3": item.iso3,
                     "Country": item.country_name,
                     "Geographical region": item.geographical_region_name,
@@ -726,7 +736,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     "Publishers": item.publishers,
                     "Sources": item.sources,
                     "Sources type": item.sources_type,
-                    "Event ID": item.gidd_event_id,
+                    "Event ID": item.gidd_event.event_id,
                     "Event name": item.gidd_event.name,
                     "Event cause": self._get_cause(item.gidd_event.cause),
                     "Event main trigger": item.event_main_trigger,
@@ -735,14 +745,12 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     "Event start date accuracy": item.gidd_event.start_date_accuracy,
                     "Event end date accuracy": item.gidd_event.end_date_accuracy,
                     "Is housing destruction": "Yes" if item.is_housing_destruction is not None else "No",
-                    "Event Code(Code:Type)": EXTERNAL_ARRAY_SEPARATOR.join([
-                        EXTERNAL_FIELD_SEPARATOR.join(data)
-                        for data in zip(*[
-                            item.gidd_event.event_codes,
-                            item.gidd_event.event_codes_type,
-                            item.gidd_event.event_codes_iso3
-                        ])
-                    ]),
+                    "Event Code(Code:Type)": self.extract_event_data(
+                        item.gidd_event.event_codes,
+                        item.gidd_event.event_codes_type,
+                        item.gidd_event.event_codes_iso3,
+                        item.iso3,
+                    ),
                     "Location name": item.locations_names,
                     "Location accuracy": item.locations_accuracy,
                     "Location type": item.locations_type,
@@ -771,9 +779,9 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             'Figure term',
             'Figure unit',
             'Total figures',
-            'Reported figures'
+            'Reported figures',
             'Household size',
-            'Hazard category'
+            'Hazard category',
             'Hazard sub cateogry',
             'Hazard type',
             'Hazard sub type',
@@ -785,7 +793,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             'Stock date',
             'Stock date accuracy',
             'Stock reporting date',
-            'Publishers'
+            'Publishers',
             'Sources',
             'Sources type',
             'Event ID',
@@ -802,8 +810,9 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             'Location name',
             'Location accuracy',
             'Location type',
-            'Displacement occurred'
+            'Displacement occurred',
         ])
+
         qs = qs.filter(
             locations_coordinates__isnull=False,
         ).annotate(
@@ -820,12 +829,13 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     gidd_event__cause=Crisis.CRISIS_TYPE.OTHER,
                     then=F('gidd_event__other_sub_type__name')
                 ),
-                output_field=models.CharField()
+                output_field=models.CharField(),
             ),
         )
+
         for item in qs:
             ws.append([
-                item.id,
+                item.figure_id,
                 item.iso3,
                 item.country_name,
                 item.geographical_region_name,
@@ -835,6 +845,8 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 self._get_term(item.term),
                 self._get_unit(item.unit),
                 item.total_figures,
+                item.reported,
+                item.household_size,
                 item.disaster_category_name,
                 item.disaster_sub_category_name,
                 item.disaster_type_name,
@@ -847,11 +859,12 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 item.stock_date,
                 item.stock_date_accuracy,
                 item.stock_reporting_date,
-                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.publishers if i is not None]),
-                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.sources if i is not None]),
-                EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.sources_type if i is not None]),
-                item.gidd_event_id,
+                self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.publishers),
+                self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.sources),
+                self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.sources_type),
+                item.gidd_event.event_id,
                 item.gidd_event.name,
+                self._get_cause(item.gidd_event.cause),
                 item.event_main_trigger,
                 item.gidd_event.start_date,
                 item.gidd_event.end_date,
@@ -862,7 +875,8 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 self.extract_event_data(
                     item.gidd_event.event_codes,
                     item.gidd_event.event_codes_type,
-                    item.gidd_event.event_codes_iso3
+                    item.gidd_event.event_codes_iso3,
+                    item.iso3,
                 ),
                 self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_names),
                 self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_accuracy),
@@ -896,7 +910,8 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             'iso3',
             'id',
         )
-        return self._export_disaggregated_geojson(queryset)
+        qs = self.filter_queryset(queryset)
+        return self._export_disaggregated_geojson(qs)
 
     @extend_schema(responses=DisaggregationSerializer(many=True))
     @action(
@@ -919,7 +934,8 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             'iso3',
             'id',
         )
-        return self._export_disaggregated_excel(queryset)
+        qs = self.filter_queryset(queryset)
+        return self._export_disaggregated_excel(qs)
 
 
 class PublicFigureAnalysisViewSet(ListOnlyViewSetMixin):

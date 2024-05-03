@@ -2,7 +2,7 @@ import datetime
 import logging
 from helix.celery import app as celery_app
 from django.utils import timezone
-from django.db import models
+from django.db import models, transaction
 from django.db.models.functions import Cast, Concat
 from django.contrib.postgres.aggregates.general import ArrayAgg
 from django.db.models import (
@@ -723,34 +723,32 @@ def update_gidd_event_and_gidd_figure_data():
 
 @celery_app.task
 def update_gidd_data(log_id):
-    # Delete all the conflicts TODO: Find way to update records
-    Conflict.objects.all().delete()
-
-    # Delete disasters
-    Disaster.objects.all().delete()
-
-    # Delete all the public figure analysis objects
-    PublicFigureAnalysis.objects.all().delete()
-
-    DisplacementData.objects.all().delete()
-
-    # Delete all the GiddFigure objects
-    GiddFigure.objects.all().delete()
-
-    # Delete all the GiddEvent objects
-    GiddEvent.objects.all().delete()
-
     try:
-        update_gidd_legacy_data()
-        update_conflict_and_disaster_data()
-        update_public_figure_analysis()
-        update_displacement_data()
-        update_idps_sadd_estimates_country_names()
-        update_gidd_event_and_gidd_figure_data()
-        StatusLog.objects.filter(id=log_id).update(
-            status=StatusLog.Status.SUCCESS,
-            completed_at=timezone.now()
-        )
+        with transaction.atomic():
+            # DELETE
+            # -- Delete all the conflicts TODO: Find way to update records
+            Conflict.objects.all().delete()
+            # -- Delete disasters
+            Disaster.objects.all().delete()
+            # -- Delete all the public figure analysis objects
+            PublicFigureAnalysis.objects.all().delete()
+            DisplacementData.objects.all().delete()
+            # -- Delete all the GiddFigure objects
+            GiddFigure.objects.all().delete()
+            # -- Delete all the GiddEvent objects
+            GiddEvent.objects.all().delete()
+
+            # Create new data for GIDD
+            update_gidd_legacy_data()
+            update_conflict_and_disaster_data()
+            update_public_figure_analysis()
+            update_displacement_data()
+            update_idps_sadd_estimates_country_names()
+            update_gidd_event_and_gidd_figure_data()
+            StatusLog.objects.filter(id=log_id).update(
+                status=StatusLog.Status.SUCCESS,
+                completed_at=timezone.now()
+            )
         logger.info('GIDD data updated.')
     except Exception as e:
         StatusLog.objects.filter(id=log_id).update(

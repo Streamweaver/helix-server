@@ -479,13 +479,13 @@ class GiddFigure(MetaInformationAbstractModel):
         null=True,
         blank=True,
     )
+
     locations_coordinates = ArrayField(
         models.CharField(
             verbose_name=_('Location Coordinates'), max_length=256
         ),
         default=list,
     )
-
     locations_names = ArrayField(
         models.CharField(
             verbose_name=_('Location Names'), max_length=256
