@@ -577,13 +577,19 @@ def update_gidd_event_and_gidd_figure_data():
             qs=figure_queryset,
             start_date=datetime.datetime(year=year, month=1, day=1),
             end_date=datetime.datetime(year=year, month=12, day=31),
+        ).filter(
+            category=Figure.FIGURE_CATEGORY_TYPES.NEW_DISPLACEMENT.value,
         )
         stock_figure_qs = Figure.filtered_idp_figures_for_listing(
             qs=figure_queryset,
             start_date=datetime.datetime(year=year, month=1, day=1),
             end_date=datetime.datetime(year=year, month=12, day=31),
+        ).filter(
+            category=Figure.FIGURE_CATEGORY_TYPES.IDPS.value,
         )
         figure_qs = nd_figure_qs | stock_figure_qs
+
+        print(str(figure_qs.query))
         qs = figure_qs.annotate(
             **Figure.annotate_stock_and_flow_dates(),
             sources_data=ArrayAgg(
