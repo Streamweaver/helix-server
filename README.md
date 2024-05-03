@@ -79,3 +79,15 @@ There are custom management commands available to facilitate specific tasks.
 ```
 > NOTE: This command populates the `calculation_logic` field in the Figure Table if there is no existing data in it.
 
+### Populate Household Size table and update AHHS data for the year 2024
+```bash
+./manage.py update_ahhs_2024 update_ahhs.csv
+```
+> NOTE: This command populates the HouseholdSize Table and updates AHHS data in the Figure Table specifically for the year 2024.
+
+### Force Update GIDD Data
+```bash
+./manage.py force_update_gidd_data
+```
+> NOTE: This command forces an update of GIDD data. It's important to note that this command is intended for local development purposes only, so it should be used with caution.
+

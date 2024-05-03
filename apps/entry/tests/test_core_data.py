@@ -744,7 +744,7 @@ class TestCoreData(HelixGraphQLTestCase):
             # FIXME: The country is not getting the correct type
             report_name = (
                 f'GRID {report.filter_figure_start_after.year + 1}' if country is None else
-                f'GRID {report.filter_figure_start_after.year  + 1} - {country.iso3}'
+                f'GRID {report.filter_figure_start_after.year + 1} - {country.iso3}'
             )
 
             report_aggregates.append({

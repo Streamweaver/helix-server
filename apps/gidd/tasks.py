@@ -2,8 +2,8 @@ import datetime
 import logging
 from helix.celery import app as celery_app
 from django.utils import timezone
-from django.db import models
-from django.db.models.functions import Cast
+from django.db import models, transaction
+from django.db.models.functions import Cast, Concat
 from django.contrib.postgres.aggregates.general import ArrayAgg
 from django.db.models import (
     Sum, Case, When, IntegerField, Value, F, Subquery, OuterRef, Q
@@ -14,6 +14,8 @@ from utils.common import round_and_remove_zero
 from apps.entry.models import Figure
 from apps.event.models import Crisis
 from .models import (
+    GiddEvent,
+    GiddFigure,
     StatusLog,
     DisasterLegacy,
     ConflictLegacy,
@@ -23,9 +25,15 @@ from .models import (
     DisplacementData,
     IdpsSaddEstimate,
 )
+from apps.event.models import Event
 from apps.country.models import Country
 from apps.report.models import Report
-from apps.common.utils import get_attr_list_from_event_codes
+from apps.common.utils import (
+    EXTERNAL_TUPLE_SEPARATOR,
+    extract_event_code_data_list,
+    extract_location_data_list,
+    extract_source_data,
+)
 from utils.db import Array
 
 
@@ -159,6 +167,7 @@ def update_conflict_and_disaster_data():
         # FIXME: Check if this should be
         # - Figure.filtered_nd_figures_for_listing
         # - Figure.filtered_idp_figures_for_listing
+        # NOTE: No we do not need to use the listing method as we are aggregating
         nd_figure_qs = Figure.filtered_nd_figures(
             qs=figure_queryset,
             start_date=datetime.datetime(year=year, month=1, day=1),
@@ -249,6 +258,11 @@ def update_conflict_and_disaster_data():
                 distinct=True,
                 filter=models.Q(event__event_code__country__id=F('country__id')),
             ),
+            _displacement_occurred=ArrayAgg(
+                F('displacement_occurred'),
+                distinct=True,
+                filter=Q(displacement_occurred__isnull=False),
+            ),
         ).filter(
             year__gte=2016,
         )
@@ -286,9 +300,12 @@ def update_conflict_and_disaster_data():
                     iso3=item['country__iso3'],
                     country_id=item['country'],
                     country_name=item['country__idmc_short_name'],
-                    event_codes=get_attr_list_from_event_codes(item['event_codes'], 'code') or [],
-                    event_codes_type=get_attr_list_from_event_codes(item['event_codes'], 'code_type') or [],
-                ) for item in disasters
+                    displacement_occurred=item['_displacement_occurred'] or [],
+                    event_codes=event_code['code'],
+                    event_codes_type=event_code['code_type']
+                )
+                for item in disasters
+                for event_code in [extract_event_code_data_list(item['event_codes'])]
             ]
         )
 
@@ -296,8 +313,6 @@ def update_conflict_and_disaster_data():
 def update_public_figure_analysis():
     # NOTE:- Exactly one aggregation should obtained for PFA
     # NOTE:- There must be exaclty one country
-    # Delete all the public figure analysis objects
-    PublicFigureAnalysis.objects.all().delete()
     data = []
 
     def _get_figures(figure_category, figure_cause, report_country_aggregation):
@@ -323,6 +338,7 @@ def update_public_figure_analysis():
             return report_country_aggregation['total_flow_disaster']
 
     # FIXME: only update the gidd_published_date when the report is stale
+    # FIXME: gidd_published_date update looks redundant
     Report.objects.filter(
         is_gidd_report=True,
     ).update(gidd_published_date=timezone.now())
@@ -375,7 +391,6 @@ def update_public_figure_analysis():
 
 
 def update_displacement_data():
-    DisplacementData.objects.all().delete()
     start_year = min(
         Disaster.objects.order_by('year').first().year,
         Conflict.objects.order_by('year').first().year
@@ -470,24 +485,275 @@ def update_idps_sadd_estimates_country_names():
         obj.save()
 
 
+def update_gidd_event_and_gidd_figure_data():
+    '''
+    Updates GiddEvent and GiddFigure data
+    '''
+
+    event_queryset = Event.objects.annotate(
+        event_codes=ArrayAgg(
+            Array(
+                models.F('event_code__event_code'),
+                Cast(models.F('event_code__event_code_type'), models.CharField()),
+                models.F('event_code__country__iso3'),
+                output_field=ArrayField(models.CharField()),
+            ),
+            distinct=True,
+        ),
+    ).values(
+        'id',
+        'name',
+        'event_type',
+        'start_date',
+        'start_date_accuracy',
+        'end_date',
+        'end_date_accuracy',
+        'violence',
+        'violence__name',
+        'violence_sub_type',
+        'violence_sub_type__name',
+        'disaster_category',
+        'disaster_category__name',
+        'disaster_sub_category',
+        'disaster_sub_category__name',
+        'disaster_type',
+        'disaster_type__name',
+        'disaster_sub_type',
+        'disaster_sub_type__name',
+        'other_sub_type',
+        'other_sub_type__name',
+        'osv_sub_type',
+        'osv_sub_type__name',
+        'event_codes',
+    )
+
+    # Create new GiddEvent
+    GiddEvent.objects.bulk_create(
+        [
+            # NOTE: We are copying all the events
+            GiddEvent(
+                id=item['id'],  # NOTE: GiddEvent ID is same as Event ID
+                event_id=item['id'],
+                name=item['name'],
+                cause=item['event_type'],
+
+                start_date=item['start_date'],
+                start_date_accuracy=item['start_date_accuracy'],
+                end_date=item['end_date'],
+                end_date_accuracy=item['end_date_accuracy'],
+
+                violence_id=item['violence'],
+                violence_sub_type_id=item['violence_sub_type'],
+
+                disaster_category_id=item['disaster_category'],
+                disaster_sub_category_id=item['disaster_sub_category'],
+                disaster_type_id=item['disaster_type'],
+                disaster_sub_type_id=item['disaster_sub_type'],
+                other_sub_type_id=item['other_sub_type'],
+                osv_sub_type_id=item['osv_sub_type'],
+
+                violence_name=item['violence__name'],
+                violence_sub_type_name=item['violence_sub_type__name'],
+                disaster_category_name=item['disaster_category__name'],
+                disaster_sub_category_name=item['disaster_sub_category__name'],
+                disaster_type_name=item['disaster_type__name'],
+                disaster_sub_type_name=item['disaster_sub_type__name'],
+                other_sub_type_name=item['other_sub_type__name'],
+                osv_sub_type_name=item['osv_sub_type__name'],
+
+                event_codes=event_code['code'],
+                event_codes_type=event_code['code_type'],
+                event_codes_iso3=event_code['iso3']
+            ) for item in event_queryset
+            for event_code in [extract_event_code_data_list(item['event_codes'])]
+        ]
+    )
+
+    for year in get_gidd_years():
+        figure_queryset = Figure.objects.filter(
+            role=Figure.ROLE.RECOMMENDED
+        )
+        nd_figure_qs = Figure.filtered_nd_figures_for_listing(
+            qs=figure_queryset,
+            start_date=datetime.datetime(year=year, month=1, day=1),
+            end_date=datetime.datetime(year=year, month=12, day=31),
+        ).filter(
+            category=Figure.FIGURE_CATEGORY_TYPES.NEW_DISPLACEMENT.value,
+        )
+        stock_figure_qs = Figure.filtered_idp_figures_for_listing(
+            qs=figure_queryset,
+            start_date=datetime.datetime(year=year, month=1, day=1),
+            end_date=datetime.datetime(year=year, month=12, day=31),
+        ).filter(
+            category=Figure.FIGURE_CATEGORY_TYPES.IDPS.value,
+        )
+        figure_qs = nd_figure_qs | stock_figure_qs
+
+        qs = figure_qs.annotate(
+            **Figure.annotate_stock_and_flow_dates(),
+            sources_data=ArrayAgg(
+                Array(
+                    F('sources__name'),
+                    F('sources__organization_kind__name'),
+                    output_field=ArrayField(models.CharField()),
+                ),
+                distinct=True,
+            ),
+            locations=ArrayAgg(
+                Array(
+                    F('geo_locations__display_name'),
+                    Concat(
+                        F('geo_locations__lat'),
+                        Value(EXTERNAL_TUPLE_SEPARATOR),
+                        F('geo_locations__lon'),
+                        output_field=models.CharField(),
+                    ),
+                    # TODO: Fetch enum values instead of labels
+                    Cast('geo_locations__accuracy', models.CharField()),
+                    Cast('geo_locations__identifier', models.CharField()),
+                    output_field=ArrayField(models.CharField()),
+                ),
+                distinct=True,
+                filter=~Q(
+                    Q(geo_locations__display_name__isnull=True) | Q(geo_locations__display_name='')
+                ),
+            ),
+            publishers_data=ArrayAgg(
+                F('entry__publishers__name'),
+                distinct=True,
+                filter=~Q(entry__publishers__name__isnull=True),
+            )
+        ).values(
+            'id',
+            'event__id',
+            'country',
+            'country__iso3',
+            'country__idmc_short_name',
+            'country__geographical_group__name',
+            'sources_data',
+            'publishers_data',
+            'locations',
+            'unit',
+            'term',
+            'category',
+            'figure_cause',
+            'total_figures',
+            'household_size',
+            'reported',
+            'flow_start_date',
+            'flow_start_date_accuracy',
+            'flow_end_date',
+            'flow_end_date_accuracy',
+            'stock_date',
+            'stock_date_accuracy',
+            'stock_reporting_date',
+            'is_housing_destruction',
+            'include_idu',
+            'excerpt_idu',
+            'displacement_occurred',
+            'violence',
+            'violence__name',
+            'violence_sub_type',
+            'violence_sub_type__name',
+            'disaster_category',
+            'disaster_category__name',
+            'disaster_sub_category',
+            'disaster_sub_category__name',
+            'disaster_type',
+            'disaster_type__name',
+            'disaster_sub_type',
+            'disaster_sub_type__name',
+            'other_sub_type',
+            'other_sub_type__name',
+            'osv_sub_type',
+            'osv_sub_type__name',
+        )
+
+        GiddFigure.objects.bulk_create(
+            [
+                GiddFigure(
+                    iso3=item['country__iso3'],
+                    figure_id=item['id'],
+                    country_name=item['country__idmc_short_name'],
+                    country_id=item['country'],
+                    gidd_event_id=item['event__id'],    # NOTE: GiddEvent ID is same as Event ID
+                    geographical_region_name=item['country__geographical_group__name'],
+                    year=year,
+                    unit=item['unit'],
+                    category=item['category'],
+                    cause=item['figure_cause'],
+                    term=item['term'],
+                    sources=source_data['sources'],
+                    publishers=item['publishers_data'],
+                    sources_type=source_data['sources_type'],
+                    total_figures=item['total_figures'],
+                    household_size=item['household_size'],
+                    reported=item['reported'],
+                    start_date=item['flow_start_date'],
+                    start_date_accuracy=item['flow_start_date_accuracy'],
+                    end_date=item['flow_end_date'],
+                    end_date_accuracy=item['flow_end_date_accuracy'],
+                    stock_date=item['stock_date'],
+                    stock_date_accuracy=item['stock_date_accuracy'],
+                    stock_reporting_date=item['stock_reporting_date'],
+                    is_housing_destruction=item['is_housing_destruction'],
+                    displacement_occurred=item['displacement_occurred'],
+
+                    locations_names=location_data['display_name'],
+                    locations_coordinates=location_data['lat_lon'],
+                    locations_accuracy=location_data['accuracy'],
+                    locations_type=location_data['type_of_points'],
+
+                    disaster_category_id=item['disaster_category'],
+                    disaster_sub_category_id=item['disaster_sub_category'],
+                    disaster_type_id=item['disaster_type'],
+                    disaster_sub_type_id=item['disaster_sub_type'],
+                    other_sub_type_id=item['other_sub_type'],
+                    osv_sub_type_id=item['osv_sub_type'],
+
+                    violence_name=item['violence__name'],
+                    violence_sub_type_name=item['violence_sub_type__name'],
+                    disaster_category_name=item['disaster_category__name'],
+                    disaster_sub_category_name=item['disaster_sub_category__name'],
+                    disaster_type_name=item['disaster_type__name'],
+                    disaster_sub_type_name=item['disaster_sub_type__name'],
+                    other_sub_type_name=item['other_sub_type__name'],
+                    osv_sub_type_name=item['osv_sub_type__name'],
+                ) for item in qs
+                for location_data in [extract_location_data_list(item['locations'])]
+                for source_data in [extract_source_data(item['sources_data'])]
+            ]
+        )
+
+
 @celery_app.task
 def update_gidd_data(log_id):
-    # Delete all the conflicts TODO: Find way to update records
-    Conflict.objects.all().delete()
-
-    # Delete disasters
-    Disaster.objects.all().delete()
-
     try:
-        update_gidd_legacy_data()
-        update_conflict_and_disaster_data()
-        update_public_figure_analysis()
-        update_displacement_data()
-        update_idps_sadd_estimates_country_names()
-        StatusLog.objects.filter(id=log_id).update(
-            status=StatusLog.Status.SUCCESS,
-            completed_at=timezone.now()
-        )
+        with transaction.atomic():
+            # DELETE
+            # -- Delete all the conflicts TODO: Find way to update records
+            Conflict.objects.all().delete()
+            # -- Delete disasters
+            Disaster.objects.all().delete()
+            # -- Delete all the public figure analysis objects
+            PublicFigureAnalysis.objects.all().delete()
+            DisplacementData.objects.all().delete()
+            # -- Delete all the GiddFigure objects
+            GiddFigure.objects.all().delete()
+            # -- Delete all the GiddEvent objects
+            GiddEvent.objects.all().delete()
+
+            # Create new data for GIDD
+            update_gidd_legacy_data()
+            update_conflict_and_disaster_data()
+            update_public_figure_analysis()
+            update_displacement_data()
+            update_idps_sadd_estimates_country_names()
+            update_gidd_event_and_gidd_figure_data()
+            StatusLog.objects.filter(id=log_id).update(
+                status=StatusLog.Status.SUCCESS,
+                completed_at=timezone.now()
+            )
         logger.info('GIDD data updated.')
     except Exception as e:
         StatusLog.objects.filter(id=log_id).update(

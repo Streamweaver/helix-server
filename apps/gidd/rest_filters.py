@@ -1,14 +1,19 @@
 import django_filters
+from rest_framework import serializers
 from django.db.models import Q
-from .filters import ReleaseMetadataFilter
+
+from apps.crisis.models import Crisis
+
+from .filters import ReleaseMetadataFilter, get_name_choices
 from .models import (
     Conflict,
     Disaster,
     DisplacementData,
+    GiddFigure,
     IdpsSaddEstimate,
     PublicFigureAnalysis,
+    ReleaseMetadata,
 )
-from apps.crisis.models import Crisis
 
 
 class RestConflictFilterSet(ReleaseMetadataFilter):
@@ -23,9 +28,13 @@ class RestConflictFilterSet(ReleaseMetadataFilter):
         }
 
     def filter_start_year(self, queryset, name, value):
+        if not value:
+            return queryset
         return queryset.filter(year__gte=value)
 
     def filter_end_year(self, queryset, name, value):
+        if not value:
+            return queryset
         return queryset.filter(year__lte=value)
 
 
@@ -43,12 +52,18 @@ class RestDisasterFilterSet(ReleaseMetadataFilter):
         }
 
     def filter_event_name(self, queryset, name, value):
+        if not value:
+            return queryset
         return queryset.filter(event_name__icontains=value)
 
     def filter_start_year(self, queryset, name, value):
+        if not value:
+            return queryset
         return queryset.filter(year__gte=value)
 
     def filter_end_year(self, queryset, name, value):
+        if not value:
+            return queryset
         return queryset.filter(year__lte=value)
 
     @property
@@ -58,9 +73,12 @@ class RestDisasterFilterSet(ReleaseMetadataFilter):
 
 
 class RestDisplacementDataFilterSet(ReleaseMetadataFilter):
+    cause = django_filters.ChoiceFilter(
+        method='filter_cause',
+        choices=get_name_choices(Crisis.CRISIS_TYPE),
+    )
     start_year = django_filters.NumberFilter(field_name='start_year', method='filter_start_year')
     end_year = django_filters.NumberFilter(field_name='end_year', method='filter_end_year')
-    cause = django_filters.CharFilter(method='filter_cause')
 
     class Meta:
         model = DisplacementData
@@ -69,22 +87,28 @@ class RestDisplacementDataFilterSet(ReleaseMetadataFilter):
         }
 
     def filter_start_year(self, queryset, name, value):
+        if not value:
+            return queryset
         return queryset.filter(year__gte=value)
 
     def filter_end_year(self, queryset, name, value):
+        if not value:
+            return queryset
         return queryset.filter(year__lte=value)
 
     def filter_cause(self, queryset, name, value):
-        if value == 'conflict':
+        if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
             return queryset.filter(
                 Q(conflict_new_displacement__gt=0) |
                 Q(conflict_total_displacement__gt=0)
             )
-        elif value == 'disaster':
+        elif value.lower() == Crisis.CRISIS_TYPE.DISASTER.name.lower():
             return queryset.filter(
                 Q(disaster_new_displacement__gt=0) |
                 Q(disaster_total_displacement__gt=0)
             )
+        if not value:
+            return queryset
 
     @property
     def qs(self):
@@ -100,9 +124,12 @@ class RestDisplacementDataFilterSet(ReleaseMetadataFilter):
 
 
 class IdpsSaddEstimateFilter(ReleaseMetadataFilter):
+    cause = django_filters.ChoiceFilter(
+        method='filter_cause',
+        choices=get_name_choices(Crisis.CRISIS_TYPE),
+    )
     start_year = django_filters.NumberFilter(field_name='start_year', method='filter_start_year')
     end_year = django_filters.NumberFilter(field_name='end_year', method='filter_end_year')
-    cause = django_filters.CharFilter(method='filter_cause')
 
     class Meta:
         model = IdpsSaddEstimate
@@ -111,29 +138,37 @@ class IdpsSaddEstimateFilter(ReleaseMetadataFilter):
         }
 
     def filter_start_year(self, queryset, name, value):
+        if not value:
+            return queryset
         return queryset.filter(year__gte=value)
 
     def filter_end_year(self, queryset, name, value):
+        if not value:
+            return queryset
         return queryset.filter(year__lte=value)
 
     def filter_cause(self, queryset, name, value):
         # NOTE: this filter is used inside displacement export
-        if value == 'conflict':
+        if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
             return queryset.filter(
                 cause=Crisis.CRISIS_TYPE.CONFLICT.value,
             )
-
-        elif value == 'disaster':
+        elif value.lower() == Crisis.CRISIS_TYPE.DISASTER.name.lower():
             return queryset.filter(
                 cause=Crisis.CRISIS_TYPE.DISASTER.value,
             )
+        if not value:
+            return queryset
         return queryset
 
 
 class PublicFigureAnalysisFilterSet(ReleaseMetadataFilter):
+    cause = django_filters.ChoiceFilter(
+        method='filter_cause',
+        choices=get_name_choices(Crisis.CRISIS_TYPE),
+    )
     start_year = django_filters.NumberFilter(field_name='start_year', method='filter_start_year')
     end_year = django_filters.NumberFilter(field_name='end_year', method='filter_end_year')
-    cause = django_filters.CharFilter(method='filter_cause')
 
     class Meta:
         model = PublicFigureAnalysis
@@ -142,20 +177,81 @@ class PublicFigureAnalysisFilterSet(ReleaseMetadataFilter):
         }
 
     def filter_start_year(self, queryset, name, value):
+        if not value:
+            return queryset
         return queryset.filter(year__gte=value)
 
     def filter_end_year(self, queryset, name, value):
+        if not value:
+            return queryset
         return queryset.filter(year__lte=value)
 
     def filter_cause(self, queryset, name, value):
         # NOTE: this filter is used inside displacement export
-        if value == 'conflict':
+        if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
+            return queryset.filter(
+                figure_cause=Crisis.CRISIS_TYPE.CONFLICT.value,
+            )
+
+        elif value.lower() == Crisis.CRISIS_TYPE.DISASTER.name.lower():
+            return queryset.filter(
+                figure_cause=Crisis.CRISIS_TYPE.DISASTER.value,
+            )
+        return queryset
+
+
+class DisaggregationFilterSet(django_filters.FilterSet):
+    cause = django_filters.ChoiceFilter(
+        method='filter_cause',
+        choices=get_name_choices(Crisis.CRISIS_TYPE),
+    )
+    release_environment = django_filters.ChoiceFilter(
+        method='no_op',
+        choices=get_name_choices(ReleaseMetadata.ReleaseEnvironment),
+    )
+
+    class Meta:
+        model = GiddFigure
+        fields = {
+            'iso3': ['in'],
+            'disaster_type': ['in'],
+        }
+
+    def filter_cause(self, queryset, name, value):
+        if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
             return queryset.filter(
                 cause=Crisis.CRISIS_TYPE.CONFLICT.value,
             )
 
-        elif value == 'disaster':
+        elif value.lower() == Crisis.CRISIS_TYPE.DISASTER.name.lower():
             return queryset.filter(
                 cause=Crisis.CRISIS_TYPE.DISASTER.value,
             )
+        if not value:
+            return queryset
         return queryset
+
+    def no_op(self, qs, name, value):
+        return qs
+
+    def get_release_metadata(self):
+        release_meta_data = ReleaseMetadata.objects.last()
+        if not release_meta_data:
+            raise serializers.ValidationError('Release metadata is not configured.')
+        return release_meta_data
+
+    def filter_release_environment(self, qs, value):
+        release_meta_data = self.get_release_metadata()
+        if value.lower() == ReleaseMetadata.ReleaseEnvironment.PRE_RELEASE.name.lower():
+            return qs.filter(year=release_meta_data.pre_release_year)
+        return qs.filter(year=release_meta_data.release_year)
+
+    @property
+    def qs(self):
+        qs = super().qs
+        release_environment_name = self.data.get(
+            'release_environment',
+            ReleaseMetadata.ReleaseEnvironment.RELEASE.name,
+        )
+        qs = self.filter_release_environment(qs, release_environment_name)
+        return qs

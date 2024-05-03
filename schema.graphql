@@ -658,9 +658,19 @@ input CountryFilterDataInputType {
 type CountryHouseholdSizeType {
   id: ID!
   oldId: String
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdBy: UserType
+  lastModifiedBy: UserType
+  versionId: String
   country: CountryType!
   year: Int!
   size: Float!
+  dataSourceCategory: String!
+  source: String!
+  sourceLink: String!
+  notes: String
+  isActive: Boolean!
 }
 
 type CountryListType {
@@ -1772,6 +1782,8 @@ enum ExternalApiType {
   GIDD_DISASTER_EXPORT_REST
   GIDD_DISPLACEMENT_EXPORT_REST
   GIDD_PUBLIC_FIGURE_ANALYSIS_REST
+  GIDD_DISAGGREGATION_EXPORT_GEOJSON
+  GIDD_DISAGGREGATION_EXPORT_EXCEL
   GIDD_CONFLICT_GRAPHQL
   GIDD_DISASTER_GRAPHQL
   GIDD_DISPLACEMENT_DATA_GRAPHQL
@@ -3132,8 +3144,8 @@ enum QA_RULE_TYPE {
 }
 
 enum QUANTIFIER {
-  MORE_THAN
-  LESS_THAN
+  MORE_THAN_OR_EQUAL
+  LESS_THAN_OR_EQUAL
   EXACT
   APPROXIMATELY
 }

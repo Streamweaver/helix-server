@@ -714,9 +714,9 @@ class Query(graphene.ObjectType):
         track_gidd(client_id, ExternalApiDump.ExternalApiType.GIDD_YEAR_GRAPHQL)
 
         gidd_meta_data = ReleaseMetadata.objects.last()
-        if kwargs['release_environment'] == ReleaseMetadata.ReleaseEnvironment.PRE_RELEASE.name:
+        if kwargs['release_environment'].lower() == ReleaseMetadata.ReleaseEnvironment.PRE_RELEASE.name.lower():
             return GiddYearType(year=gidd_meta_data.pre_release_year)
-        if kwargs['release_environment'] == ReleaseMetadata.ReleaseEnvironment.RELEASE.name:
+        if kwargs['release_environment'].lower() == ReleaseMetadata.ReleaseEnvironment.RELEASE.name.lower():
             return GiddYearType(year=gidd_meta_data.release_year)
 
     @staticmethod

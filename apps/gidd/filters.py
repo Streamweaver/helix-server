@@ -1,8 +1,10 @@
+import typing
 import django_filters
 from rest_framework import serializers
 from django.db.models import Q
 from utils.filters import StringListFilter, IDListFilter
 from apps.entry.models import ExternalApiDump
+from apps.crisis.models import Crisis
 from .models import (
     Conflict,
     Disaster,
@@ -13,8 +15,24 @@ from .models import (
 )
 
 
+def get_name_choices(enum_class) -> typing.List[typing.Tuple[str, str]]:
+    return [
+        (i.name, i.label)
+        for i in enum_class
+    ] + [
+        (i.name.lower(), i.label)
+        for i in enum_class
+    ]
+
+
 class ReleaseMetadataFilter(django_filters.FilterSet):
-    release_environment = django_filters.CharFilter(method='filter_release_environment')
+    release_environment = django_filters.ChoiceFilter(
+        method='no_op',
+        choices=get_name_choices(ReleaseMetadata.ReleaseEnvironment),
+    )
+
+    def no_op(self, qs, name, value):
+        return qs
 
     def get_release_metadata(self):
         release_meta_data = ReleaseMetadata.objects.last()
@@ -22,18 +40,20 @@ class ReleaseMetadataFilter(django_filters.FilterSet):
             raise serializers.ValidationError('Release metadata is not configured.')
         return release_meta_data
 
-    def filter_release_environment(self, qs, name, value):
+    def filter_release_environment(self, qs, value):
         release_meta_data = self.get_release_metadata()
-        if value == ReleaseMetadata.ReleaseEnvironment.PRE_RELEASE.name:
+        if value.lower() == ReleaseMetadata.ReleaseEnvironment.PRE_RELEASE.name.lower():
             return qs.filter(year__lte=release_meta_data.pre_release_year)
         return qs.filter(year__lte=release_meta_data.release_year)
 
     @property
     def qs(self):
         qs = super().qs
-        if 'release_environment' not in self.data:
-            release_meta_data = self.get_release_metadata()
-            return qs.filter(year__lte=release_meta_data.release_year)
+        release_environment_name = self.data.get(
+            'release_environment',
+            ReleaseMetadata.ReleaseEnvironment.RELEASE.name,
+        )
+        qs = self.filter_release_environment(qs, release_environment_name)
         return qs
 
 
@@ -161,7 +181,10 @@ class DisplacementDataFilter(ReleaseMetadataFilter):
     start_year = django_filters.NumberFilter(method='filter_start_year')
     end_year = django_filters.NumberFilter(method='filter_end_year')
     countries_iso3 = StringListFilter(method='filter_countries_iso3')
-    cause = django_filters.CharFilter(method='filter_cause')
+    cause = django_filters.ChoiceFilter(
+        method='filter_cause',
+        choices=get_name_choices(Crisis.CRISIS_TYPE),
+    )
 
     class Meta:
         model = DisplacementData
@@ -177,12 +200,12 @@ class DisplacementDataFilter(ReleaseMetadataFilter):
         return queryset.filter(iso3__in=value)
 
     def filter_cause(self, queryset, name, value):
-        if value == 'conflict':
+        if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
             return queryset.filter(
                 Q(conflict_new_displacement__gt=0) |
                 Q(conflict_total_displacement__gt=0)
             )
-        elif value == 'disaster':
+        elif value.lower() == Crisis.CRISIS_TYPE.DISASTER.name.lower():
             return queryset.filter(
                 Q(disaster_new_displacement__gt=0) |
                 Q(disaster_total_displacement__gt=0)

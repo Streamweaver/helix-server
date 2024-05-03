@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from apps.country.models import Country
 from .models import (
-    Conflict, Disaster, StatusLog, ReleaseMetadata,
-    DisplacementData, PublicFigureAnalysis
+    Conflict, Disaster, GiddFigure, StatusLog, ReleaseMetadata,
+    DisplacementData, PublicFigureAnalysis, IdpsSaddEstimate,
 )
 from apps.crisis.models import Crisis
 from apps.entry.models import Figure
@@ -90,10 +90,10 @@ class PublicFigureAnalysisSerializer(serializers.ModelSerializer):
     figure_category_name = serializers.SerializerMethodField('get_figure_category_name')
 
     def get_figure_cause_name(self, obj):
-        return Crisis.CRISIS_TYPE.get(obj.figure_cause).name
+        return Crisis.CRISIS_TYPE.get(obj.figure_cause).label
 
     def get_figure_category_name(self, obj):
-        return Figure.FIGURE_CATEGORY_TYPES.get(obj.figure_category).name
+        return Figure.FIGURE_CATEGORY_TYPES.get(obj.figure_category).label
 
     class Meta:
         model = PublicFigureAnalysis
@@ -128,3 +128,56 @@ class ReleaseMetadataSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         validated_data['modified_by'] = user
         return ReleaseMetadata.objects.create(**validated_data)
+
+
+class DisaggregationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GiddFigure
+        fields = (
+            'iso3',
+            'figure',
+            'country_name',
+            'geographical_region_name',
+            'year',
+            'locations_coordinates',
+            'unit',
+            'category',
+            'cause',
+            'term',
+            'total_figures',
+            'household_size',
+            'reported',
+            'start_date',
+            'end_date',
+            'start_date_accuracy',
+            'end_date_accuracy',
+            'stock_date',
+            'stock_date_accuracy',
+            'stock_reporting_date',
+            'sources',
+            'publishers',
+            'gidd_event',
+            'is_housing_destruction',
+            'locations_names',
+            'locations_accuracy',
+            'locations_type',
+            'displacement_occurred',
+        )
+
+
+class IdpsSaddEstimateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for validating and processing data from IdpsSaddEstimate CSV files.
+    Automatically computes 'iso3' and 'country_name' from the associated country.
+    """
+
+    class Meta:
+        model = IdpsSaddEstimate
+        exclude = ['iso3', 'country_name']  # This are calculated by country
+
+    def validate(self, validated_data):
+        validated_data = super().validate(validated_data)
+        country = validated_data['country']
+        validated_data['country_name'] = country.name
+        validated_data['iso3'] = country.iso3
+        return validated_data

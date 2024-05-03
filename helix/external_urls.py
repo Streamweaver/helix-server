@@ -8,6 +8,7 @@ from apps.entry.views import (
 from apps.gidd.views import (
     CountryViewSet,
     ConflictViewSet,
+    DisaggregationViewSet,
     DisasterViewSet,
     DisplacementDataViewSet,
     PublicFigureAnalysisViewSet,
@@ -26,6 +27,12 @@ urlpatterns = [
     path('idus/all/', IdusAllFlatCachedView.as_view()),
     path('idus/all/disaster/', IdusAllDisasterCachedView.as_view()),
     path('gidd/', include(router.urls)),
+    path('gidd/disaggregations/disaggregation-geojson/', DisaggregationViewSet.as_view({
+        'get': 'export_disaggregated_geojson',
+    }), name='disaggregations-geojson-view'),
+    path('gidd/disaggregations/disaggregation-export/', DisaggregationViewSet.as_view({
+        'get': 'export_disaggregated',
+    }), name='disaggregations-export-view'),
 
     # OpenAPI
     path('api-schema/', SpectacularAPIView.as_view(), name='schema'),
