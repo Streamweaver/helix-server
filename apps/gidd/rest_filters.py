@@ -1,6 +1,9 @@
 import django_filters
 from rest_framework import serializers
 from django.db.models import Q
+
+from apps.crisis.models import Crisis
+
 from .filters import ReleaseMetadataFilter, get_name_choices
 from .models import (
     Conflict,
@@ -11,7 +14,6 @@ from .models import (
     PublicFigureAnalysis,
     ReleaseMetadata,
 )
-from apps.crisis.models import Crisis
 
 
 class RestConflictFilterSet(ReleaseMetadataFilter):
@@ -47,7 +49,10 @@ class RestDisasterFilterSet(ReleaseMetadataFilter):
 
 
 class RestDisplacementDataFilterSet(ReleaseMetadataFilter):
-    cause = django_filters.CharFilter(method='filter_cause')
+    cause = django_filters.ChoiceFilter(
+        method='filter_cause',
+        choices=get_name_choices(Crisis.CRISIS_TYPE),
+    )
 
     class Meta:
         model = DisplacementData
@@ -56,12 +61,12 @@ class RestDisplacementDataFilterSet(ReleaseMetadataFilter):
         }
 
     def filter_cause(self, queryset, name, value):
-        if value == 'conflict':
+        if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
             return queryset.filter(
                 Q(conflict_new_displacement__gt=0) |
                 Q(conflict_total_displacement__gt=0)
             )
-        elif value == 'disaster':
+        elif value.lower() == Crisis.CRISIS_TYPE.DISASTER.name.lower():
             return queryset.filter(
                 Q(disaster_new_displacement__gt=0) |
                 Q(disaster_total_displacement__gt=0)
@@ -81,7 +86,10 @@ class RestDisplacementDataFilterSet(ReleaseMetadataFilter):
 
 
 class IdpsSaddEstimateFilter(ReleaseMetadataFilter):
-    cause = django_filters.CharFilter(method='filter_cause')
+    cause = django_filters.ChoiceFilter(
+        method='filter_cause',
+        choices=get_name_choices(Crisis.CRISIS_TYPE),
+    )
 
     class Meta:
         model = IdpsSaddEstimate
@@ -91,12 +99,11 @@ class IdpsSaddEstimateFilter(ReleaseMetadataFilter):
 
     def filter_cause(self, queryset, name, value):
         # NOTE: this filter is used inside displacement export
-        if value == 'conflict':
+        if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
             return queryset.filter(
                 cause=Crisis.CRISIS_TYPE.CONFLICT.value,
             )
-
-        elif value == 'disaster':
+        elif value.lower() == Crisis.CRISIS_TYPE.DISASTER.name.lower():
             return queryset.filter(
                 cause=Crisis.CRISIS_TYPE.DISASTER.value,
             )
@@ -104,7 +111,10 @@ class IdpsSaddEstimateFilter(ReleaseMetadataFilter):
 
 
 class PublicFigureAnalysisFilterSet(ReleaseMetadataFilter):
-    cause = django_filters.CharFilter(method='filter_cause')
+    cause = django_filters.ChoiceFilter(
+        method='filter_cause',
+        choices=get_name_choices(Crisis.CRISIS_TYPE),
+    )
 
     class Meta:
         model = PublicFigureAnalysis
@@ -114,14 +124,14 @@ class PublicFigureAnalysisFilterSet(ReleaseMetadataFilter):
 
     def filter_cause(self, queryset, name, value):
         # NOTE: this filter is used inside displacement export
-        if value == 'conflict':
+        if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
             return queryset.filter(
-                cause=Crisis.CRISIS_TYPE.CONFLICT.value,
+                figure_cause=Crisis.CRISIS_TYPE.CONFLICT.value,
             )
 
-        elif value == 'disaster':
+        elif value.lower() == Crisis.CRISIS_TYPE.DISASTER.name.lower():
             return queryset.filter(
-                cause=Crisis.CRISIS_TYPE.DISASTER.value,
+                figure_cause=Crisis.CRISIS_TYPE.DISASTER.value,
             )
         return queryset
 
@@ -144,12 +154,12 @@ class DisaggregationFilterSet(django_filters.FilterSet):
         }
 
     def filter_cause(self, queryset, name, value):
-        if value == Crisis.CRISIS_TYPE.CONFLICT.name:
+        if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
             return queryset.filter(
                 cause=Crisis.CRISIS_TYPE.CONFLICT.value,
             )
 
-        elif value == Crisis.CRISIS_TYPE.DISASTER.name:
+        elif value.lower() == Crisis.CRISIS_TYPE.DISASTER.name.lower():
             return queryset.filter(
                 cause=Crisis.CRISIS_TYPE.DISASTER.value,
             )
@@ -166,7 +176,7 @@ class DisaggregationFilterSet(django_filters.FilterSet):
 
     def filter_release_environment(self, qs, value):
         release_meta_data = self.get_release_metadata()
-        if value == ReleaseMetadata.ReleaseEnvironment.PRE_RELEASE.name:
+        if value.lower() == ReleaseMetadata.ReleaseEnvironment.PRE_RELEASE.name.lower():
             return qs.filter(year=release_meta_data.pre_release_year)
         return qs.filter(year=release_meta_data.release_year)
 
