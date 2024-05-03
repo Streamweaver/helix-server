@@ -813,6 +813,196 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             'Displacement occurred',
         ])
 
+        # Tab 2
+        ws2 = wb.create_sheet('2_Context_Displacement_data')
+        ws2.append([
+            'ISO3',
+            'Year',
+            'Figure cause',
+            'Figure category',
+            'Description',
+            'Figures',
+            'Figures rounded',
+        ])
+        pfa_qs = PublicFigureAnalysisFilterSet(
+            data=self.request.query_params,
+            queryset=PublicFigureAnalysis.objects.all()
+        ).qs.order_by('iso3', 'year')
+        # FIXME: sort this and filter this
+        for item in pfa_qs:
+            ws2.append([
+                item.iso3,
+                item.year,
+                item.figure_cause.label,
+                item.figure_category.label,
+                item.description,
+                item.figures,
+                item.figures_rounded,
+            ])
+
+        # README TAB
+        ws3 = wb.create_sheet('README')
+        readme_text = [
+            ['TITLE: Disasters Global Internal Displacement Database (GIDD)'],
+            [],
+            ['FILENAME: IDMC_Internal_Displacement_Disaggregated'],
+            [],
+            ['SOURCE: Internal Displacement Monitoring Centre (IDMC)'],
+            [],
+            [f'DATE EXTRACTED: {datetime.now().strftime("%B %d, %Y")}'],
+            [],
+            [f'LAST UPDATE: {StatusLog.last_release_date()}'],
+            [],
+            ['DESCRIPTION:'],
+            [
+                'The Internal Displacement Monitoring Centre (IDMC) continuously monitors global displacement events '
+                'triggered by conflict, violence, and disasters throughout the year. By collecting and analyzing both '
+                'structured and unstructured secondary data from a variety of sources—including government agencies, '
+                'UN agencies, the International Federation of the Red Cross and Red Cressent , and media—IDMC ensures '
+                'comprehensive coverage and high data reliability. Data is disaggregated by type of metric '
+                '(internal displacements or IDPs), cause, event, location, and data reliability. Rigorous quality '
+                'controls are applied to maintain accuracy. The database contains displacement figures from various '
+                'countries and regions, covering conflict-induced displacement from 2009 to 2023 and disaster-induced '
+                'displacement from 2008 to 2023. For detailed definitions and more robust descriptions, please visit '
+                'IDMC Monitoring Tools (https://www.internal-displacement.org/monitoring-tools).'
+            ],
+            [''],
+            ['KEY DEFINITIONS:'],
+            [''],
+            [
+                'Internal Displacements (flows): The estimated total number of internal displacements within the '
+                'reporting year. This figure may include individuals displaced multiple times.'
+            ],
+            [
+                'Total Number of IDPs (stocks): Represents the cumulative total of Internally Displaced Persons (IDPs) '
+                'at a specific location and point in time, reflecting the total population living in displacement as '
+                'of the end of the reporting year.'
+            ],
+            [
+                'USE LICENSE: This content is licensed under CC BY-NC. Detailed licensing information is available at '
+                'Creative Commons License (See: https://creativecommons.org/licenses/by-nc/4.0/).'
+            ],
+            [''],
+            ['COVERAGE: Global'],
+            [''],
+            ['CONTACT: info@idmc.ch'],
+        ]
+
+        for item in readme_text:
+            ws3.append(item)
+        ws3.append([])
+        ws3.append(['DATA DESCRIPTION: 1_Disaggregated_Data table'])
+        ws3.append([])
+
+        data_description_1 = [
+            ["ID: IDMC figure unique identifier"],
+            ["ISO3: ISO 3166-1 alpha-3 'AB9' was assigned to the Abyei Area."],
+            ["Country / Territory: Short name of the country or territory."],
+            ["Geographical region: IDMC geographical region"],
+            ["Figure cause: Displacement trigger"],
+            ["Year: The year for which displacement figures are reported."],
+            [
+                "Figure category: Type of displacement metric, this field contains values of Internal displacements "
+                "(population flows) and  IDPs  (Total number of IDPs  or population stocks)"
+            ],
+            ["Total figures: Total value of internal displacement categories reported"],
+            ["Reported: Figures can be reported in households of numbers of people."],
+            ["Figure term: Reported term used by the source of the figure"],
+            ["Unit: Unit of reporting. It can be households or people"],
+            ["Hazard Category: Based on the CRED EM-DAT classification."],
+            ["Hazard sub type: Specific sub-type of the hazard as per CRED EM-DAT."],
+            ["Hazard type: Hazard type as categorized by CRED EM-DAT."],
+            ["Start date: Start date of displacement flow"],
+            ["Start date accuracy: Uncertainty or accuracy of start date"],
+            ["End date: End date of the displacement flow"],
+            ["End date accuracy: Uncertainty or accuracy of end date"],
+            ["Stock date: Stock date"],
+            ["Stock date accuracy: Uncertainty or accuracy of stock date"],
+            [
+                "Stock reporting date: This corresponds to IDMC's reporting timeframe of the total number of people "
+                "leaving on situations of internal displacement."
+            ],
+            ["Publishers: Organizations responsible for distributing and disseminating internal displacement data"],
+            ["Sources:  The original providers of data on internal displacement or primary source of data."],
+            ["Sources type: IDMC's source type."],
+            ["Event ID: IDMC's unique event ID"],
+            [
+                "Event name: Common or official event name for the event, if available. Otherwise, events are coded "
+                "based on the country, type of hazard, location, and event start date."
+            ],
+            ["Event cause: Cause or main driver of displacement event."],
+            ["Event main trigger: Event main hazard sub  type or conflict type"],
+            ["Event start date: Event or hazard start date"],
+            ["Event end date: Event or hazard end date date"],
+            ["Event start date accuracy: Uncertainty or accuracy of event start date"],
+            ["Event end date accuracy: Uncertainty or accuracy of event end date"],
+            [
+                "Is housing destruction: This field represents if the figure also represent the number of people "
+                "displaced resulting form housing destruction. The values of this field are Yes or No to flag figures "
+                "that reported housing destruction too. To calculate "
+            ],
+            [
+                "Violence type: This field categorizes the type of violence using IDMC's typology, which aligns with "
+                "international classifications. The categories include\n"
+                "- International Armed Conflict (IAC): Refers to armed conflict between two or more states.\n"
+                "- Non-International Armed Conflict (NIAC): Refers to protracted armed conflict occurring within the "
+                "territory of a single state between its government and non-state armed groups, or between such groups "
+                "themselves.\n"
+                "- Unclear/Unknown: Indicates situations where the type of violence is not definitively categorized "
+                "due to limited information."
+            ],
+            [
+                "Event codes (Code:Type): Unique codes such as the GLIDE number and other database-specific codes used "
+                "to identify and track specific events across various databases."
+            ],
+            ["Locations name: Name of locations were displacement was reported"],
+            ["Locations coordinates: This field contains geographic coordinates representing the reported locations."],
+            [
+                "Locations accuracy:  This field indicates the estimated precision of the reported locations. It "
+                "serves as a clue to the likely administrative unit level (e.g., country, state, district) used for "
+                "reporting."
+            ],
+            [
+                "Locations type: This field specifies the type of displacement location within a reported event. It "
+                "can indicate, Origin: The place where people were displaced from. Destination: The location where "
+                "displaced people arrived. Both: In some cases, both origin and destination information might be "
+                "included."
+            ],
+            [
+                "Displacement occurred: This refers to situations where people are moved from a potentially dangerous "
+                "area as a precaution, triggered by an early warning system."
+            ],
+        ]
+        for item in data_description_1:
+            ws3.append(item)
+        ws3.append([])
+        ws3.append(['DATA DESCRIPTION: 2_Context_Displacement_data table'])
+        ws3.append([])
+        ws3.append([
+            'This dataset provides contextual information and analysis documented by IDMC analysts. It captures flags '
+            'related to methodology, caveats, sources, and challenges identified for each metric, reporting year, and '
+            'country.'
+        ])
+        ws3.append([])
+
+        data_description_2 = [
+            ["ISO3: ISO 3166-1 alpha-3  'AB9' was assigned to the Abyei Area."],
+            ["Year: The year for which displacement figures are reported."],
+            ["figure_cause_name: Trigger of displacement"],
+            [
+                "figure_category_name: Type of displacement metric, this field contains values of Internal "
+                "displacements (population flows) and  IDPs  (Total number of IDPs  or population stocks)"
+            ],
+            [
+                "description: Contains the methodology, sources description, caveats and challenges identified for "
+                "the displacement figures reported"
+            ],
+            ["figures: total number of displacements or total number of IDPs reported."],
+            ["figures_rounded: Rounded figures"],
+        ]
+        for item in data_description_2:
+            ws3.append(item)
+
         qs = qs.filter(
             locations_coordinates__isnull=False,
         ).annotate(
@@ -882,33 +1072,6 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_accuracy),
                 self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_type),
                 self._get_displacement_occurred(item.displacement_occurred),
-            ])
-
-        # Tab 2
-        ws2 = wb.create_sheet('2_Context_Displacement_data')
-        ws2.append([
-            'ISO3',
-            'Year',
-            'Figure cause',
-            'Figure category',
-            'Description',
-            'Figures',
-            'Figures rounded',
-        ])
-        pfa_qs = PublicFigureAnalysisFilterSet(
-            data=self.request.query_params,
-            queryset=PublicFigureAnalysis.objects.all()
-        ).qs.order_by('iso3', 'year')
-        # FIXME: sort this and filter this
-        for item in pfa_qs:
-            ws2.append([
-                item.iso3,
-                item.year,
-                item.figure_cause.label,
-                item.figure_category.label,
-                item.description,
-                item.figures,
-                item.figures_rounded,
             ])
 
         response = HttpResponse(content=save_virtual_workbook(wb))
