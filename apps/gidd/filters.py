@@ -26,6 +26,7 @@ class ReleaseMetadataFilter(django_filters.FilterSet):
         method='no_op',
         choices=get_name_choices(ReleaseMetadata.ReleaseEnvironment),
     )
+    
 
     def no_op(self, qs, name, value):
         return qs
