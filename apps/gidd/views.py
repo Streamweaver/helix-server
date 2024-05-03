@@ -219,7 +219,7 @@ class DisasterViewSet(ListOnlyViewSetMixin):
         ws2.append([])
 
         table = [
-            ['ISO3: ISO 3166-1 alpha-3. The ISO3 "AB9" was assigned to the Abyei Area.'],
+            ['ISO3: ISO 3166-1 alpha-3 \'AB9\' was assigned to the Abyei Area.'],
             ['Country / Territory: Short name of the country or territory.'],
             ['Year: The year for which displacement figures are reported.'],
             [
@@ -487,7 +487,7 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
                 'Centre (IDMC).'
             ],
             [''],
-            ['ISO3: ISO 3166-1 alpha-3 “AB9” was assigned to the Abyei Area.'],
+            ['ISO3: ISO 3166-1 alpha-3 \'AB9\' was assigned to the Abyei Area.'],
             ['Country / Territory: Short name of the country or territory.'],
             ['Year: The year for which displacement figures are reported.'],
             [
@@ -541,8 +541,9 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
                 'metric, reporting year, and country.'
             ],
             [],
-            ['ISO3: ISO 3166-1 alpha-3  "AB9" was assigned to the Abyei Area.'],
+            ['ISO3: ISO 3166-1 alpha-3 \'AB9\' was assigned to the Abyei Area.'],
             ['Year: The year for which displacement figures are reported.'],
+            ['figure_cause_name: Trigger of displacement'],
             [
                 'figure_category_name: Type of displacement metric, this field contrains values of '
                 'Internal displacements (population flows) and  IDPs  (Total number of IDPs  or population stocks)'
@@ -558,7 +559,7 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
         for item in readme_text_3:
             ws4.append(item)
         readme_text_4 = [
-            ['ISO3: ISO 3166-1 alpha-3. The ISO3 “AB9” was assigned to the Abyei Area.'],
+            ['ISO3: ISO 3166-1 alpha-3 \'AB9\' was assigned to the Abyei Area.'],
             ['Country: Short name of the country or territory.'],
             ['Geographical region: Geographical region'],
             ['Year: The year for which displacement figures are reported.'],

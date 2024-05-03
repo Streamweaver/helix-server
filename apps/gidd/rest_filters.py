@@ -28,19 +28,43 @@ class RestConflictFilterSet(ReleaseMetadataFilter):
         }
 
     def filter_start_year(self, queryset, name, value):
+        if not value:
+            return queryset
         return queryset.filter(year__gte=value)
 
     def filter_end_year(self, queryset, name, value):
+        if not value:
+            return queryset
         return queryset.filter(year__lte=value)
 
 
 class RestDisasterFilterSet(ReleaseMetadataFilter):
+    event_name = django_filters.CharFilter(method='filter_event_name')
+    start_year = django_filters.NumberFilter(field_name='start_year', method='filter_start_year')
+    end_year = django_filters.NumberFilter(field_name='end_year', method='filter_end_year')
 
     class Meta:
         model = Disaster
         fields = {
-            'iso3': ['iexact'],
+            'event_name': ['icontains'],
+            'iso3': ['in'],
+            'hazard_type': ['in'],
         }
+
+    def filter_event_name(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(event_name__icontains=value)
+
+    def filter_start_year(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(year__gte=value)
+
+    def filter_end_year(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(year__lte=value)
 
     @property
     def qs(self):
@@ -53,12 +77,24 @@ class RestDisplacementDataFilterSet(ReleaseMetadataFilter):
         method='filter_cause',
         choices=get_name_choices(Crisis.CRISIS_TYPE),
     )
+    start_year = django_filters.NumberFilter(field_name='start_year', method='filter_start_year')
+    end_year = django_filters.NumberFilter(field_name='end_year', method='filter_end_year')
 
     class Meta:
         model = DisplacementData
         fields = {
-            'iso3': ['iexact'],
+            'iso3': ['in'],
         }
+
+    def filter_start_year(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(year__gte=value)
+
+    def filter_end_year(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(year__lte=value)
 
     def filter_cause(self, queryset, name, value):
         if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
@@ -71,6 +107,8 @@ class RestDisplacementDataFilterSet(ReleaseMetadataFilter):
                 Q(disaster_new_displacement__gt=0) |
                 Q(disaster_total_displacement__gt=0)
             )
+        if not value:
+            return queryset
 
     @property
     def qs(self):
@@ -90,12 +128,24 @@ class IdpsSaddEstimateFilter(ReleaseMetadataFilter):
         method='filter_cause',
         choices=get_name_choices(Crisis.CRISIS_TYPE),
     )
+    start_year = django_filters.NumberFilter(field_name='start_year', method='filter_start_year')
+    end_year = django_filters.NumberFilter(field_name='end_year', method='filter_end_year')
 
     class Meta:
         model = IdpsSaddEstimate
         fields = {
-            'iso3': ['iexact'],
+            'iso3': ['in'],
         }
+
+    def filter_start_year(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(year__gte=value)
+
+    def filter_end_year(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(year__lte=value)
 
     def filter_cause(self, queryset, name, value):
         # NOTE: this filter is used inside displacement export
@@ -107,6 +157,8 @@ class IdpsSaddEstimateFilter(ReleaseMetadataFilter):
             return queryset.filter(
                 cause=Crisis.CRISIS_TYPE.DISASTER.value,
             )
+        if not value:
+            return queryset
         return queryset
 
 
@@ -115,12 +167,24 @@ class PublicFigureAnalysisFilterSet(ReleaseMetadataFilter):
         method='filter_cause',
         choices=get_name_choices(Crisis.CRISIS_TYPE),
     )
+    start_year = django_filters.NumberFilter(field_name='start_year', method='filter_start_year')
+    end_year = django_filters.NumberFilter(field_name='end_year', method='filter_end_year')
 
     class Meta:
         model = PublicFigureAnalysis
         fields = {
-            'iso3': ['iexact'],
+            'iso3': ['in'],
         }
+
+    def filter_start_year(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(year__gte=value)
+
+    def filter_end_year(self, queryset, name, value):
+        if not value:
+            return queryset
+        return queryset.filter(year__lte=value)
 
     def filter_cause(self, queryset, name, value):
         # NOTE: this filter is used inside displacement export
@@ -163,6 +227,8 @@ class DisaggregationFilterSet(django_filters.FilterSet):
             return queryset.filter(
                 cause=Crisis.CRISIS_TYPE.DISASTER.value,
             )
+        if not value:
+            return queryset
         return queryset
 
     def no_op(self, qs, name, value):
