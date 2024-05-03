@@ -19,8 +19,10 @@ from django.db.models import (
 
 from apps.country.models import Country
 from apps.entry.models import ExternalApiDump, Figure
-from apps.common.utils import EXTERNAL_ARRAY_SEPARATOR, EXTERNAL_FIELD_SEPARATOR, \
-    format_event_codes_as_string, extract_source_data_as_string
+from apps.common.utils import (
+    EXTERNAL_ARRAY_SEPARATOR,
+    EXTERNAL_FIELD_SEPARATOR,
+)
 from apps.crisis.models import Crisis
 
 from .models import (
@@ -36,7 +38,7 @@ from .serializers import (
     PublicFigureAnalysisSerializer,
 )
 from .rest_filters import (
-    DisaggregationFilterst,
+    DisaggregationFilterSet,
     RestConflictFilterSet,
     RestDisasterFilterSet,
     RestDisplacementDataFilterSet,
@@ -594,28 +596,28 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
         return response
 
 
-@client_id
-class DisaggregationViewSet(viewsets.GenericViewSet):
+class DisaggregationViewSet(ListOnlyViewSetMixin):
     serializer_class = DisaggregationSerializer
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter)
-    filterset_class = DisaggregationFilterst
+    filterset_class = DisaggregationFilterSet
+    queryset = GiddFigure.objects.all()
 
     def _get_term(self, term):
-        return Figure.FIGURE_TERMS.get(term).label if term != None else None
+        return Figure.FIGURE_TERMS.get(term).label if term is not None else None
 
     def _get_category(self, category):
-        return Figure.FIGURE_CATEGORY_TYPES.get(category).label if category != None else None
+        return Figure.FIGURE_CATEGORY_TYPES.get(category).label if category is not None else None
 
     def _get_cause(self, cause):
-        return Crisis.CRISIS_TYPE.get(cause).label if cause != None else None
+        return Crisis.CRISIS_TYPE.get(cause).label if cause is not None else None
 
     def _get_displacement_occurred(self, displacement_occurred) -> str:
-        if displacement_occurred != None:
+        if displacement_occurred is not None:
             return DisasterViewSet.get_displacement_status([displacement_occurred])
         return ""
 
     def _get_unit(self, unit):
-        return Figure.UNIT.get(unit).label if unit != None else None
+        return Figure.UNIT.get(unit).label if unit is not None else None
 
     def _export_disaggregated_geojson(self, qs):
 
@@ -695,7 +697,15 @@ class DisaggregationViewSet(viewsets.GenericViewSet):
                     "Event end date": item.gidd_event.end_date,
                     "Event start date accuracy": item.gidd_event.start_date_accuracy,
                     "Event end date accuracy": item.gidd_event.end_date_accuracy,
-                    "Is housing destruction": "Yes" if item.is_housing_destruction else "No",
+                    "Is housing destruction": "Yes" if item.is_housing_destruction is not None else "No",
+                    "Event Code(Code:Type)": EXTERNAL_ARRAY_SEPARATOR.join([
+                        EXTERNAL_FIELD_SEPARATOR.join(data)
+                        for data in zip(*[
+                            item.gidd_event.event_codes,
+                            item.gidd_event.event_codes_type,
+                            item.gidd_event.event_codes_iso3
+                        ])
+                    ]),
                     "Location name": item.locations_names,
                     "Location accuracy": item.locations_accuracy,
                     "Location type": item.locations_type,
@@ -805,7 +815,6 @@ class DisaggregationViewSet(viewsets.GenericViewSet):
                 EXTERNAL_ARRAY_SEPARATOR.join([i for i in item.sources_type if i is not None]),
                 item.gidd_event_id,
                 item.gidd_event.name,
-                # self._get_cause(item.gidd_event.cause),
                 item.event_main_trigger,
                 item.gidd_event.start_date,
                 item.gidd_event.end_date,
@@ -814,8 +823,8 @@ class DisaggregationViewSet(viewsets.GenericViewSet):
                 "Yes" if item.is_housing_destruction else "No",
                 item.violence_name,
                 EXTERNAL_ARRAY_SEPARATOR.join([
-                    EXTERNAL_FIELD_SEPARATOR.join(xxx)
-                    for xxx in zip(*[
+                    EXTERNAL_FIELD_SEPARATOR.join(data)
+                    for data in zip(*[
                         item.gidd_event.event_codes,
                         item.gidd_event.event_codes_type,
                         item.gidd_event.event_codes_iso3
@@ -843,12 +852,12 @@ class DisaggregationViewSet(viewsets.GenericViewSet):
         """
         Export the disaggregated data in geojson format file
         """
-        # track_gidd(
-        #     self.request.GET.get('client_id'),
-        #     ExternalApiDump.ExternalApiType.GIDD_DISAGGREGATION_EXPORT_GEOJSON,
-        #     viewset=self,
-        # )
-        queryset = GiddFigure.objects.order_by(
+        track_gidd(
+            self.request.GET.get('client_id'),
+            ExternalApiDump.ExternalApiType.GIDD_DISAGGREGATION_EXPORT_GEOJSON,
+            viewset=self,
+        )
+        queryset = GiddFigure.objects.select_related('gidd_event').order_by(
             '-year',
             'iso3',
         )
@@ -870,7 +879,7 @@ class DisaggregationViewSet(viewsets.GenericViewSet):
             ExternalApiDump.ExternalApiType.GIDD_DISAGGREGATION_EXPORT_EXCEL,
             viewset=self,
         )
-        queryset = GiddFigure.objects.order_by(
+        queryset = GiddFigure.objects.select_related('gidd_event').order_by(
             '-year',
             'iso3',
         )

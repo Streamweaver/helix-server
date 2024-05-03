@@ -8,6 +8,7 @@ from .models import (
     GiddFigure,
     IdpsSaddEstimate,
     PublicFigureAnalysis,
+    ReleaseMetadata,
 )
 from apps.crisis.models import Crisis
 
@@ -124,10 +125,14 @@ class PublicFigureAnalysisFilterSet(ReleaseMetadataFilter):
         return queryset
 
 
-class DisaggregationFilterst(ReleaseMetadataFilter):
+class DisaggregationFilterSet(django_filters.FilterSet):
     cause = django_filters.ChoiceFilter(
         method='filter_cause',
         choices=get_name_choices(Crisis.CRISIS_TYPE),
+    )
+    release_environment = django_filters.ChoiceFilter(
+        method='no_op',
+        choices=get_name_choices(ReleaseMetadata.ReleaseEnvironment),
     )
 
     class Meta:
@@ -147,3 +152,22 @@ class DisaggregationFilterst(ReleaseMetadataFilter):
                 cause=Crisis.CRISIS_TYPE.DISASTER.value,
             )
         return queryset
+
+    def no_op(self, qs, name, value):
+        return qs
+
+    def filter_release_environment(self, qs, value):
+        release_meta_data = self.get_release_metadata()
+        if value == ReleaseMetadata.ReleaseEnvironment.PRE_RELEASE.name:
+            return qs.filter(year=release_meta_data.pre_release_year)
+        return qs.filter(year=release_meta_data.release_year)
+
+    @property
+    def qs(self):
+        qs = super().qs
+        release_environment_name = self.data.get(
+            'release_environment',
+            ReleaseMetadata.ReleaseEnvironment.RELEASE.name,
+        )
+        qs = self.filter_release_environment(qs, release_environment_name)
+        return qs

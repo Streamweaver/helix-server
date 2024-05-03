@@ -29,8 +29,10 @@ from apps.event.models import Event
 from apps.country.models import Country
 from apps.report.models import Report
 from apps.common.utils import (
-    EXTERNAL_TUPLE_SEPARATOR, extract_event_code_data_list, extract_location_data_list,
-    extract_source_data
+    EXTERNAL_TUPLE_SEPARATOR,
+    extract_event_code_data_list,
+    extract_location_data_list,
+    extract_source_data,
 )
 from utils.db import Array
 
@@ -601,6 +603,7 @@ def update_gidd_event_and_gidd_figure_data():
                         F('geo_locations__lon'),
                         output_field=models.CharField(),
                     ),
+                    # TODO: Fetch enum values instead of labels
                     Cast('geo_locations__accuracy', models.CharField()),
                     Cast('geo_locations__identifier', models.CharField()),
                     output_field=ArrayField(models.CharField()),
@@ -632,10 +635,10 @@ def update_gidd_event_and_gidd_figure_data():
             'total_figures',
             'household_size',
             'reported',
-            'start_date',
-            'start_date_accuracy',
-            'end_date',
-            'end_date_accuracy',
+            'flow_start_date',
+            'flow_start_date_accuracy',
+            'flow_end_date',
+            'flow_end_date_accuracy',
             'stock_date',
             'stock_date_accuracy',
             'stock_reporting_date',
@@ -681,10 +684,10 @@ def update_gidd_event_and_gidd_figure_data():
                     total_figures=item['total_figures'],
                     household_size=item['household_size'],
                     reported=item['reported'],
-                    start_date=item['start_date'],
-                    start_date_accuracy=item['start_date_accuracy'],
-                    end_date=item['end_date'],
-                    end_date_accuracy=item['end_date_accuracy'],
+                    start_date=item['flow_start_date'],
+                    start_date_accuracy=item['flow_start_date_accuracy'],
+                    end_date=item['flow_end_date'],
+                    end_date_accuracy=item['flow_end_date_accuracy'],
                     stock_date=item['stock_date'],
                     stock_date_accuracy=item['stock_date_accuracy'],
                     stock_reporting_date=item['stock_reporting_date'],
