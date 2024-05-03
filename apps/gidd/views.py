@@ -751,9 +751,9 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                         item.gidd_event.event_codes_iso3,
                         item.iso3,
                     ),
-                    "Location name": item.locations_names,
-                    "Location accuracy": item.locations_accuracy,
-                    "Location type": item.locations_type,
+                    "Locations name": item.locations_names,
+                    "Locations accuracy": item.locations_accuracy,
+                    "Locations type": item.locations_type,
                     "Displacement occurred": self._get_displacement_occurred(item.displacement_occurred),
                 })
             }
@@ -807,9 +807,10 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             'Event end date accuracy',
             'Is housing destruction',
             'Event codes (Code:Type)',
-            'Location name',
-            'Location accuracy',
-            'Location type',
+            'Locations coordinates',
+            'Locations name',
+            'Locations accuracy',
+            'Locations type',
             'Displacement occurred',
         ])
 
@@ -1068,6 +1069,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     item.gidd_event.event_codes_iso3,
                     item.iso3,
                 ),
+                self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_coordinates),
                 self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_names),
                 self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_accuracy),
                 self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_type),

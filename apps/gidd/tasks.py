@@ -589,7 +589,6 @@ def update_gidd_event_and_gidd_figure_data():
         )
         figure_qs = nd_figure_qs | stock_figure_qs
 
-        print(str(figure_qs.query))
         qs = figure_qs.annotate(
             **Figure.annotate_stock_and_flow_dates(),
             sources_data=ArrayAgg(
