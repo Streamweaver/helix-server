@@ -203,7 +203,7 @@ class DisasterViewSet(ListOnlyViewSetMixin):
                 'refer to the IDMC Monitoring Tools (https://www.internal-displacement.org/monitoring-tools).'
             ],
             [''],
-            ['KEY DEFINITIONS: '],
+            ['KEY DEFINITIONS:'],
             [''],
             [
                 'Internal Displacements (flows): This metric represents the number of internal displacements, or '
@@ -237,7 +237,7 @@ class DisasterViewSet(ListOnlyViewSetMixin):
                 '2019 onwards.'
             ],
             [''],
-            ['CITATION: '],
+            ['CITATION:'],
             [
                 'All derived work from IDMC data could cite IDMC following this example: Internal Displacement '
                 'Monitoring Centre. Global Internal Displacement Database - Disasters. IDMC (2023). Available at: '
@@ -501,7 +501,7 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
                 'refer to the IDMC Monitoring Tools (https://www.internal-displacement.org/monitoring-tools).\n'
             ],
             [''],
-            ['KEY DEFINITIONS: '],
+            ['KEY DEFINITIONS:'],
             [''],
             [
                 'Internal Displacements (flows): This metric represents the number of internal displacements, or '
@@ -540,7 +540,7 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
                 'of IDPs from disaster-related events are available from 2019 onwards.'
             ],
             [''],
-            ['CITATION: '],
+            ['CITATION:'],
             [
                 'All derived work from IDMC data could cite IDMC following this example: Internal Displacement '
                 'Monitoring Centre. Global Internal Displacement Database. IDMC (2023). Available at: '
