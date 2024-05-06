@@ -598,7 +598,7 @@ def update_gidd_event_and_gidd_figure_data():
                     output_field=ArrayField(models.CharField()),
                 ),
                 distinct=True,
-                filter=~Q(entry__is_confidential=True)
+                filter=Q(entry__is_confidential=False)
             ),
             locations=ArrayAgg(
                 Array(
@@ -615,16 +615,17 @@ def update_gidd_event_and_gidd_figure_data():
                     output_field=ArrayField(models.CharField()),
                 ),
                 distinct=True,
-                filter=~Q(
-                    Q(geo_locations__display_name__isnull=True) | Q(geo_locations__display_name='')
+                filter=Q(
+                    Q(geo_locations__display_name__isnull=False),
+                    ~Q(geo_locations__display_name='')
                 ),
             ),
             publishers_data=ArrayAgg(
                 F('entry__publishers__name'),
                 distinct=True,
-                filter=~Q(
-                    Q(entry__publishers__name__isnull=True) &
-                    Q(entry__is_confidential=True)
+                filter=Q(
+                    entry__is_confidential=False,
+                    entry__publishers__name__isnull=False,
                 )
             )
         ).values(
