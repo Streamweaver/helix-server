@@ -119,9 +119,8 @@ class DisasterViewSet(ListOnlyViewSetMixin):
         Export disaster
         """
         qs = self.filter_queryset(self.get_queryset())
-        wb = Workbook()
-        ws = wb.active
-        ws.title = "1_Disaster_Displacement_data"
+        wb = Workbook(write_only=True)
+        ws = wb.create_sheet('1_Disaster_Displacement_data')
         ws.append([
             'ISO3',
             'Country / Territory',
@@ -401,10 +400,9 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
             'iso3',
         )
 
-        wb = Workbook()
-        ws = wb.active
+        wb = Workbook(write_only=True)
         # Tab 1
-        ws.title = "1_Displacement_data"
+        ws = wb.create_sheet('1_Displacement_data')
         if request.GET.get('cause') == 'conflict':
             self.export_conflicts(ws, qs)
         elif request.GET.get('cause') == 'disaster':
@@ -1016,9 +1014,9 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         return response
 
     def _export_disaggregated_excel(self, qs):
-        wb = Workbook()
-        ws = wb.active
-        ws.title = "1_Disaggregated_Data"
+        wb = Workbook(write_only=True)
+
+        ws = wb.create_sheet('1_Disaggregated_Data')
         ws.append([
             'ID',
             'ISO3',
