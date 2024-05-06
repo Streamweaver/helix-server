@@ -598,6 +598,7 @@ def update_gidd_event_and_gidd_figure_data():
                     output_field=ArrayField(models.CharField()),
                 ),
                 distinct=True,
+                filter=~Q(entry__is_confidential=True)
             ),
             locations=ArrayAgg(
                 Array(
@@ -621,7 +622,10 @@ def update_gidd_event_and_gidd_figure_data():
             publishers_data=ArrayAgg(
                 F('entry__publishers__name'),
                 distinct=True,
-                filter=~Q(entry__publishers__name__isnull=True),
+                filter=~Q(
+                    Q(entry__publishers__name__isnull=True) &
+                    Q(entry__is_confidential=True)
+                )
             )
         ).values(
             'id',

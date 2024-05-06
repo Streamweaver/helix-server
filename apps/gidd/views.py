@@ -690,11 +690,6 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter)
     filterset_class = DisaggregationFilterSet
 
-    def _get_term(self, term) -> typing.Optional[str]:
-        if term is None:
-            return None
-        return Figure.FIGURE_TERMS.get(term).label
-
     def _get_category(self, category) -> typing.Optional[str]:
         if category is None:
             return
@@ -803,7 +798,6 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     "Figure cause": self._get_cause(item.cause),
                     "Year": item.year,
                     "Figure category": self._get_category(item.category),
-                    "Figure term": self._get_term(item.term),
                     "Figure unit": self._get_unit(item.unit),
                     "Reported figures": item.reported,
                     "Household size": item.household_size,
@@ -864,7 +858,6 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             'Figure cause',
             'Year',
             'Figure category',
-            'Figure term',
             'Figure unit',
             'Reported figures',
             'Household size',
@@ -916,7 +909,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         pfa_qs = PublicFigureAnalysisFilterSet(
             data=self.request.query_params,
             queryset=PublicFigureAnalysis.objects.all()
-        ).qs.order_by('iso3', 'year')
+        ).qs.order_by('iso3', 'year', 'id')
         # FIXME: sort this and filter this
         for item in pfa_qs:
             ws2.append([
@@ -1121,7 +1114,6 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 self._get_cause(item.cause),
                 item.year,
                 self._get_category(item.category),
-                self._get_term(item.term),
                 self._get_unit(item.unit),
                 item.reported,
                 item.household_size,
