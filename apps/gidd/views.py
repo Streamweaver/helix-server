@@ -184,27 +184,27 @@ class DisasterViewSet(ListOnlyViewSetMixin):
                 'structured and unstructured secondary data from diverse sources—including government agencies, '
                 'UN agencies, the International Federation of the Red Cross and Red Crescent, and the media.'
             ],
-            [''],
+            [],
             [
                 'IDMC analysts rigorously analyse and triangulate all reported data. The data undergo thorough quality '
                 'control processes, involving engagement with primary data collectors for peer review and validation. '
                 'This meticulous approach guarantees that the data reported by IDMC reflects high accuracy.'
             ],
-            [''],
+            [],
             [
                 'The data in the Global Internal Displacement Database (GIDD) is annually validated and peer-reviewed, '
                 'having passed through various quality control processes in consultation with different UN agencies, '
                 'goverments and local data providers.'
             ],
-            [''],
+            [],
             [
                 'The GIDD database documents displacement due to conflict from 2009 to 2023 and disaster-induced '
                 'displacement from 2008 to 2023. For detailed definitions and more comprehensive descriptions, please '
                 'refer to the IDMC Monitoring Tools (https://www.internal-displacement.org/monitoring-tools).'
             ],
-            [''],
+            [],
             ['KEY DEFINITIONS:'],
-            [''],
+            [],
             [
                 'Internal Displacements (flows): This metric represents the number of internal displacements, or '
                 'internal displacement population flows, reported from January 1st to December 31st of a reporting year. '
@@ -224,28 +224,28 @@ class DisasterViewSet(ListOnlyViewSetMixin):
                 'human, material, economic or environmental losses and impacts, which exceeds the ability of the '
                 'affected community or society to cope using its own resources (UNSDR).'
             ],
-            [''],
-            [''],
+            [],
+            [],
             [
                 'USE LICENSE: This content is licensed under CC BY-NC. Detailed licensing information is available at '
                 'Creative Commons License (See: https://creativecommons.org/licenses/by-nc/4.0/).'
             ],
-            [''],
+            [],
             [
                 'COVERAGE: Global. The GIDD provides data on internal displacements triggered by disasters dates back '
                 'to 2008, and the metrics on the total number of IDPs from disaster-related events are available from '
                 '2019 onwards.'
             ],
-            [''],
+            [],
             ['CITATION:'],
             [
                 'All derived work from IDMC data could cite IDMC following this example: Internal Displacement '
                 'Monitoring Centre. Global Internal Displacement Database - Disasters. IDMC (2023). Available at: '
                 'https://www.internal-displacement.org/database/displacement-data/ (Accessed: [date of access]).'
             ],
-            [''],
+            [],
             ['CONTACT: info@idmc.ch'],
-            [''],
+            [],
         ]
 
         for item in readme_text:
@@ -469,11 +469,11 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
         ws4 = wb.create_sheet('README')
         readme_text = [
             ['TITLE: Global Internal Displacement Database (GIDD)'],
-            [''],
+            [],
             ['FILENAME: IDMC_Internal_Displacement_Conflict-Violence_Disasters'],
-            [''],
+            [],
             ['SOURCE: Internal Displacement Monitoring Centre (IDMC)'],
-            [''],
+            [],
 
             [f'DATE EXTRACTED: {datetime.now().strftime("%B %d, %Y")}'],
             [],
@@ -498,9 +498,9 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
                 'displacement from 2008 to 2023. For detailed definitions and more comprehensive descriptions, please '
                 'refer to the IDMC Monitoring Tools (https://www.internal-displacement.org/monitoring-tools).\n'
             ],
-            [''],
+            [],
             ['KEY DEFINITIONS:'],
-            [''],
+            [],
             [
                 'Internal Displacements (flows): This metric represents the number of internal displacements, or '
                 'internal displacement population flows, reported from January 1st to December 31st of a reporting year.'
@@ -525,28 +525,28 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
                 'human, material, economic or environmental losses and impacts, which exceeds the ability of the '
                 'affected community or society to cope using its own resources (UNSDR).'
             ],
-            [''],
+            [],
             [
                 'USE LICENSE: This content is licensed under CC BY-NC. Detailed licensing information is available at '
                 'Creative Commons License (See: https://creativecommons.org/licenses/by-nc/4.0/).'
             ],
-            [''],
+            [],
             [
                 'COVERAGE: Global. The GIDD provides data on internal displacement caused by conflict since 2009. This '
                 'includes information on both metrics: internal displacements and the total number of IDPs. Data on '
                 'internal displacements triggered by disasters dates back to 2008, and the metrics on the total number '
                 'of IDPs from disaster-related events are available from 2019 onwards.'
             ],
-            [''],
+            [],
             ['CITATION:'],
             [
                 'All derived work from IDMC data could cite IDMC following this example: Internal Displacement '
                 'Monitoring Centre. Global Internal Displacement Database. IDMC (2023). Available at: '
                 'https://www.internal-displacement.org/database/displacement-data/ (Accessed: [date of access]).'
             ],
-            [''],
+            [],
             ['CONTACT: info@idmc.ch'],
-            [''],
+            [],
         ]
 
         for item in readme_text:
@@ -559,7 +559,7 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
                 'and other situations of violence, as compiled and reported by the Internal Displacement Monitoring '
                 'Centre (IDMC).'
             ],
-            [''],
+            [],
             ['ISO3: Represents the ISO 3166-1 alpha-3 code. The code \'AB9\' is assigned to the Abyei Area.'],
             ['Country / Territory: Short name of the country or territory.'],
             ['Year: Indicates the year for which displacement data are reported.'],
@@ -1072,10 +1072,12 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             'Figures',
             'Figures rounded',
         ])
-        pfa_qs = PublicFigureAnalysisFilterSet(
+
+        pfa_qs = DisaggregationFilterSet(
             data=self.request.query_params,
             queryset=PublicFigureAnalysis.objects.filter(year__gte=2023)
         ).qs.order_by('iso3', 'year', 'id')
+
         for item in pfa_qs:
             ws2.append([
                 item.iso3,
@@ -1107,27 +1109,27 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 'structured and unstructured secondary data from diverse sources—including government agencies, '
                 'UN agencies, the International Federation of the Red Cross and Red Crescent, and the media.'
             ],
-            [''],
+            [],
             [
                 'IDMC analysts rigorously analyse and triangulate all reported data. The data undergo thorough quality '
                 'control processes, involving engagement with primary data collectors for peer review and validation. '
                 'This meticulous approach guarantees that the data reported by IDMC reflects high accuracy.'
             ],
-            [''],
+            [],
             [
                 'The data in the Global Internal Displacement Database (GIDD) is annually validated and peer-reviewed, '
                 'having passed through various quality control processes in consultation with different UN agencies, '
                 'goverments and local data providers.'
             ],
-            [''],
+            [],
             [
                 'The GIDD database documents displacement due to conflict from 2009 to 2023 and disaster-induced '
                 'displacement from 2008 to 2023. For detailed definitions and more comprehensive descriptions, please '
                 'refer to the IDMC Monitoring Tools (https://www.internal-displacement.org/monitoring-tools).'
             ],
-            [''],
+            [],
             ['KEY DEFINITIONS:'],
-            [''],
+            [],
             [
                 'Internal Displacements (flows): This metric represents the number of internal displacements, or '
                 'internal displacement population flows, reported from January 1st to December 31st of a reporting year. '
@@ -1152,25 +1154,26 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 'human, material, economic or environmental losses and impacts, which exceeds the ability of the '
                 'affected community or society to cope using its own resources (UNSDR).'
             ],
+            [],
             [
                 'USE LICENSE: This content is licensed under CC BY-NC. Detailed licensing information is available at '
                 'Creative Commons License (See: https://creativecommons.org/licenses/by-nc/4.0/).'
             ],
-            [''],
+            [],
             [
                 'COVERAGE: Global. The GIDD provides data on internal displacement caused by conflict since 2009. This '
                 'includes information on both metrics: internal displacements and the total number of IDPs. Data on '
                 'internal displacements triggered by disasters dates back to 2008, and the metrics on the total number '
                 'of IDPs from disaster-related events are available from 2019 onwards.'
             ],
-            [''],
+            [],
             ['CITATION: '],
             [
                 'All derived work from IDMC data could cite IDMC following this example: Internal Displacement '
                 'Monitoring Centre. Global Internal Displacement Database. IDMC (2023). Available at: '
                 'https://www.internal-displacement.org/database/displacement-data/ (Accessed: [date of access]).'
             ],
-            [''],
+            [],
             ['CONTACT: info@idmc.ch'],
         ]
 
@@ -1319,7 +1322,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 "ensure accurate representation and avoid duplication of figures."
             ],
             [
-                "Displacement Occurred: This field contains values that represent if preventive evacuations were "
+                "Displacement occurred: This field contains values that represent if preventive evacuations were "
                 "reported. These evacuations are the result of existing early warning systems."
             ],
         ]
