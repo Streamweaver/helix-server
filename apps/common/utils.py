@@ -182,3 +182,23 @@ def extract_source_data_as_string(
         EXTERNAL_FIELD_SEPARATOR.join(item)
         for item in data
     )
+
+
+class ExtractPublisherData(typing.TypedDict):
+    publishers: typing.List[str]
+    publishers_type: typing.List[str]
+
+
+def extract_publisher_data(
+        data: typing.List[typing.Tuple[str, str]]
+) -> ExtractPublisherData:
+
+    publishers = []
+    publishers_type = []
+    for i in data:
+        publishers.append(i[0])
+        publishers_type.append(i[1])
+    return {
+        'publishers': publishers,
+        'publishers_type': publishers_type,
+    }

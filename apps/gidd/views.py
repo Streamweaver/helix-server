@@ -18,6 +18,7 @@ from django.db.models import (
     F, Case, When, Q
 )
 
+from apps.contrib.commons import DATE_ACCURACY
 from apps.country.models import Country
 from apps.entry.models import ExternalApiDump, Figure
 from apps.common.utils import (
@@ -698,6 +699,11 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             return
         return Crisis.CRISIS_TYPE.get(cause).label
 
+    def _get_date_accuracy(self, accuracy) -> typing.Optional[str]:
+        if accuracy is None:
+            return
+        return DATE_ACCURACY.get(accuracy).label
+
     def _get_displacement_occurred(self, displacement_occurred) -> str:
         if displacement_occurred is not None:
             return DisasterViewSet.get_displacement_status([displacement_occurred])
@@ -975,11 +981,11 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     "Violence type": item.violence_name,
                     "Other event sub type": item.other_sub_type_name,
                     "Start date": item.start_date,
-                    "Start date accuracy": item.start_date_accuracy,
+                    "Start date accuracy": self._get_date_accuracy(item.start_date_accuracy),
                     "End date": item.end_date,
-                    "End date accuracy": item.end_date_accuracy,
+                    "End date accuracy": self._get_date_accuracy(item.end_date_accuracy),
                     "Stock date": item.stock_date,
-                    "Stock date accuracy": item.stock_date_accuracy,
+                    "Stock date accuracy": self._get_date_accuracy(item.stock_date_accuracy),
                     "Stock reporting date": item.stock_reporting_date,
                     "Publishers": item.publishers,
                     "Sources": item.sources,
@@ -990,8 +996,8 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     "Event main trigger": item.event_main_trigger,
                     "Event start date": item.gidd_event.start_date,
                     "Event end date": item.gidd_event.end_date,
-                    "Event start date accuracy": item.gidd_event.start_date_accuracy,
-                    "Event end date accuracy": item.gidd_event.end_date_accuracy,
+                    "Event start date accuracy": self._get_date_accuracy(item.gidd_event.start_date_accuracy),
+                    "Event end date accuracy": self._get_date_accuracy(item.gidd_event.end_date_accuracy),
                     "Is housing destruction": "Yes" if item.is_housing_destruction is not None else "No",
                     "Event codes (Code:Type)": self.extract_event_data(
                         item.gidd_event.event_codes,
@@ -1406,11 +1412,11 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 item.violence_name,
                 item.other_sub_type_name,
                 item.start_date,
-                item.start_date_accuracy,
+                self._get_date_accuracy(item.start_date_accuracy),
                 item.end_date,
-                item.end_date_accuracy,
+                self._get_date_accuracy(item.end_date_accuracy),
                 item.stock_date,
-                item.stock_date_accuracy,
+                self._get_date_accuracy(item.stock_date_accuracy),
                 item.stock_reporting_date,
                 self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.publishers),
                 self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.sources),
@@ -1421,8 +1427,8 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 item.event_main_trigger,
                 item.gidd_event.start_date,
                 item.gidd_event.end_date,
-                item.gidd_event.start_date_accuracy,
-                item.gidd_event.end_date_accuracy,
+                self._get_date_accuracy(item.gidd_event.start_date_accuracy),
+                self._get_date_accuracy(item.gidd_event.end_date_accuracy),
                 "Yes" if item.is_housing_destruction else "No",
                 self.extract_event_data(
                     item.gidd_event.event_codes,

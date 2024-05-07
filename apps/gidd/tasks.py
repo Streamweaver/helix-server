@@ -33,6 +33,7 @@ from apps.common.utils import (
     extract_event_code_data_list,
     extract_location_data_list,
     extract_source_data,
+    extract_publisher_data,
 )
 from utils.db import Array
 
@@ -621,13 +622,27 @@ def update_gidd_event_and_gidd_figure_data():
                 ),
             ),
             publishers_data=ArrayAgg(
-                F('entry__publishers__name'),
+                Array(
+                    F('entry__publishers__name'),
+                    F('entry__publishers__organization_kind__name'),
+                    output_field=ArrayField(models.CharField()),
+                ),
                 distinct=True,
                 filter=Q(
                     entry__is_confidential=False,
                     entry__publishers__name__isnull=False,
                 )
-            )
+            ),
+            context_of_violence_data=ArrayAgg(
+                F('context_of_violence__name'),
+                distinct=True,
+                filter=Q(context_of_violence__name__isnull=False),
+            ),
+            tags_data=ArrayAgg(
+                F('tags__name'),
+                distinct=True,
+                filter=Q(tags__name__isnull=False),
+            ),
         ).values(
             'id',
             'event__id',
@@ -639,6 +654,8 @@ def update_gidd_event_and_gidd_figure_data():
             'publishers_data',
             'locations',
             'unit',
+            'quantifier',
+            'role',
             'term',
             'category',
             'figure_cause',
@@ -672,6 +689,14 @@ def update_gidd_event_and_gidd_figure_data():
             'other_sub_type__name',
             'osv_sub_type',
             'osv_sub_type__name',
+            'source_excerpt',
+            'calculation_logic',
+            'is_disaggregated',
+            'entry',
+            'entry__article_title',
+            'entry__is_confidential',
+            'tags_data',
+            'context_of_violence_data',
         )
 
         GiddFigure.objects.bulk_create(
@@ -688,8 +713,18 @@ def update_gidd_event_and_gidd_figure_data():
                     category=item['category'],
                     cause=item['figure_cause'],
                     term=item['term'],
+                    role=item['role'],
+                    quantifier=item['quantifier'],
+                    source_excerpt=item['source_excerpt'],
+                    calculation_logic=item['calculation_logic'],
+                    is_disaggregated=item['is_disaggregated'],
+                    entry_id=item['entry'],
+                    entry_name=item['entry__article_title'],
                     sources=source_data['sources'],
-                    publishers=item['publishers_data'],
+                    publishers=publisher_data['publishers'],
+                    publishers_type=publisher_data['publishers_type'],
+                    context_of_violence=item['context_of_violence_data'],
+                    tags=item['tags_data'],
                     sources_type=source_data['sources_type'],
                     total_figures=item['total_figures'],
                     household_size=item['household_size'],
@@ -703,6 +738,9 @@ def update_gidd_event_and_gidd_figure_data():
                     stock_reporting_date=item['stock_reporting_date'],
                     is_housing_destruction=item['is_housing_destruction'],
                     displacement_occurred=item['displacement_occurred'],
+                    include_idu=item['include_idu'],
+                    excerpt_idu=item['excerpt_idu'],
+                    is_confidential=item['entry__is_confidential'],
 
                     locations_names=location_data['display_name'],
                     locations_coordinates=location_data['lat_lon'],
@@ -727,6 +765,7 @@ def update_gidd_event_and_gidd_figure_data():
                 ) for item in qs
                 for location_data in [extract_location_data_list(item['locations'])]
                 for source_data in [extract_source_data(item['sources_data'])]
+                for publisher_data in [extract_publisher_data(item['publishers_data'])]
             ]
         )
 
