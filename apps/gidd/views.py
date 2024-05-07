@@ -424,7 +424,6 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
             data=self.request.query_params,
             queryset=PublicFigureAnalysis.objects.all()
         ).qs.order_by('iso3', 'year')
-        # FIXME: sort this and filter this
         for item in pfa_qs:
             ws2.append([
                 item.iso3,
@@ -1075,9 +1074,8 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         ])
         pfa_qs = PublicFigureAnalysisFilterSet(
             data=self.request.query_params,
-            queryset=PublicFigureAnalysis.objects.all()
+            queryset=PublicFigureAnalysis.objects.filter(year__gte=2023)
         ).qs.order_by('iso3', 'year', 'id')
-        # FIXME: sort this and filter this
         for item in pfa_qs:
             ws2.append([
                 item.iso3,
@@ -1104,35 +1102,74 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             [],
             ['DESCRIPTION:'],
             [
-                'The Internal Displacement Monitoring Centre (IDMC) continuously monitors global displacement events '
-                'triggered by conflict, violence, and disasters throughout the year. By collecting and analyzing both '
-                'structured and unstructured secondary data from a variety of sources—including government agencies, '
-                'UN agencies, the International Federation of the Red Cross and Red Cressent , and media—IDMC ensures '
-                'comprehensive coverage and high data reliability. Data is disaggregated by type of metric '
-                '(internal displacements or IDPs), cause, event, location, and data reliability. Rigorous quality '
-                'controls are applied to maintain accuracy. The database contains displacement figures from various '
-                'countries and regions, covering conflict-induced displacement from 2009 to 2023 and disaster-induced '
-                'displacement from 2008 to 2023. For detailed definitions and more robust descriptions, please visit '
-                'IDMC Monitoring Tools (https://www.internal-displacement.org/monitoring-tools).'
+                'The Internal Displacement Monitoring Centre (IDMC) monitors internal displacement events globally, '
+                'triggered by disasters, conflict, and other forms of violence. It gathers and analyses both '
+                'structured and unstructured secondary data from diverse sources—including government agencies, '
+                'UN agencies, the International Federation of the Red Cross and Red Crescent, and the media.'
+            ],
+            [''],
+            [
+                'IDMC analysts rigorously analyse and triangulate all reported data. The data undergo thorough quality '
+                'control processes, involving engagement with primary data collectors for peer review and validation. '
+                'This meticulous approach guarantees that the data reported by IDMC reflects high accuracy.'
+            ],
+            [''],
+            [
+                'The data in the Global Internal Displacement Database (GIDD) is annually validated and peer-reviewed, '
+                'having passed through various quality control processes in consultation with different UN agencies, '
+                'goverments and local data providers.'
+            ],
+            [''],
+            [
+                'The GIDD database documents displacement due to conflict from 2009 to 2023 and disaster-induced '
+                'displacement from 2008 to 2023. For detailed definitions and more comprehensive descriptions, please '
+                'refer to the IDMC Monitoring Tools (https://www.internal-displacement.org/monitoring-tools).'
             ],
             [''],
             ['KEY DEFINITIONS:'],
             [''],
             [
-                'Internal Displacements (flows): The estimated total number of internal displacements within the '
-                'reporting year. This figure may include individuals displaced multiple times.'
+                'Internal Displacements (flows): This metric represents the number of internal displacements, or '
+                'internal displacement population flows, reported from January 1st to December 31st of a reporting year. '
+                'This figure may include individuals who are displaced multiple times during the year by different events.'
             ],
             [
-                'Total Number of IDPs (stocks): Represents the cumulative total of Internally Displaced Persons (IDPs) '
-                'at a specific location and point in time, reflecting the total population living in displacement as '
-                'of the end of the reporting year.'
+                'Total number of Internally Displaced Persons (IDPs) (stocks): This metric represents the total number '
+                'of people living in situations of internal displacement as of the end of the reporting year, '
+                'specifically on December 31st of each year.'
+            ],
+            [
+                'Conflict displacement: Refers to situations where people are forced to leave their homes or places of '
+                'habitual residence as a result or in order to avoid the impact of armed conflict, communal violence '
+                'and criminal violence.'
+            ],
+            [
+                'Disaster displacement: Refers to situations where people are forced to leave their homes or places of '
+                'habitual residence as a result, or in anticipation of the negative impact of natural hazards.'
+            ],
+            [
+                'Disaster: A serious disruption of the functioning of a community or a society involving widespread '
+                'human, material, economic or environmental losses and impacts, which exceeds the ability of the '
+                'affected community or society to cope using its own resources (UNSDR).'
             ],
             [
                 'USE LICENSE: This content is licensed under CC BY-NC. Detailed licensing information is available at '
                 'Creative Commons License (See: https://creativecommons.org/licenses/by-nc/4.0/).'
             ],
             [''],
-            ['COVERAGE: Global'],
+            [
+                'COVERAGE: Global. The GIDD provides data on internal displacement caused by conflict since 2009. This '
+                'includes information on both metrics: internal displacements and the total number of IDPs. Data on '
+                'internal displacements triggered by disasters dates back to 2008, and the metrics on the total number '
+                'of IDPs from disaster-related events are available from 2019 onwards.'
+            ],
+            [''],
+            ['CITATION: '],
+            [
+                'All derived work from IDMC data could cite IDMC following this example: Internal Displacement '
+                'Monitoring Centre. Global Internal Displacement Database. IDMC (2023). Available at: '
+                'https://www.internal-displacement.org/database/displacement-data/ (Accessed: [date of access]).'
+            ],
             [''],
             ['CONTACT: info@idmc.ch'],
         ]
@@ -1144,51 +1181,87 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         ws3.append([])
 
         data_description_1 = [
-            ["ID: IDMC figure unique identifier"],
-            ["ISO3: ISO 3166-1 alpha-3 'AB9' was assigned to the Abyei Area."],
+            ["ID: IDMC figure unique identifier."],
+            ["ISO3: Represents the ISO 3166-1 alpha-3 code. The code 'AB9' is assigned to the Abyei Area."],
             ["Country / Territory: Short name of the country or territory."],
-            ["Geographical region: IDMC geographical region"],
-            ["Figure cause: Displacement trigger"],
-            ["Year: The year for which displacement figures are reported."],
+            ["Geographical region: Corresponds to IDMC's geographical regions."],
+            ["Figure cause:  Identifies the trigger of displacement, such as conflict or disasters."],
+            ["Year: Indicates the year for which displacement data are reported."],
             [
-                "Figure category: Type of displacement metric, this field contains values of Internal displacements "
-                "(population flows) and  IDPs  (Total number of IDPs  or population stocks)"
+                "Figure category:  Categorizes the type of displacement metric. It details values for Internal "
+                "Displacements (internal displacement flows) and Total Number of IDPs (internal displacement stocks), "
+                "as defined earlier in this document."
             ],
-            ["Total figures: Total value of internal displacement categories reported"],
-            ["Reported: Figures can be reported in households of numbers of people."],
-            ["Figure term: Reported term used by the source of the figure"],
-            ["Unit: Unit of reporting. It can be households or people"],
-            ["Hazard Category: Based on the CRED EM-DAT classification."],
-            ["Hazard sub type: Specific sub-type of the hazard as per CRED EM-DAT."],
-            ["Hazard type: Hazard type as categorized by CRED EM-DAT."],
-            ["Start date: Start date of displacement flow"],
-            ["Start date accuracy: Uncertainty or accuracy of start date"],
-            ["End date: End date of the displacement flow"],
-            ["End date accuracy: Uncertainty or accuracy of end date"],
-            ["Stock date: Stock date"],
-            ["Stock date accuracy: Uncertainty or accuracy of stock date"],
             [
-                "Stock reporting date: This corresponds to IDMC's reporting timeframe of the total number of people "
-                "leaving on situations of internal displacement."
+                "Total figures: Represents the total number of internal displacements or IDPs. For internal "
+                "displacements, units are recorded as 'internal displacement flows' or 'internal displacement "
+                "movements.' For total number of IDPs, units reflect the total number of people living in displacement."
+            ],
+            [
+                "Reported figures: This field represents the values reported by the original source. Figures can be "
+                "reported either in terms of households or individual counts."
+            ],
+            [
+                "Figure unit: This field specifies the type of unit reported in the 'Reported' column. Possible values "
+                "include 'households' or 'people'. The catogy people include  'internal displacement flows' or 'internal"
+                " displacement movements.'"
+            ],
+            [
+                "Household size: This metric represents the average number of individuals per household. It is "
+                "calculated using data from various sources, including the United Nations Department of Economic and "
+                "Social Affairs (UNDESA), national statistical offices, and estimates from local primary data providers "
+                "shared with IDMC."
+            ],
+            ["Hazard Category: Hazard category based on the CRED EM-DAT classification."],
+            ["Hazard sub category: Hazard sub category based on the CRED EM-DAT classification."],
+            ["Hazard Type: Hazard type as categorized by CRED EM-DAT."],
+            ["Hazard Sub-Type: Specific sub-type of the hazard based on CRED EM-DAT."],
+            ["Start date: Start date of displacement flow."],
+            ["Start date accuracy: Uncertainty or accuracy of start date."],
+            ["End date: End date of thedisplacement flow."],
+            ["End date accuracy: Uncertainty or accuracy of end date."],
+            [
+                "Stock date: This field indicates the year in which the data for the IDP metric (total number of "
+                "internally displaced persons or stocks) was collected."
+            ],
+            ["Stock date accuracy: Uncertainty or accuracy of stock date."],
+            [
+                "Stock reporting date: This field reflects the year IDMC uses to report the total number of internally "
+                "displaced persons (IDPs). It represents the IDMC reporting year, which may not coincide with the "
+                "actual data collection year. Given the protracted nature of displacement, annual updates on the total "
+                "number of IDPs may not always be available. To maintain accuracy in reporting, IDMC relies on the "
+                "most recent verified data until evidence shows that the displaced population has achieved a durable "
+                "solution."
             ],
             ["Publishers: Organizations responsible for distributing and disseminating internal displacement data"],
-            ["Sources:  The original providers of data on internal displacement or primary source of data."],
-            ["Sources type: IDMC's source type."],
-            ["Event ID: IDMC's unique event ID"],
             [
-                "Event name: Common or official event name for the event, if available. Otherwise, events are coded "
-                "based on the country, type of hazard, location, and event start date."
+                "Sources: This field lists the names of the primary data providers or the original sources for the "
+                "internal displacement data reported by IDMC."
             ],
-            ["Event cause: Cause or main driver of displacement event."],
-            ["Event main trigger: Event main hazard sub  type or conflict type"],
-            ["Event start date: Event or hazard start date"],
-            ["Event end date: Event or hazard end date date"],
-            ["Event start date accuracy: Uncertainty or accuracy of event start date"],
-            ["Event end date accuracy: Uncertainty or accuracy of event end date"],
+            ["Sources type: This field categorizes the type of source as defined by IDMC."],
+            ["Event ID: Unique identifier for events as assigned by IDMC."],
             [
-                "Is housing destruction: This field represents if the figure also represent the number of people "
-                "displaced resulting form housing destruction. The values of this field are Yes or No to flag figures "
-                "that reported housing destruction too. To calculate "
+                "Event name: This field includes the event's coded name, which is based on the country, type of hazard, "
+                "location, and start date. It also incorporates the common or official name of the event, when available."
+            ],
+            ["Event cause: Identifies the trigger of displacement, such as conflict or disasters."],
+            [
+                "Event main trigger: This field identifies the primary hazard subtype or conflict type that initiated "
+                "the event, serving as the main driver of a disaster or conflict. For disasters, associated fields such "
+                "as \"Hazard Category\", \"Hazard Subcategory\", \"Hazard Type\", and \"Hazard Sub-Type\" detail the "
+                "cascading impacts stemming from this main trigger. For instance, a tropical storm identified as the "
+                "main driver of displacement might lead to reports in \"Hazard Sub-Type\" of floods, landslides, and "
+                "other related disaster types arising from the initial hazard."
+            ],
+            ["Event start date: Event or hazard start date."],
+            ["Event end date: Event or hazard end date date."],
+            ["Event start date accuracy: Uncertainty or accuracy of event start date."],
+            ["Event end date accuracy: Uncertainty or accuracy of event end date."],
+            [
+                "Is housing destruction: This field  indicates whether the displacement data includes individuals "
+                "displaced by housing destruction. Values are \"Yes\" if the data reflects households whose homes were "
+                "destroyed and \"No\" otherwise. This field relies on the data specified in \"Reported Figures\" and "
+                "is linked to the \"Unit\" of measurement used, which in this context refers to houses destroyed."
             ],
             [
                 "Violence type: This field categorizes the type of violence using IDMC's typology, which aligns with "
@@ -1204,22 +1277,50 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 "Event codes (Code:Type): Unique codes such as the GLIDE number and other database-specific codes used "
                 "to identify and track specific events across various databases."
             ],
-            ["Locations name: Name of locations were displacement was reported"],
-            ["Locations coordinates: This field contains geographic coordinates representing the reported locations."],
+            [
+                "Locations name: This field indicates the names of locations where displacement incidents have been "
+                "reported. It's important to note that this field may exhibit a many-to-one relationship, signifying "
+                "that multiple location names could be associated with a single reported figure, preventing "
+                "disaggregation by individual location. This becomes particularly relevant in geospatial analysis, "
+                "where Geographic Information System (GIS) software may interpret these multi-point entities as single "
+                "data points, potentially leading to the inadvertent double-counting of figures. To mitigate this "
+                "issue, it's advisable to preprocess the dataset by either dividing the total figure by the number of "
+                "locations or distributing the \"Total figures\" values based on a weighting factor such as population "
+                "density. This ensures a more accurate representation of the displacement data across individual "
+                "locations and prevents duplication of figures during analysis."
+            ],
+            [
+                "Locations coordinates: This field contains geographic coordinates representing the reported locations. "
+                "Please note that this field contains multipoints  meaning that multiple locations may represent one "
+                "figures. It's important to note that this field may exhibit a many-to-one relationship, signifying "
+                "that multiple location names could be associated with a single reported figure, preventing "
+                "disaggregation by individual location. This becomes particularly relevant in geospatial analysis, "
+                "where Geographic Information System (GIS) software may interpret these multi-point entities as single "
+                "data points, potentially leading to the inadvertent double-counting of figures. To mitigate this "
+                "issue, it's advisable to preprocess the dataset by either dividing the total figure by the number of "
+                "locations or distributing the \"Total figures\" values based on a weighting factor such as population "
+                "density. This ensures a more accurate representation of the displacement data across individual "
+                "locations and prevents duplication of figures during analysis."
+            ],
             [
                 "Locations accuracy:  This field indicates the estimated precision of the reported locations. It "
                 "serves as a clue to the likely administrative unit level (e.g., country, state, district) used for "
-                "reporting."
+                "reporting. "
             ],
             [
                 "Locations type: This field specifies the type of displacement location within a reported event. It "
                 "can indicate, Origin: The place where people were displaced from. Destination: The location where "
                 "displaced people arrived. Both: In some cases, both origin and destination information might be "
-                "included."
+                "included. It's crucial to note that different locations reported for a single figure may pertain to "
+                "both the origin and destination of displacement incidents. This distinction is particularly salient "
+                "in geospatial analysis, where Geographic Information System (GIS) software may interpret these "
+                "multi-point entities as singular data points, potentially resulting in inadvertent double-counting of "
+                "figures. To mitigate this issue, it is recommended to preprocess the dataset prior to GIS analysis to "
+                "ensure accurate representation and avoid duplication of figures."
             ],
             [
-                "Displacement occurred: This refers to situations where people are moved from a potentially dangerous "
-                "area as a precaution, triggered by an early warning system."
+                "Displacement Occurred: This field contains values that represent if preventive evacuations were "
+                "reported. These evacuations are the result of existing early warning systems."
             ],
         ]
         for item in data_description_1:
@@ -1235,19 +1336,29 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         ws3.append([])
 
         data_description_2 = [
-            ["ISO3: ISO 3166-1 alpha-3  'AB9' was assigned to the Abyei Area."],
-            ["Year: The year for which displacement figures are reported."],
-            ["figure_cause_name: Trigger of displacement"],
+            ["ISO3: Represents the ISO 3166-1 alpha-3 code, the code 'AB9' is assigned to the Abyei Area."],
+            ["Year: Indicates the year for which displacement data are reported."],
+            ["Figure_Cause_Name: Identifies the trigger of displacement, such as conflict or disasters."],
             [
-                "figure_category_name: Type of displacement metric, this field contains values of Internal "
-                "displacements (population flows) and  IDPs  (Total number of IDPs  or population stocks)"
+                "Figure_Category_Name: Categorizes the type of displacement metric. It details values for Internal "
+                "Displacements (internal displacement flows) and Total Number of IDPs (internal displacement stocks), "
+                "as defined earlier in this document."
             ],
             [
-                "description: Contains the methodology, sources description, caveats and challenges identified for "
-                "the displacement figures reported"
+                "Description: Provides contextual information about the data, including sources and data limitations. "
+                "It is essential for representing the analysis conducted by IDMC analysts. This field also details the "
+                "methodology used, descriptions of sources, and outlines any caveats and challenges identified with "
+                "the displacement figures reported."
             ],
-            ["figures: total number of displacements or total number of IDPs reported."],
-            ["figures_rounded: Rounded figures"],
+            [
+                "Figures: Represents the total number of internal displacements or IDPs. For internal displacements, "
+                "units are recorded as 'internal displacement flows' or 'internal displacement movements.' For total "
+                "number of IDPs, units reflect the total number of people living in displacement."
+            ],
+            [
+                "Figures_Rounded: Displays rounded figures to provide a simplified view of the data that matches the "
+                "figures reported in the Global Report on Internal Displacement (GRID)."
+            ],
         ]
         for item in data_description_2:
             ws3.append(item)
