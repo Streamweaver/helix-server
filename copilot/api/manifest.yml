@@ -55,7 +55,7 @@ environments:
   staging:
     http:
       alias: helix-tools-api-staging.idmcdb.org
-    cpu: 256
+    cpu: 1024
     memory: 2048
     count:
       range: 1-2
