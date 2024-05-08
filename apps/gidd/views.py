@@ -1529,7 +1529,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             'iso3',
             'id',
         ).filter(
-            year__gte=2022
+            year__gte=2023
         )
         qs = self.filter_queryset(queryset)
         return self._export_disaggregated_excel(qs)

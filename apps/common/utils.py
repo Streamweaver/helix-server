@@ -29,7 +29,23 @@ def format_locations(
             location_name.strip(),
             location,
             _get_accuracy_label(accuracy),
-            _get_identifier_label(type_of_point)
+            _get_identifier_label(type_of_point),
+        ])
+    return location_list
+
+
+def format_locations_raw(
+    locations_data: typing.List[typing.Tuple[str, str, str, str, str]]
+) -> typing.List[typing.Tuple[int, str, str, int, int]]:
+    location_list = []
+    for loc in locations_data:
+        location_id, location_name, location, accuracy, type_of_point = loc
+        location_list.append([
+            int(location_id),
+            location_name.strip(),
+            location,
+            int(accuracy),
+            int(type_of_point),
         ])
     return location_list
 
@@ -50,6 +66,14 @@ class ExtractLocationData(typing.TypedDict):
     type_of_points: typing.List[str]
 
 
+class ExtractLocationDataRaw(typing.TypedDict):
+    ids: typing.List[str]
+    display_name: typing.List[str]
+    lat_lon: typing.List[str]
+    accuracy: typing.List[int]
+    type_of_points: typing.List[int]
+
+
 class ExtractLocationDataAsString(typing.TypedDict):
     display_name: str
     lat_lon: str
@@ -66,6 +90,23 @@ def extract_location_data_list(
     transposed_components = zip(*location_components)
 
     return {
+        'display_name': next(transposed_components, []),
+        'lat_lon': next(transposed_components, []),
+        'accuracy': next(transposed_components, []),
+        'type_of_points': next(transposed_components, [])
+    }
+
+
+def extract_location_raw_data_list(
+    data: typing.List[typing.Tuple[str, str, str, str, str]],
+) -> ExtractLocationDataRaw:
+    # Split the formatted location data into individual components
+    location_components = format_locations_raw(data)
+
+    transposed_components = zip(*location_components)
+
+    return {
+        'ids': next(transposed_components, []),
         'display_name': next(transposed_components, []),
         'lat_lon': next(transposed_components, []),
         'accuracy': next(transposed_components, []),
@@ -118,6 +159,23 @@ def format_event_codes(
     return code_list
 
 
+def format_event_codes_raw(
+    event_codes_data: typing.List[typing.Tuple[str, str, str, str]]
+) -> typing.List[typing.Tuple[int, str, int, str]]:
+    code_list = []
+    for code in event_codes_data:
+        _id, event_code, event_code_type, event_iso3 = code
+        if _id is None:
+            continue
+        code_list.append([
+            int(_id),
+            event_code,
+            int(event_code_type),
+            event_iso3,
+        ])
+    return code_list
+
+
 def format_event_codes_as_string(
     event_codes_data: typing.List[typing.Union[typing.Tuple[str, str, str], typing.Tuple[str, str]]]
 ) -> str:
@@ -155,21 +213,57 @@ def extract_event_code_data(
     }
 
 
+def extract_event_code_data_raw_list(
+    data: typing.List[typing.Tuple[str, str, str, str]]
+):
+    # Split the formatted event code data into individual components
+    event_code_components = format_event_codes_raw(data)
+
+    transposed_components = zip(*event_code_components)
+
+    return {
+        'id': next(transposed_components, []),
+        'code': next(transposed_components, []),
+        'code_type': next(transposed_components, []),
+        'iso3': next(transposed_components, []),
+    }
+
+
+def extract_event_code_data_raw(
+    data: typing.List[typing.Tuple[str, str, str, str]]
+):
+    # Split the formatted event code data into individual components
+    extracted_data = extract_event_code_data_raw_list(data)
+
+    return {
+        'id': EXTERNAL_ARRAY_SEPARATOR.join(extracted_data.get('id', [])),
+        'code': EXTERNAL_ARRAY_SEPARATOR.join(extracted_data.get('code', [])),
+        'code_type': EXTERNAL_ARRAY_SEPARATOR.join(extracted_data.get('code_type', [])),
+        'iso3': EXTERNAL_ARRAY_SEPARATOR.join(extracted_data.get('iso3', [])),
+    }
+
+
 class ExtractSourceData(typing.TypedDict):
+    ids: typing.List[int]
     sources: typing.List[str]
     sources_type: typing.List[str]
 
 
 def extract_source_data(
-        data: typing.List[typing.Tuple[str, str]]
+        data: typing.List[typing.Tuple[str, str, str]]
 ) -> ExtractSourceData:
 
+    ids = []
     sources = []
     sources_type = []
-    for i in data:
-        sources.append(i[0])
-        sources_type.append(i[1])
+    for _id, source, source_type in data:
+        if _id is None:
+            continue
+        ids.append(int(_id))
+        sources.append(source)
+        sources_type.append(source_type)
     return {
+        'ids': ids,
         'sources': sources,
         'sources_type': sources_type,
     }
@@ -185,20 +279,58 @@ def extract_source_data_as_string(
 
 
 class ExtractPublisherData(typing.TypedDict):
+    ids: typing.List[int]
     publishers: typing.List[str]
     publishers_type: typing.List[str]
 
 
 def extract_publisher_data(
-        data: typing.List[typing.Tuple[str, str]]
+        data: typing.List[typing.Tuple[str, str, str]]
 ) -> ExtractPublisherData:
 
+    ids = []
     publishers = []
     publishers_type = []
-    for i in data:
-        publishers.append(i[0])
-        publishers_type.append(i[1])
+    for _id, publisher, publisher_type in data:
+        if _id is None:
+            continue
+        ids.append(int(_id))
+        publishers.append(publisher)
+        publishers_type.append(publisher_type)
     return {
+        'ids': ids,
         'publishers': publishers,
         'publishers_type': publishers_type,
+    }
+
+
+def extract_context_of_voilence_raw_data_list(
+    data: typing.List[typing.Tuple[str, str]]
+):
+    ids = []
+    context_of_violence = []
+    for _id, violence in data:
+        if _id is None:
+            continue
+        ids.append(int(_id))
+        context_of_violence.append(violence)
+    return {
+        'ids': ids,
+        'context_of_violence': context_of_violence,
+    }
+
+
+def extract_tag_raw_data_list(
+    data: typing.List[typing.Tuple[str, str]]
+):
+    ids = []
+    tags = []
+    for _id, tag in data:
+        if _id is None:
+            continue
+        ids.append(int(_id))
+        tags.append(tag)
+    return {
+        'ids': ids,
+        'tags': tags,
     }
