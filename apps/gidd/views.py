@@ -20,11 +20,12 @@ from django.db.models import (
 
 from apps.contrib.commons import DATE_ACCURACY
 from apps.country.models import Country
-from apps.entry.models import ExternalApiDump, Figure
+from apps.entry.models import ExternalApiDump, Figure, OSMName
 from apps.common.utils import (
     EXTERNAL_ARRAY_SEPARATOR,
     EXTERNAL_FIELD_SEPARATOR,
 )
+from apps.event.models import EventCode
 from apps.crisis.models import Crisis
 
 from .models import (
@@ -717,10 +718,14 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
     def extract_event_data(
         self,
         event_code: typing.List[typing.Tuple[str]],
-        event_code_type: typing.List[typing.Tuple[str]],
+        event_code_type: typing.List[typing.Tuple[int]],
         event_code_iso3: typing.List[typing.Tuple[str]],
         filter_iso3: str
     ) -> str:
+        def _get_event_code_label(key: str) -> str:
+            obj = EventCode.EVENT_CODE_TYPE(int(key))
+            return getattr(obj, "label", key)
+
         event_code_components = [
             event_code,
             event_code_type,
@@ -729,9 +734,37 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         transposed_components = zip(*event_code_components)
 
         return EXTERNAL_ARRAY_SEPARATOR.join(
-            EXTERNAL_FIELD_SEPARATOR.join([loc[0], loc[1]])
+            EXTERNAL_FIELD_SEPARATOR.join([loc[0], _get_event_code_label(loc[1])])
             for loc in transposed_components
             if loc[2] == filter_iso3
+        )
+
+    @staticmethod
+    def _get_location_accuracy(
+        location_accuracy: typing.List[typing.Tuple[int]]
+    ) -> str:
+        def _get_accuracy_label(accuracy):
+            if accuracy is None:
+                return None
+            return OSMName.OSM_ACCURACY.get(accuracy).label
+
+        return EXTERNAL_ARRAY_SEPARATOR.join(
+            EXTERNAL_FIELD_SEPARATOR.join([_get_accuracy_label(accuracy)])
+            for accuracy in location_accuracy
+        )
+
+    @staticmethod
+    def _get_location_type(
+        location_type: typing.List[typing.Tuple[int]]
+    ) -> str:
+        def _get_type_label(type):
+            if type is None:
+                return None
+            return OSMName.IDENTIFIER.get(type).label
+
+        return EXTERNAL_ARRAY_SEPARATOR.join(
+            EXTERNAL_FIELD_SEPARATOR.join([_get_type_label(type)])
+            for type in location_type
         )
 
     @staticmethod
@@ -1006,8 +1039,8 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                         item.iso3,
                     ),
                     "Locations name": item.locations_names,
-                    "Locations accuracy": item.locations_accuracy,
-                    "Locations type": item.locations_type,
+                    "Locations accuracy": self._get_location_accuracy(item.locations_accuracy),
+                    "Locations type": self._get_location_type(item.locations_type),
                     "Displacement occurred": self._get_displacement_occurred(item.displacement_occurred),
                 })
             }
@@ -1438,8 +1471,8 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 ),
                 self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_coordinates),
                 self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_names),
-                self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_accuracy),
-                self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_type),
+                self._get_location_accuracy(item.locations_accuracy),
+                self._get_location_type(item.locations_type),
                 self._get_displacement_occurred(item.displacement_occurred),
             ])
 
@@ -1496,7 +1529,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             'iso3',
             'id',
         ).filter(
-            year__gte=2023
+            year__gte=2022
         )
         qs = self.filter_queryset(queryset)
         return self._export_disaggregated_excel(qs)

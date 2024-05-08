@@ -354,14 +354,20 @@ class GiddEvent(MetaInformationAbstractModel):
         default=list,
     )
     event_codes_type = ArrayField(
-        models.CharField(
-            verbose_name=_('Event Code Types'), max_length=256
+        models.IntegerField(
+            verbose_name=_('Event Code Types'),
         ),
         default=list,
     )
     event_codes_iso3 = ArrayField(
         models.CharField(
             verbose_name=_('Event Code ISO3'), max_length=256
+        ),
+        default=list,
+    )
+    event_codes_ids = ArrayField(
+        models.IntegerField(
+            verbose_name=_('Event Code IDs'),
         ),
         default=list,
     )
@@ -509,9 +515,21 @@ class GiddFigure(MetaInformationAbstractModel):
         ),
         default=list,
     )
+    sources_ids = ArrayField(
+        models.IntegerField(
+            verbose_name=_('Sources IDs'),
+        ),
+        default=list,
+    )
     sources_type = ArrayField(
         models.CharField(
             verbose_name=_('Sources Type'), max_length=256
+        ),
+        default=list,
+    )
+    publishers_ids = ArrayField(
+        models.IntegerField(
+            verbose_name=_('Publishers IDs'),
         ),
         default=list,
     )
@@ -551,6 +569,12 @@ class GiddFigure(MetaInformationAbstractModel):
         ),
         default=list,
     )
+    context_of_violence_ids = ArrayField(
+        models.IntegerField(
+            verbose_name=_('Context of Violence IDs'),
+        ),
+        default=list,
+    )
     calculation_logic = models.TextField(
         verbose_name=_('Analysis and Calculation Logic'),
         blank=True,
@@ -559,6 +583,12 @@ class GiddFigure(MetaInformationAbstractModel):
     tags = ArrayField(
         models.CharField(
             verbose_name=_('Tags'), max_length=256
+        ),
+        default=list,
+    )
+    tags_ids = ArrayField(
+        models.IntegerField(
+            verbose_name=_('Tags IDs'),
         ),
         default=list,
     )
@@ -571,6 +601,13 @@ class GiddFigure(MetaInformationAbstractModel):
     is_disaggregated = models.BooleanField(
         verbose_name=_('Is disaggregated'),
         default=False
+    )
+
+    locations_ids = ArrayField(
+        models.IntegerField(
+            verbose_name=_('Location IDs'),
+        ),
+        default=list,
     )
 
     locations_coordinates = ArrayField(
@@ -586,14 +623,14 @@ class GiddFigure(MetaInformationAbstractModel):
         default=list,
     )
     locations_accuracy = ArrayField(
-        models.CharField(
-            verbose_name=_('Location Accuracy'), max_length=256
+        models.IntegerField(
+            verbose_name=_('Location Accuracy'),
         ),
         default=list,
     )
     locations_type = ArrayField(
-        models.CharField(
-            verbose_name=_('Location Type'), max_length=256
+        models.IntegerField(
+            verbose_name=_('Location Type'),
         ),
         default=list,
     )
