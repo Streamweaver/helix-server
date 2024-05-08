@@ -109,6 +109,7 @@ class RestDisplacementDataFilterSet(ReleaseMetadataFilter):
             )
         if not value:
             return queryset
+        return queryset
 
     @property
     def qs(self):
@@ -197,6 +198,8 @@ class PublicFigureAnalysisFilterSet(ReleaseMetadataFilter):
             return queryset.filter(
                 figure_cause=Crisis.CRISIS_TYPE.DISASTER.value,
             )
+        if not value:
+            return queryset
         return queryset
 
 
@@ -230,6 +233,60 @@ class DisaggregationFilterSet(django_filters.FilterSet):
         if not value:
             return queryset
         return queryset
+
+    def no_op(self, qs, name, value):
+        return qs
+
+    def get_release_metadata(self):
+        release_meta_data = ReleaseMetadata.objects.last()
+        if not release_meta_data:
+            raise serializers.ValidationError('Release metadata is not configured.')
+        return release_meta_data
+
+    def filter_release_environment(self, qs, value):
+        release_meta_data = self.get_release_metadata()
+        if value.lower() == ReleaseMetadata.ReleaseEnvironment.PRE_RELEASE.name.lower():
+            return qs.filter(year=release_meta_data.pre_release_year)
+        return qs.filter(year=release_meta_data.release_year)
+
+    @property
+    def qs(self):
+        qs = super().qs
+        release_environment_name = self.data.get(
+            'release_environment',
+            ReleaseMetadata.ReleaseEnvironment.RELEASE.name,
+        )
+        qs = self.filter_release_environment(qs, release_environment_name)
+        return qs
+
+
+class DisaggregationPublicFigureAnalysisFilterSet(django_filters.FilterSet):
+    cause = django_filters.ChoiceFilter(
+        method='filter_figure_cause',
+        choices=get_name_choices(Crisis.CRISIS_TYPE),
+    )
+    release_environment = django_filters.ChoiceFilter(
+        method='no_op',
+        choices=get_name_choices(ReleaseMetadata.ReleaseEnvironment),
+    )
+
+    class Meta:
+        model = PublicFigureAnalysis
+        fields = {
+            'iso3': ['in'],
+        }
+
+    def filter_figure_cause(self, qs, name, value):
+        # NOTE: this filter is used inside disaggregation export
+        if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
+            return qs.filter(
+                figure_cause=Crisis.CRISIS_TYPE.CONFLICT.value,
+            )
+        elif value.lower() == Crisis.CRISIS_TYPE.DISASTER.name.lower():
+            return qs.filter(
+                figure_cause=Crisis.CRISIS_TYPE.DISASTER.value,
+            )
+        return qs
 
     def no_op(self, qs, name, value):
         return qs

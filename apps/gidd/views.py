@@ -47,6 +47,7 @@ from .rest_filters import (
     RestDisplacementDataFilterSet,
     IdpsSaddEstimateFilter,
     PublicFigureAnalysisFilterSet,
+    DisaggregationPublicFigureAnalysisFilterSet,
 )
 from utils.common import track_gidd, client_id
 
@@ -115,6 +116,7 @@ class DisasterViewSet(ListOnlyViewSetMixin):
         methods=["get"],
         url_path="disaster-export",
         permission_classes=[AllowAny],
+        pagination_class=None,
     )
     def export(self, request):
         """
@@ -390,6 +392,7 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
         methods=["get"],
         url_path="displacement-export",
         permission_classes=[AllowAny],
+        pagination_class=None,
     )
     def export(self, request):
         """
@@ -405,9 +408,9 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
         wb = Workbook(write_only=True)
         # Tab 1
         ws = wb.create_sheet('1_Displacement_data')
-        if request.GET.get('cause') == 'conflict':
+        if request.GET.get('cause').lower() == 'conflict':
             self.export_conflicts(ws, qs)
-        elif request.GET.get('cause') == 'disaster':
+        elif request.GET.get('cause').lower() == 'disaster':
             self.export_disasters(ws, qs)
         else:
             self.export_displacements(ws, qs)
@@ -687,8 +690,9 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
 class DisaggregationViewSet(ListOnlyViewSetMixin):
     queryset = GiddFigure.objects.all()
     serializer_class = DisaggregationSerializer
-    filter_backends = (DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter)
+    filter_backends = (DjangoFilterBackend, )
     filterset_class = DisaggregationFilterSet
+    pagination_class = None
 
     def _get_category(self, category) -> typing.Optional[str]:
         if category is None:
@@ -1112,7 +1116,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             'Figures rounded',
         ])
 
-        pfa_qs = DisaggregationFilterSet(
+        pfa_qs = DisaggregationPublicFigureAnalysisFilterSet(
             data=self.request.query_params,
             queryset=PublicFigureAnalysis.objects.filter(year__gte=2023)
         ).qs.order_by('iso3', 'year', 'id')
@@ -1488,6 +1492,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         methods=["get"],
         url_path="disaggregated-geojson",
         permission_classes=[AllowAny],
+        pagination_class=None,
     )
     def export_disaggregated_geojson(self, request):
         """
@@ -1514,6 +1519,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         methods=["get"],
         url_path="disaggregated-export",
         permission_classes=[AllowAny],
+        pagination_class=None,
     )
     def export_disaggregated(self, request):
         """
