@@ -2,8 +2,9 @@ import graphene
 from utils.graphene.enums import (
     convert_enum_to_graphene_enum,
 )
-
+from django_enumfield import enum
 from apps.gidd.models import StatusLog, ReleaseMetadata
+from django.utils.translation import gettext_lazy as _
 
 GiddStatusLogEnum = convert_enum_to_graphene_enum(StatusLog.Status, name='GiddStatusLogTypeEnum')
 GiddReleaseEnvironmentsEnum = convert_enum_to_graphene_enum(
@@ -19,3 +20,14 @@ enum_map = dict(
 
 class GiddEnumType(graphene.ObjectType):
     gidd_release_meta_data = graphene.Field(GiddReleaseEnvironmentsEnum)
+
+
+# NOTE: We are creating a separate enum because we are not exposting "OTEHR" in GIDD
+class CRISIS_TYPE_PUBLIC(enum.Enum):
+    CONFLICT = 0
+    DISASTER = 1
+
+    __labels__ = {
+        CONFLICT: _("Conflict"),
+        DISASTER: _("Disaster"),
+    }
