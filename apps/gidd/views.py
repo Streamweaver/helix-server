@@ -52,6 +52,61 @@ from .rest_filters import (
 from utils.common import track_gidd, client_id
 
 
+def _get_location_accuracy_label(accuracy):
+    if accuracy is None:
+        return None
+    return OSMName.OSM_ACCURACY.get(accuracy).label
+
+
+def _get_location_type_label(type):
+    if type is None:
+        return None
+    return OSMName.IDENTIFIER.get(type).label
+
+
+def _get_event_code_label(key: str):
+    if key is None:
+        return None
+    return EventCode.EVENT_CODE_TYPE.get(int(key)).label
+
+
+def _get_location_accuracy_labels(
+    location_accuracy: typing.List[typing.Tuple[int]]
+) -> str:
+    return string_join(
+        EXTERNAL_ARRAY_SEPARATOR,
+        [_get_location_accuracy_label(accuracy) for accuracy in location_accuracy]
+    )
+
+
+def _get_location_type_labels(
+    location_type: typing.List[typing.Tuple[int]]
+) -> str:
+    return string_join(
+        EXTERNAL_ARRAY_SEPARATOR,
+        [_get_location_type_label(type) for type in location_type]
+    )
+
+
+def string_join(
+    separator: str,
+    data: typing.List[str],
+) -> str:
+    return separator.join([
+        str(item)
+        for item in data
+        if item is not None
+    ])
+
+
+def remove_null_from_dict(data: dict) -> dict:
+    return {
+        key: value
+        for key, value in data.items()
+        if value is not None
+    }
+
+
 @client_id
 class ListOnlyViewSetMixin(mixins.ListModelMixin, viewsets.GenericViewSet):
     def get(self, request, *args, **kwargs):
@@ -408,9 +463,12 @@ class DisplacementDataViewSet(ListOnlyViewSetMixin):
         wb = Workbook(write_only=True)
         # Tab 1
         ws = wb.create_sheet('1_Displacement_data')
-        if request.GET.get('cause').lower() == 'conflict':
+
+        request_cause = request.GET.get('cause')
+
+        if request_cause and request_cause.lower() == 'conflict':
             self.export_conflicts(ws, qs)
-        elif request.GET.get('cause').lower() == 'disaster':
+        if request_cause and request_cause.lower() == 'disaster':
             self.export_disasters(ws, qs)
         else:
             self.export_displacements(ws, qs)
@@ -726,10 +784,6 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         event_code_iso3: typing.List[typing.Tuple[str]],
         filter_iso3: str
     ) -> str:
-        def _get_event_code_label(key: str) -> str:
-            obj = EventCode.EVENT_CODE_TYPE(int(key))
-            return getattr(obj, "label", key)
-
         event_code_components = [
             event_code,
             event_code_type,
@@ -743,55 +797,27 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             if loc[2] == filter_iso3
         )
 
-    @staticmethod
-    def _get_location_accuracy(
-        location_accuracy: typing.List[typing.Tuple[int]]
+    def extract_event_data_raw(
+        self,
+        event_code: typing.List[typing.Tuple[str]],
+        event_code_type: typing.List[typing.Tuple[int]],
+        event_code_iso3: typing.List[typing.Tuple[str]],
+        filter_iso3: str
     ) -> str:
-        def _get_accuracy_label(accuracy):
-            if accuracy is None:
-                return None
-            return OSMName.OSM_ACCURACY.get(accuracy).label
+        event_code_components = [
+            event_code,
+            event_code_type,
+            event_code_iso3
+        ]
+        transposed_components = zip(*event_code_components)
 
-        return EXTERNAL_ARRAY_SEPARATOR.join(
-            EXTERNAL_FIELD_SEPARATOR.join([_get_accuracy_label(accuracy)])
-            for accuracy in location_accuracy
-        )
-
-    @staticmethod
-    def _get_location_type(
-        location_type: typing.List[typing.Tuple[int]]
-    ) -> str:
-        def _get_type_label(type):
-            if type is None:
-                return None
-            return OSMName.IDENTIFIER.get(type).label
-
-        return EXTERNAL_ARRAY_SEPARATOR.join(
-            EXTERNAL_FIELD_SEPARATOR.join([_get_type_label(type)])
-            for type in location_type
-        )
-
-    @staticmethod
-    def string_join(
-        separator: str,
-        data: typing.List[str],
-    ) -> str:
-        return separator.join([
-            str(item)
-            for item in data
-            if item is not None
-        ])
-
-    @staticmethod
-    def remove_null_from_dict(data: dict) -> dict:
-        return {
-            key: value
-            for key, value in data.items()
-            if value is not None
-        }
+        return [
+            [loc[0], _get_event_code_label(loc[1])]
+            for loc in transposed_components
+            if loc[2] == filter_iso3
+        ]
 
     def _export_disaggregated_geojson(self, qs):
-
         def format_coordinate(coordinate: str) -> typing.Tuple[float, float]:
             lat, lng = coordinate.split(', ')
             return (float(lng), float(lat))
@@ -999,7 +1025,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     "type": "MultiPoint",
                     "coordinates": format_coordinates(item.locations_coordinates),
                 },
-                "properties": self.remove_null_from_dict({
+                "properties": remove_null_from_dict({
                     "ID": item.figure_id,
                     "ISO3": item.iso3,
                     "Country": item.country_name,
@@ -1036,15 +1062,15 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     "Event start date accuracy": self._get_date_accuracy(item.gidd_event.start_date_accuracy),
                     "Event end date accuracy": self._get_date_accuracy(item.gidd_event.end_date_accuracy),
                     "Is housing destruction": "Yes" if item.is_housing_destruction is not None else "No",
-                    "Event codes (Code:Type)": self.extract_event_data(
+                    "Event codes (Code:Type)": self.extract_event_data_raw(
                         item.gidd_event.event_codes,
                         item.gidd_event.event_codes_type,
                         item.gidd_event.event_codes_iso3,
                         item.iso3,
                     ),
                     "Locations name": item.locations_names,
-                    "Locations accuracy": self._get_location_accuracy(item.locations_accuracy),
-                    "Locations type": self._get_location_type(item.locations_type),
+                    "Locations accuracy": [_get_location_accuracy_label(x) for x in item.locations_accuracy],
+                    "Locations type": [_get_location_type_label(x) for x in item.locations_type],
                     "Displacement occurred": self._get_displacement_occurred(item.displacement_occurred),
                 })
             }
@@ -1455,9 +1481,9 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                 item.stock_date,
                 self._get_date_accuracy(item.stock_date_accuracy),
                 item.stock_reporting_date,
-                self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.publishers),
-                self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.sources),
-                self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.sources_type),
+                string_join(EXTERNAL_ARRAY_SEPARATOR, item.publishers),
+                string_join(EXTERNAL_ARRAY_SEPARATOR, item.sources),
+                string_join(EXTERNAL_ARRAY_SEPARATOR, item.sources_type),
                 item.gidd_event.event_id,
                 item.gidd_event.name,
                 self._get_cause(item.gidd_event.cause),
@@ -1473,10 +1499,10 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
                     item.gidd_event.event_codes_iso3,
                     item.iso3,
                 ),
-                self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_coordinates),
-                self.string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_names),
-                self._get_location_accuracy(item.locations_accuracy),
-                self._get_location_type(item.locations_type),
+                string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_coordinates),
+                string_join(EXTERNAL_ARRAY_SEPARATOR, item.locations_names),
+                _get_location_accuracy_labels(item.locations_accuracy),
+                _get_location_type_labels(item.locations_type),
                 self._get_displacement_occurred(item.displacement_occurred),
             ])
 

@@ -4,6 +4,7 @@ from django.db.models import Q
 
 from apps.crisis.models import Crisis
 
+from .enums import CRISIS_TYPE_PUBLIC
 from .filters import ReleaseMetadataFilter, get_name_choices
 from .models import (
     Conflict,
@@ -75,7 +76,7 @@ class RestDisasterFilterSet(ReleaseMetadataFilter):
 class RestDisplacementDataFilterSet(ReleaseMetadataFilter):
     cause = django_filters.ChoiceFilter(
         method='filter_cause',
-        choices=get_name_choices(Crisis.CRISIS_TYPE),
+        choices=get_name_choices(CRISIS_TYPE_PUBLIC),
     )
     start_year = django_filters.NumberFilter(field_name='start_year', method='filter_start_year')
     end_year = django_filters.NumberFilter(field_name='end_year', method='filter_end_year')
@@ -97,6 +98,8 @@ class RestDisplacementDataFilterSet(ReleaseMetadataFilter):
         return queryset.filter(year__lte=value)
 
     def filter_cause(self, queryset, name, value):
+        if not value:
+            return queryset
         if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
             return queryset.filter(
                 Q(conflict_new_displacement__gt=0) |
@@ -107,8 +110,6 @@ class RestDisplacementDataFilterSet(ReleaseMetadataFilter):
                 Q(disaster_new_displacement__gt=0) |
                 Q(disaster_total_displacement__gt=0)
             )
-        if not value:
-            return queryset
         return queryset
 
     @property
@@ -127,7 +128,7 @@ class RestDisplacementDataFilterSet(ReleaseMetadataFilter):
 class IdpsSaddEstimateFilter(ReleaseMetadataFilter):
     cause = django_filters.ChoiceFilter(
         method='filter_cause',
-        choices=get_name_choices(Crisis.CRISIS_TYPE),
+        choices=get_name_choices(CRISIS_TYPE_PUBLIC),
     )
     start_year = django_filters.NumberFilter(field_name='start_year', method='filter_start_year')
     end_year = django_filters.NumberFilter(field_name='end_year', method='filter_end_year')
@@ -149,6 +150,8 @@ class IdpsSaddEstimateFilter(ReleaseMetadataFilter):
         return queryset.filter(year__lte=value)
 
     def filter_cause(self, queryset, name, value):
+        if not value:
+            return queryset
         # NOTE: this filter is used inside displacement export
         if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
             return queryset.filter(
@@ -158,15 +161,13 @@ class IdpsSaddEstimateFilter(ReleaseMetadataFilter):
             return queryset.filter(
                 cause=Crisis.CRISIS_TYPE.DISASTER.value,
             )
-        if not value:
-            return queryset
         return queryset
 
 
 class PublicFigureAnalysisFilterSet(ReleaseMetadataFilter):
     cause = django_filters.ChoiceFilter(
         method='filter_cause',
-        choices=get_name_choices(Crisis.CRISIS_TYPE),
+        choices=get_name_choices(CRISIS_TYPE_PUBLIC),
     )
     start_year = django_filters.NumberFilter(field_name='start_year', method='filter_start_year')
     end_year = django_filters.NumberFilter(field_name='end_year', method='filter_end_year')
@@ -188,6 +189,8 @@ class PublicFigureAnalysisFilterSet(ReleaseMetadataFilter):
         return queryset.filter(year__lte=value)
 
     def filter_cause(self, queryset, name, value):
+        if not value:
+            return queryset
         # NOTE: this filter is used inside displacement export
         if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
             return queryset.filter(
@@ -198,15 +201,13 @@ class PublicFigureAnalysisFilterSet(ReleaseMetadataFilter):
             return queryset.filter(
                 figure_cause=Crisis.CRISIS_TYPE.DISASTER.value,
             )
-        if not value:
-            return queryset
         return queryset
 
 
 class DisaggregationFilterSet(django_filters.FilterSet):
     cause = django_filters.ChoiceFilter(
         method='filter_cause',
-        choices=get_name_choices(Crisis.CRISIS_TYPE),
+        choices=get_name_choices(CRISIS_TYPE_PUBLIC),
     )
     release_environment = django_filters.ChoiceFilter(
         method='no_op',
@@ -221,6 +222,8 @@ class DisaggregationFilterSet(django_filters.FilterSet):
         }
 
     def filter_cause(self, queryset, name, value):
+        if not value:
+            return queryset
         if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
             return queryset.filter(
                 cause=Crisis.CRISIS_TYPE.CONFLICT.value,
@@ -230,8 +233,6 @@ class DisaggregationFilterSet(django_filters.FilterSet):
             return queryset.filter(
                 cause=Crisis.CRISIS_TYPE.DISASTER.value,
             )
-        if not value:
-            return queryset
         return queryset
 
     def no_op(self, qs, name, value):
@@ -263,7 +264,7 @@ class DisaggregationFilterSet(django_filters.FilterSet):
 class DisaggregationPublicFigureAnalysisFilterSet(django_filters.FilterSet):
     cause = django_filters.ChoiceFilter(
         method='filter_figure_cause',
-        choices=get_name_choices(Crisis.CRISIS_TYPE),
+        choices=get_name_choices(CRISIS_TYPE_PUBLIC),
     )
     release_environment = django_filters.ChoiceFilter(
         method='no_op',
@@ -277,6 +278,8 @@ class DisaggregationPublicFigureAnalysisFilterSet(django_filters.FilterSet):
         }
 
     def filter_figure_cause(self, qs, name, value):
+        if not value:
+            return qs
         # NOTE: this filter is used inside disaggregation export
         if value.lower() == Crisis.CRISIS_TYPE.CONFLICT.name.lower():
             return qs.filter(

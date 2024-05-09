@@ -5,6 +5,7 @@ from django.db.models import Q
 from utils.filters import StringListFilter, IDListFilter
 from apps.entry.models import ExternalApiDump
 from apps.crisis.models import Crisis
+from .enums import CRISIS_TYPE_PUBLIC
 from .models import (
     Conflict,
     Disaster,
@@ -183,7 +184,7 @@ class DisplacementDataFilter(ReleaseMetadataFilter):
     countries_iso3 = StringListFilter(method='filter_countries_iso3')
     cause = django_filters.ChoiceFilter(
         method='filter_cause',
-        choices=get_name_choices(Crisis.CRISIS_TYPE),
+        choices=get_name_choices(CRISIS_TYPE_PUBLIC),
     )
 
     class Meta:
@@ -210,6 +211,7 @@ class DisplacementDataFilter(ReleaseMetadataFilter):
                 Q(disaster_new_displacement__gt=0) |
                 Q(disaster_total_displacement__gt=0)
             )
+        return queryset
 
     @property
     def qs(self):
