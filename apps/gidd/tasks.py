@@ -3,7 +3,7 @@ import logging
 from helix.celery import app as celery_app
 from django.utils import timezone
 from django.db import models, transaction
-from django.db.models.functions import Cast, Concat
+from django.db.models.functions import Cast, Concat, Coalesce
 from django.contrib.postgres.aggregates.general import ArrayAgg
 from django.db.models import (
     Sum, Case, When, IntegerField, Value, F, Subquery, OuterRef, Q
@@ -12,7 +12,7 @@ from django.contrib.postgres.fields import ArrayField
 
 from utils.common import round_and_remove_zero
 from apps.entry.models import Figure
-from apps.event.models import Crisis
+from apps.event.models import Crisis, EventCode
 from .models import (
     GiddEvent,
     GiddFigure,
@@ -252,15 +252,25 @@ def update_conflict_and_disaster_data():
                 )
             ),
             year=Value(year, output_field=IntegerField()),
-            event_codes=ArrayAgg(
-                Array(
-                    F('event__event_code__event_code'),
-                    Cast(F('event__event_code__event_code_type'), models.CharField()),
-                    F('event__event_code__country__iso3'),
-                    output_field=ArrayField(models.CharField()),
+            event_codes=Coalesce(
+                Subquery(
+                    EventCode.objects.filter(
+                        event_id=OuterRef('event'),
+                        country_id=F('country')
+                    ).order_by().values('event')
+                    .annotate(
+                        code=ArrayAgg(
+                            Array(
+                                F('event_code'),
+                                Cast(models.F('event_code_type'), models.CharField()),
+                                F('country__iso3'),
+                                output_field=ArrayField(models.CharField()),
+                            ),
+                            distinct=True,
+                        ),
+                    ).values('code')[:1],
                 ),
-                distinct=True,
-                filter=models.Q(event__event_code__country__id=F('country__id')),
+                [],
             ),
             _displacement_occurred=ArrayAgg(
                 F('displacement_occurred'),
