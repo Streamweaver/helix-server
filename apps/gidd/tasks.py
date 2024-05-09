@@ -3,7 +3,7 @@ import logging
 from helix.celery import app as celery_app
 from django.utils import timezone
 from django.db import models, transaction
-from django.db.models.functions import Cast, Concat
+from django.db.models.functions import Cast, Concat, Coalesce
 from django.contrib.postgres.aggregates.general import ArrayAgg
 from django.db.models import (
     Sum, Case, When, IntegerField, Value, F, Subquery, OuterRef, Q
@@ -12,7 +12,7 @@ from django.contrib.postgres.fields import ArrayField
 
 from utils.common import round_and_remove_zero
 from apps.entry.models import Figure
-from apps.event.models import Crisis
+from apps.event.models import Crisis, EventCode
 from .models import (
     GiddEvent,
     GiddFigure,
@@ -31,8 +31,12 @@ from apps.report.models import Report
 from apps.common.utils import (
     EXTERNAL_TUPLE_SEPARATOR,
     extract_event_code_data_list,
-    extract_location_data_list,
+    extract_event_code_data_raw_list,
+    extract_location_raw_data_list,
     extract_source_data,
+    extract_publisher_data,
+    extract_context_of_voilence_raw_data_list,
+    extract_tag_raw_data_list,
 )
 from utils.db import Array
 
@@ -248,15 +252,25 @@ def update_conflict_and_disaster_data():
                 )
             ),
             year=Value(year, output_field=IntegerField()),
-            event_codes=ArrayAgg(
-                Array(
-                    F('event__event_code__event_code'),
-                    Cast(F('event__event_code__event_code_type'), models.CharField()),
-                    F('event__event_code__country__iso3'),
-                    output_field=ArrayField(models.CharField()),
+            event_codes=Coalesce(
+                Subquery(
+                    EventCode.objects.filter(
+                        event_id=OuterRef('event'),
+                        country_id=F('country')
+                    ).order_by().values('event')
+                    .annotate(
+                        code=ArrayAgg(
+                            Array(
+                                F('event_code'),
+                                Cast(models.F('event_code_type'), models.CharField()),
+                                F('country__iso3'),
+                                output_field=ArrayField(models.CharField()),
+                            ),
+                            distinct=True,
+                        ),
+                    ).values('code')[:1],
                 ),
-                distinct=True,
-                filter=models.Q(event__event_code__country__id=F('country__id')),
+                [],
             ),
             _displacement_occurred=ArrayAgg(
                 F('displacement_occurred'),
@@ -493,8 +507,9 @@ def update_gidd_event_and_gidd_figure_data():
     event_queryset = Event.objects.annotate(
         event_codes=ArrayAgg(
             Array(
+                Cast(models.F('event_code__id'), models.CharField()),
                 models.F('event_code__event_code'),
-                Cast(models.F('event_code__event_code_type'), models.CharField()),
+                Cast(models.F('event_code__event_code_type'), models.CharField()),  # NOTE: ENUM is used instead of string
                 models.F('event_code__country__iso3'),
                 output_field=ArrayField(models.CharField()),
             ),
@@ -561,11 +576,12 @@ def update_gidd_event_and_gidd_figure_data():
                 other_sub_type_name=item['other_sub_type__name'],
                 osv_sub_type_name=item['osv_sub_type__name'],
 
+                event_codes_ids=event_code['id'],
                 event_codes=event_code['code'],
                 event_codes_type=event_code['code_type'],
                 event_codes_iso3=event_code['iso3']
             ) for item in event_queryset
-            for event_code in [extract_event_code_data_list(item['event_codes'])]
+            for event_code in [extract_event_code_data_raw_list(item['event_codes'])]
         ]
     )
 
@@ -593,6 +609,7 @@ def update_gidd_event_and_gidd_figure_data():
             **Figure.annotate_stock_and_flow_dates(),
             sources_data=ArrayAgg(
                 Array(
+                    Cast('sources__id', models.CharField()),
                     F('sources__name'),
                     F('sources__organization_kind__name'),
                     output_field=ArrayField(models.CharField()),
@@ -602,6 +619,7 @@ def update_gidd_event_and_gidd_figure_data():
             ),
             locations=ArrayAgg(
                 Array(
+                    Cast('geo_locations__id', models.CharField()),
                     F('geo_locations__display_name'),
                     Concat(
                         F('geo_locations__lat'),
@@ -621,13 +639,36 @@ def update_gidd_event_and_gidd_figure_data():
                 ),
             ),
             publishers_data=ArrayAgg(
-                F('entry__publishers__name'),
+                Array(
+                    Cast('entry__publishers__id', models.CharField()),
+                    F('entry__publishers__name'),
+                    F('entry__publishers__organization_kind__name'),
+                    output_field=ArrayField(models.CharField()),
+                ),
                 distinct=True,
                 filter=Q(
                     entry__is_confidential=False,
                     entry__publishers__name__isnull=False,
                 )
-            )
+            ),
+            context_of_violence_data=ArrayAgg(
+                Array(
+                    Cast('context_of_violence__id', models.CharField()),
+                    F('context_of_violence__name'),
+                    output_field=ArrayField(models.CharField()),
+                ),
+                distinct=True,
+                filter=Q(context_of_violence__name__isnull=False),
+            ),
+            tags_data=ArrayAgg(
+                Array(
+                    Cast('tags__id', models.CharField()),
+                    F('tags__name'),
+                    output_field=ArrayField(models.CharField()),
+                ),
+                distinct=True,
+                filter=Q(tags__name__isnull=False),
+            ),
         ).values(
             'id',
             'event__id',
@@ -639,6 +680,8 @@ def update_gidd_event_and_gidd_figure_data():
             'publishers_data',
             'locations',
             'unit',
+            'quantifier',
+            'role',
             'term',
             'category',
             'figure_cause',
@@ -672,6 +715,14 @@ def update_gidd_event_and_gidd_figure_data():
             'other_sub_type__name',
             'osv_sub_type',
             'osv_sub_type__name',
+            'source_excerpt',
+            'calculation_logic',
+            'is_disaggregated',
+            'entry',
+            'entry__article_title',
+            'entry__is_confidential',
+            'tags_data',
+            'context_of_violence_data',
         )
 
         GiddFigure.objects.bulk_create(
@@ -688,8 +739,22 @@ def update_gidd_event_and_gidd_figure_data():
                     category=item['category'],
                     cause=item['figure_cause'],
                     term=item['term'],
+                    role=item['role'],
+                    quantifier=item['quantifier'],
+                    source_excerpt=item['source_excerpt'],
+                    calculation_logic=item['calculation_logic'],
+                    is_disaggregated=item['is_disaggregated'],
+                    entry_id=item['entry'],
+                    entry_name=item['entry__article_title'],
+                    publishers=publisher_data['publishers'],
+                    publishers_ids=publisher_data['ids'],
+                    publishers_type=publisher_data['publishers_type'],
+                    context_of_violence=context_of_violence_data['context_of_violence'],
+                    context_of_violence_ids=context_of_violence_data['ids'],
+                    tags=tag_data['tags'],
+                    tags_ids=tag_data['ids'],
                     sources=source_data['sources'],
-                    publishers=item['publishers_data'],
+                    sources_ids=source_data['ids'],
                     sources_type=source_data['sources_type'],
                     total_figures=item['total_figures'],
                     household_size=item['household_size'],
@@ -703,7 +768,11 @@ def update_gidd_event_and_gidd_figure_data():
                     stock_reporting_date=item['stock_reporting_date'],
                     is_housing_destruction=item['is_housing_destruction'],
                     displacement_occurred=item['displacement_occurred'],
+                    include_idu=item['include_idu'],
+                    excerpt_idu=item['excerpt_idu'],
+                    is_confidential=item['entry__is_confidential'],
 
+                    locations_ids=location_data['ids'],
                     locations_names=location_data['display_name'],
                     locations_coordinates=location_data['lat_lon'],
                     locations_accuracy=location_data['accuracy'],
@@ -725,8 +794,11 @@ def update_gidd_event_and_gidd_figure_data():
                     other_sub_type_name=item['other_sub_type__name'],
                     osv_sub_type_name=item['osv_sub_type__name'],
                 ) for item in qs
-                for location_data in [extract_location_data_list(item['locations'])]
+                for location_data in [extract_location_raw_data_list(item['locations'])]
                 for source_data in [extract_source_data(item['sources_data'])]
+                for publisher_data in [extract_publisher_data(item['publishers_data'])]
+                for context_of_violence_data in [extract_context_of_voilence_raw_data_list(item['context_of_violence_data'])]
+                for tag_data in [extract_tag_raw_data_list(item['tags_data'])]
             ]
         )
 

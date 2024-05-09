@@ -2,9 +2,10 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_enumfield import enum
 from django.contrib.postgres.fields import ArrayField
+from apps.contrib.commons import DATE_ACCURACY
 from apps.contrib.models import MetaInformationAbstractModel
 from apps.crisis.models import Crisis
-from apps.entry.models import Figure
+from apps.entry.models import Figure, Entry
 
 
 class Conflict(models.Model):
@@ -325,9 +326,20 @@ class GiddEvent(MetaInformationAbstractModel):
     cause = enum.EnumField(Crisis.CRISIS_TYPE, verbose_name=_('Cause'))
     # Dates
     start_date = models.DateField(blank=True, null=True)
-    start_date_accuracy = models.TextField(blank=True, null=True)
+    start_date_accuracy = enum.EnumField(
+        DATE_ACCURACY,
+        verbose_name=_('Start Date Accuracy'),
+        default=DATE_ACCURACY.DAY,
+        blank=True,
+        null=True,
+    )
     end_date = models.DateField(blank=True, null=True)
-    end_date_accuracy = models.TextField(blank=True, null=True)
+    end_date_accuracy = enum.EnumField(
+        DATE_ACCURACY,
+        verbose_name=_('End date accuracy'),
+        blank=True,
+        null=True,
+    )
 
     glide_numbers = ArrayField(
         models.CharField(
@@ -342,14 +354,20 @@ class GiddEvent(MetaInformationAbstractModel):
         default=list,
     )
     event_codes_type = ArrayField(
-        models.CharField(
-            verbose_name=_('Event Code Types'), max_length=256
+        models.IntegerField(
+            verbose_name=_('Event Code Types'),
         ),
         default=list,
     )
     event_codes_iso3 = ArrayField(
         models.CharField(
             verbose_name=_('Event Code ISO3'), max_length=256
+        ),
+        default=list,
+    )
+    event_codes_ids = ArrayField(
+        models.IntegerField(
+            verbose_name=_('Event Code IDs'),
         ),
         default=list,
     )
@@ -442,19 +460,64 @@ class GiddFigure(MetaInformationAbstractModel):
         verbose_name=_('Household Size'),
         blank=True, null=True
     )
+    quantifier = enum.EnumField(
+        enum=Figure.QUANTIFIER,
+        verbose_name=_('Quantifier'),
+        null=True,
+    )
     reported = models.PositiveIntegerField(verbose_name=_('Reported Figures'))
+    role = enum.EnumField(enum=Figure.ROLE, verbose_name=_('Role'), default=Figure.ROLE.RECOMMENDED)
     # Dates
     start_date = models.DateField(blank=True, null=True)
-    start_date_accuracy = models.TextField(blank=True, null=True)
+    start_date_accuracy = enum.EnumField(
+        DATE_ACCURACY,
+        verbose_name=_('Start Date Accuracy'),
+        default=DATE_ACCURACY.DAY,
+        blank=True,
+        null=True,
+    )
     end_date = models.DateField(blank=True, null=True)
-    end_date_accuracy = models.TextField(blank=True, null=True)
+    end_date_accuracy = enum.EnumField(
+        DATE_ACCURACY,
+        verbose_name=_('End date accuracy'),
+        blank=True,
+        null=True,
+    )
     stock_date = models.DateField(blank=True, null=True)
-    stock_date_accuracy = models.TextField(blank=True, null=True)
+    stock_date_accuracy = enum.EnumField(
+        DATE_ACCURACY,
+        verbose_name=_('Stock date accuracy'),
+        blank=True,
+        null=True,
+    )
     stock_reporting_date = models.DateField(blank=True, null=True)
-
+    include_idu = models.BooleanField(
+        verbose_name=_('Include in IDU'),
+        null=True,
+    )
+    excerpt_idu = models.TextField(
+        verbose_name=_('Excerpt for IDU'),
+        blank=True,
+        null=True
+    )
+    is_confidential = models.BooleanField(
+        verbose_name=_('Confidential Source'),
+        default=False,
+    )
+    source_excerpt = models.TextField(
+        verbose_name=_('Excerpt from Source'),
+        blank=True,
+        null=True
+    )
     sources = ArrayField(
         models.CharField(
             verbose_name=_('Sources'), max_length=256
+        ),
+        default=list,
+    )
+    sources_ids = ArrayField(
+        models.IntegerField(
+            verbose_name=_('Sources IDs'),
         ),
         default=list,
     )
@@ -464,21 +527,87 @@ class GiddFigure(MetaInformationAbstractModel):
         ),
         default=list,
     )
+    publishers_ids = ArrayField(
+        models.IntegerField(
+            verbose_name=_('Publishers IDs'),
+        ),
+        default=list,
+    )
     publishers = ArrayField(
         models.CharField(
             verbose_name=_('Publishers'), max_length=256
         ),
         default=list,
     )
+    publishers_type = ArrayField(
+        models.CharField(
+            verbose_name=_('Publishers Type'), max_length=256
+        ),
+        default=list,
+    )
+
     gidd_event = models.ForeignKey(
         'gidd.GiddEvent', verbose_name=_('GIDD Event'),
         related_name='gidd_figures', on_delete=models.PROTECT
+    )
+    entry = models.ForeignKey(
+        Entry,
+        verbose_name=_('Entry'),
+        related_name='gidd_figures',
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    entry_name = models.CharField(
+        max_length=512,
+        verbose_name=_('Entry Title'),
+        blank=True,
+        null=True
+    )
+    context_of_violence = ArrayField(
+        models.CharField(
+            verbose_name=_('Context of Violences'), max_length=256
+        ),
+        default=list,
+    )
+    context_of_violence_ids = ArrayField(
+        models.IntegerField(
+            verbose_name=_('Context of Violence IDs'),
+        ),
+        default=list,
+    )
+    calculation_logic = models.TextField(
+        verbose_name=_('Analysis and Calculation Logic'),
+        blank=True,
+        null=True
+    )
+    tags = ArrayField(
+        models.CharField(
+            verbose_name=_('Tags'), max_length=256
+        ),
+        default=list,
+    )
+    tags_ids = ArrayField(
+        models.IntegerField(
+            verbose_name=_('Tags IDs'),
+        ),
+        default=list,
     )
     is_housing_destruction = models.BooleanField(
         verbose_name=_('Is Housing Destruction'),
         default=False,
         null=True,
         blank=True,
+    )
+    is_disaggregated = models.BooleanField(
+        verbose_name=_('Is disaggregated'),
+        default=False
+    )
+
+    locations_ids = ArrayField(
+        models.IntegerField(
+            verbose_name=_('Location IDs'),
+        ),
+        default=list,
     )
 
     locations_coordinates = ArrayField(
@@ -494,14 +623,14 @@ class GiddFigure(MetaInformationAbstractModel):
         default=list,
     )
     locations_accuracy = ArrayField(
-        models.CharField(
-            verbose_name=_('Location Accuracy'), max_length=256
+        models.IntegerField(
+            verbose_name=_('Location Accuracy'),
         ),
         default=list,
     )
     locations_type = ArrayField(
-        models.CharField(
-            verbose_name=_('Location Type'), max_length=256
+        models.IntegerField(
+            verbose_name=_('Location Type'),
         ),
         default=list,
     )
