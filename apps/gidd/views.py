@@ -846,10 +846,19 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             ),
         )
         now = timezone.now().strftime("%B %d, %Y")
+
+        # Determine the filename based on filters
+        filter_cause = self.request.query_params.get('cause', '').lower()
+        filename_map = {
+            Crisis.CRISIS_TYPE.CONFLICT.name.lower(): 'IDMC_GIDD_Conflict_Internal_Displacement_Disaggregated',
+            Crisis.CRISIS_TYPE.DISASTER.name.lower(): 'IDMC_GIDD_Disasters_Internal_Displacement_Disaggregated'
+        }
+        filename = filename_map.get(filter_cause, 'IDMC_GIDD_Internal_Displacement_Disaggregated')
+
         readme_text = (
             "TITLE: Disasters Global Internal Displacement Database (GIDD)\n"
             "\n"
-            "FILENAME: IDMC_Internal_Displacement_Disaggregated\n"
+            f"FILENAME: {filename}\n"
             "\n"
             "SOURCE: Internal Displacement Monitoring Centre (IDMC)\n"
             "\n"
@@ -1078,11 +1087,19 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
 
         feature_collection = json.dumps(feature_collection, cls=DjangoJSONEncoder)
         response = HttpResponse(content=feature_collection, content_type='application/json')
-        response['Content-Disposition'] = 'attachment; filename="IDMC_Internal_Displacement_Disaggregated.geojson"'
+        response['Content-Disposition'] = f'attachment; filename={filename}.geojson'
         return response
 
     def _export_disaggregated_excel(self, qs):
         wb = Workbook(write_only=True)
+
+        # Determine the filename based on filters
+        filter_cause = self.request.query_params.get('cause', '').lower()
+        filename_map = {
+            Crisis.CRISIS_TYPE.CONFLICT.name.lower(): 'IDMC_GIDD_Conflict_Internal_Displacement_Disaggregated',
+            Crisis.CRISIS_TYPE.DISASTER.name.lower(): 'IDMC_GIDD_Disasters_Internal_Displacement_Disaggregated'
+        }
+        filename = filename_map.get(filter_cause, 'IDMC_GIDD_Internal_Displacement_Disaggregated')
 
         ws = wb.create_sheet('1_Disaggregated_Data')
         ws.append([
@@ -1163,7 +1180,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
         readme_text = [
             ['TITLE: Disasters Global Internal Displacement Database (GIDD)'],
             [],
-            ['FILENAME: IDMC_Internal_Displacement_Disaggregated'],
+            [f'FILENAME: {filename}'],
             [],
             ['SOURCE: Internal Displacement Monitoring Centre (IDMC)'],
             [],
@@ -1507,8 +1524,7 @@ class DisaggregationViewSet(ListOnlyViewSetMixin):
             ])
 
         response = HttpResponse(content=save_virtual_workbook(wb))
-        filename = 'IDMC_Internal_Displacement_Disaggregated.xlsx'
-        response['Content-Disposition'] = f'attachment; filename={filename}'
+        response['Content-Disposition'] = f'attachment; filename={filename}.xlsx'
         response['Content-Type'] = 'application/octet-stream'
         return response
 
