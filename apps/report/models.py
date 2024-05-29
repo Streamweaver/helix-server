@@ -61,6 +61,20 @@ class Report(MetaInformationArchiveAbstractModel,
              QueryAbstractModel,
              FigureDisaggregationAbstractModel,
              models.Model):
+    """
+    **Class Report**
+
+    Class representing a report.
+
+    Inherits from:
+    - MetaInformationArchiveAbstractModel
+    - QueryAbstractModel
+    - FigureDisaggregationAbstractModel
+    - models.Model
+
+    Docstring format:
+
+    """
     class REPORT_TYPE(enum.Enum):
         GROUP = 0
         MASTERFACT = 1
@@ -408,6 +422,12 @@ class Report(MetaInformationArchiveAbstractModel,
 
 
 class ReportComment(MetaInformationArchiveAbstractModel, models.Model):
+    """Represents a comment on a report.
+
+    Attributes:
+        body (TextField): The body of the comment.
+        report (ForeignKey): The report that the comment belongs to.
+    """
     body = models.TextField(verbose_name=_('Body'))
     report = models.ForeignKey('Report', verbose_name=_('Report'),
                                related_name='comments', on_delete=models.CASCADE)
@@ -420,6 +440,24 @@ class ReportComment(MetaInformationArchiveAbstractModel, models.Model):
 
 
 class ReportApproval(MetaInformationArchiveAbstractModel, models.Model):
+    """
+    Represents the approval status of a report by a user.
+
+    Inherited Attributes:
+        - MetaInformationArchiveAbstractModel (class): Abstract base class for models containing meta information.
+
+    Attributes:
+        - generation (ForeignKey): Foreign key to the ReportGeneration model, representing the report being approved.
+        - created_by (ForeignKey): Foreign key to the User model, representing the user who approved the report.
+        - is_approved (BooleanField): Indicates whether the report is approved or not.
+
+    Meta:
+        - unique_together (tuple): Specifies that the combination of 'generation' and 'created_by' fields should be unique.
+
+    Methods:
+        - __str__(): Returns a string representation of the ReportApproval instance.
+
+    """
     generation = models.ForeignKey('ReportGeneration', verbose_name=_('Report'),
                                    related_name='approvals', on_delete=models.CASCADE)
     created_by = models.ForeignKey(User, verbose_name=_('Approved By'),
@@ -434,17 +472,52 @@ class ReportApproval(MetaInformationArchiveAbstractModel, models.Model):
 
 
 def full_report_upload_to(instance, filename: str) -> str:
+    """
+    Uploads a full report to the specified location.
+
+    Parameters:
+        instance: The instance of the report to be uploaded.
+        filename (str): The name of the file to be uploaded.
+
+    Returns:
+        str: The file path of the uploaded full report.
+
+    Example:
+        instance = {
+            'report_id': 1234,
+            'report_name': 'Full Report'
+        }
+        filename = 'report.pdf'
+        full_report_upload_to(instance, filename)
+        Output: "report/generation/full/{random_uuid}/report.pdf"
+    """
     return f'report/generation/full/{uuid4()}/{filename}'
 
 
 def snapshot_report_upload_to(instance, filename: str) -> str:
+    """
+    Creates the file path for uploading a snapshot report.
+
+    Args:
+        instance (Any): The instance of the report.
+        filename (str): The name of the file to be uploaded.
+
+    Returns:
+        str: The file path for uploading the snapshot report.
+
+    Example:
+        >>> instance = some_instance
+        >>> filename = 'report.pdf'
+        >>> snapshot_report_upload_to(instance, filename)
+        'report/generation/snapshot/{generated_uuid}/report.pdf'
+    """
     return f'report/generation/snapshot/{uuid4()}/{filename}'
 
 
 class ReportGeneration(MetaInformationArchiveAbstractModel, models.Model):
-    '''
-    A report can be generated multiple times, each called a generation
-    '''
+    """
+
+    """
     class REPORT_GENERATION_STATUS(enum.Enum):
         PENDING = 0
         IN_PROGRESS = 1

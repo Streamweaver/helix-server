@@ -17,6 +17,30 @@ from .models import (
 
 
 def get_name_choices(enum_class) -> typing.List[typing.Tuple[str, str]]:
+    """
+    Returns a list of tuples containing name choices from the given enum class.
+
+    Parameters:
+    - enum_class (enum): The enum class to get the name choices from.
+
+    Returns:
+    - List of tuples: Each tuple contains two string values: the name and the label.
+
+    Example usage:
+    ```
+    class MyEnum(Enum):
+        VALUE_1 = "Value 1"
+        VALUE_2 = "Value 2"
+
+    choices = get_name_choices(MyEnum)
+    print(choices)
+    # Output: [('VALUE_1', 'Value 1'), ('VALUE_2', 'Value 2'), ('value_1', 'Value 1'), ('value_2', 'Value 2')]
+    ```
+
+    Notes:
+    - The method returns the name choices from the enum class as tuples, where the first element of each tuple is the name of the enum item in uppercase, and the second element is the corresponding label.
+    - The method also includes lowercase versions of the name choices in the returned list.
+    """
     return [
         (i.name, i.label)
         for i in enum_class
@@ -27,6 +51,9 @@ def get_name_choices(enum_class) -> typing.List[typing.Tuple[str, str]]:
 
 
 class ReleaseMetadataFilter(django_filters.FilterSet):
+    """
+
+    """
     release_environment = django_filters.ChoiceFilter(
         method='no_op',
         choices=get_name_choices(ReleaseMetadata.ReleaseEnvironment),
@@ -59,7 +86,26 @@ class ReleaseMetadataFilter(django_filters.FilterSet):
 
 
 class ConflictFilter(ReleaseMetadataFilter):
+    """
+    A class used to filter Conflict objects based on specific criteria.
 
+    Inherits from the ReleaseMetadataFilter class.
+
+    Attributes
+    ----------
+    Meta : class
+        A nested class that specifies metadata about the ConflictFilter class.
+
+        model : class
+            The model class that the ConflictFilter is filtering.
+
+        fields : dict
+            A dictionary that specifies the fields and lookup types for filtering.
+
+    Methods
+    -------
+    No additional methods are defined in this class.
+    """
     class Meta:
         model = Conflict
         fields = {
@@ -68,6 +114,28 @@ class ConflictFilter(ReleaseMetadataFilter):
 
 
 class DisasterFilter(ReleaseMetadataFilter):
+    """
+
+    This class is a subclass of ReleaseMetadataFilter and is used for filtering disaster data based on various parameters.
+
+    Attributes:
+        - hazard_types: IDListFilter object that filters disaster data based on hazard types.
+        - event_name: CharFilter object that filters disaster data based on event name.
+        - start_year: NumberFilter object that filters disaster data based on start year.
+        - end_year: NumberFilter object that filters disaster data based on end year.
+        - countries_iso3: StringListFilter object that filters disaster data based on countries' ISO3 codes.
+
+    Methods:
+        - filter_event_name(queryset, name, value): Filters the queryset based on the event name.
+        - filter_hazard_types(queryset, name, value): Filters the queryset based on the hazard types.
+        - filter_start_year(queryset, name, value): Filters the queryset based on the start year.
+        - filter_end_year(queryset, name, value): Filters the queryset based on the end year.
+        - filter_countries_iso3(queryset, name, value): Filters the queryset based on the countries' ISO3 codes.
+
+    Properties:
+        - qs: Overrides the parent class's qs property and returns the filtered queryset with new_displacement greater than 0.
+
+    """
     hazard_types = IDListFilter(method='filter_hazard_types')
     event_name = django_filters.CharFilter(method='filter_event_name')
     start_year = django_filters.NumberFilter(method='filter_start_year')
@@ -102,6 +170,26 @@ class DisasterFilter(ReleaseMetadataFilter):
 
 
 class ConflictStatisticsFilter(ReleaseMetadataFilter):
+    """
+    Class: ConflictStatisticsFilter
+
+    Subclass of: ReleaseMetadataFilter
+
+    This class is used to filter conflict statistics based on various criteria such as countries, start year, end year, and country ISO3 code.
+
+    Attributes:
+        countries (StringListFilter): A filter for selecting conflicts based on countries.
+        start_year (NumberFilter): A filter for selecting conflicts that occurred on or after a certain year.
+        end_year (NumberFilter): A filter for selecting conflicts that occurred on or before a certain year.
+        countries_iso3 (StringListFilter): A filter for selecting conflicts based on country ISO3 codes.
+
+    Methods:
+        filter_countries(queryset, name, value): Filters the queryset based on the specified countries.
+        filter_start_year(queryset, name, value): Filters the queryset to select conflicts that occurred on or after the specified start year.
+        filter_end_year(queryset, name, value): Filters the queryset to select conflicts that occurred on or before the specified end year.
+        filter_countries_iso3(queryset, name, value): Filters the queryset based on the specified country ISO3 codes.
+
+    """
     countries = StringListFilter(method='filter_countries')
     start_year = django_filters.NumberFilter(method='filter_start_year')
     end_year = django_filters.NumberFilter(method='filter_end_year')
@@ -125,6 +213,16 @@ class ConflictStatisticsFilter(ReleaseMetadataFilter):
 
 
 class DisasterStatisticsFilter(ReleaseMetadataFilter):
+    """
+    A class that represents a filter for disaster statistics.
+
+    Attributes:
+        hazard_types (IDListFilter): A filter for hazard types.
+        countries (StringListFilter): A filter for countries.
+        start_year (django_filters.NumberFilter): A filter for the starting year.
+        end_year (django_filters.NumberFilter): A filter for the ending year.
+        countries_iso3 (StringListFilter): A filter for countries' ISO3 codes.
+    """
     hazard_types = IDListFilter(method='filter_hazard_types')
     countries = StringListFilter(method='filter_countries')
     start_year = django_filters.NumberFilter(method='filter_start_year')
@@ -152,6 +250,19 @@ class DisasterStatisticsFilter(ReleaseMetadataFilter):
 
 
 class GiddStatusLogFilter(django_filters.FilterSet):
+    """
+
+    GiddStatusLogFilter class
+
+    A class that provides filtering capabilities for the StatusLog model based on the status field.
+
+    Attributes:
+        status (StringListFilter): A filter for the status field.
+
+    Methods:
+        filter_by_status(qs, name, value): Filters the queryset based on the provided status values.
+
+    """
     status = StringListFilter(method='filter_by_status')
 
     class Meta:
@@ -170,6 +281,16 @@ class GiddStatusLogFilter(django_filters.FilterSet):
 
 
 class PublicFigureAnalysisFilter(ReleaseMetadataFilter):
+    """
+    Class: PublicFigureAnalysisFilter
+
+    This class is an implementation of ReleaseMetadataFilter used for filtering PublicFigureAnalysis model instances based on certain criteria.
+
+    Attributes:
+        - model: The model attribute specifies the model class that the filter is intended for, which is PublicFigureAnalysis in this case.
+        - fields: The fields attribute is a dictionary that defines the available filter options for the PublicFigureAnalysis model. The key represents the field name, and the value is a list of available filter options for that field.
+
+    """
     class Meta:
         model = PublicFigureAnalysis
         fields = {
@@ -179,6 +300,28 @@ class PublicFigureAnalysisFilter(ReleaseMetadataFilter):
 
 
 class DisplacementDataFilter(ReleaseMetadataFilter):
+    """
+
+    Class: DisplacementDataFilter
+
+    Extends: ReleaseMetadataFilter
+
+    Filters the DisplacementData model based on various parameters such as start year, end year, countries, and cause.
+
+    Attributes:
+    - start_year: A django_filters.NumberFilter instance that filters the queryset based on the start year of the displacement data.
+    - end_year: A django_filters.NumberFilter instance that filters the queryset based on the end year of the displacement data.
+    - countries_iso3: A StringListFilter instance that filters the queryset based on the ISO3 country codes.
+    - cause: A django_filters.ChoiceFilter instance that filters the queryset based on the cause of the displacement. Can be 'conflict' or 'disaster'.
+
+    Methods:
+    - filter_start_year(queryset, name, value): Filters the queryset based on the start year.
+    - filter_end_year(queryset, name, value): Filters the queryset based on the end year.
+    - filter_countries_iso3(queryset, name, value): Filters the queryset based on the countries' ISO3 codes.
+    - filter_cause(queryset, name, value): Filters the queryset based on the cause of the displacement.
+    - qs(): Returns the filtered queryset based on the parameters.
+
+    """
     start_year = django_filters.NumberFilter(method='filter_start_year')
     end_year = django_filters.NumberFilter(method='filter_end_year')
     countries_iso3 = StringListFilter(method='filter_countries_iso3')

@@ -48,6 +48,30 @@ FigureUpdateInputType = generate_input_type_for_serializer(
 
 
 class CreateEntry(graphene.Mutation):
+    """
+
+    Class: CreateEntry
+
+    Description:
+    This class is a mutation class that allows the creation of new entries. It takes in data of type 'EntryCreateInputType' as an argument and returns a response containing information about the success of the mutation and any errors that occurred.
+
+    Attributes:
+    - Arguments:
+        - data: Required. Type: EntryCreateInputType. The input data for creating a new entry.
+    - errors: A list of CustomErrorType objects. Contains any errors that occurred during the mutation.
+    - ok: Boolean value representing the success status of the mutation.
+    - result: Field of type EntryType. Contains the newly created entry if the mutation was successful.
+
+    Methods:
+    - mutate(root, info, data):
+        - Description: A static method that handles the mutation logic.
+        - Parameters:
+            - root: The root object.
+            - info: Information about the request.
+            - data: The input data for creating a new entry.
+        - Returns: An instance of the CreateEntry class.
+
+    """
     class Arguments:
         data = EntryCreateInputType(required=True)
 
@@ -66,6 +90,41 @@ class CreateEntry(graphene.Mutation):
 
 
 class UpdateEntry(graphene.Mutation):
+    """
+    Class UpdateEntry
+
+    A class representing a mutation for updating an Entry object.
+
+    Properties:
+    - data: Required argument of type EntryUpdateInputType. Represents the data to update the Entry object.
+    - errors: A list of CustomErrorType objects. Represents any errors that occurred during the mutation.
+    - ok: A boolean value indicating the success of the mutation.
+    - result: An EntryType object representing the updated Entry object.
+
+    Methods:
+    - mutate(root, info, data): Static method that performs the mutation operation. It takes the following parameters:
+      - root: The root object.
+      - info: The GraphQL resolver info object.
+      - data: The data to update the Entry object.
+
+    Returns:
+    An instance of the UpdateEntry class.
+
+    Example Usage:
+    mutation {
+      updateEntry(data: {id: 1, ...}) {
+        errors {
+          field
+          messages
+        }
+        ok
+        result {
+          id
+          ...
+        }
+      }
+    }
+    """
     class Arguments:
         data = EntryUpdateInputType(required=True)
 
@@ -91,6 +150,39 @@ class UpdateEntry(graphene.Mutation):
 
 
 class DeleteEntry(graphene.Mutation):
+    """
+    Class to delete an entry.
+
+    .. note::
+        This class is a mutation class that is responsible for deleting an entry.
+
+    .. attribute:: Arguments
+
+        - **id** (*graphene.ID(required=True)*) - The ID of the entry to be deleted.
+
+    .. attribute:: errors
+
+        - **errors** (*graphene.List(graphene.NonNull(CustomErrorType))*) - A list of custom error types.
+
+    .. attribute:: ok
+
+        - **ok** (*graphene.Boolean*) - A boolean value indicating if the entry was successfully deleted.
+
+    .. attribute:: result
+
+        - **result** (*graphene.Field(EntryType)*) - The deleted entry.
+
+    .. method:: mutate(root, info, id)
+
+        This method is responsible for the actual deletion of the entry. It takes the following parameters:
+
+        - **root** - The root value.
+        - **info** - The GraphQL resolve info.
+        - **id** - The ID of the entry to be deleted.
+
+        :returns: A `DeleteEntry` instance containing the deleted entry, errors (if any), and the success status.
+        :rtype: DeleteEntry
+    """
     class Arguments:
         id = graphene.ID(required=True)
 
@@ -171,7 +263,19 @@ SourcePreviewInputType = generate_input_type_for_serializer(
 
 class CreateSourcePreview(graphene.Mutation):
     """
-    Pass id if you accidentally posted a wrong url, and need to change the preview.
+    CreateSourcePreview class
+
+    This class is a mutation for creating a source preview.
+
+    Attributes:
+        ok (graphene.Boolean): Indicates if the mutation was successful.
+        errors (graphene.List[CustomErrorType]): List of errors occurred during the mutation.
+        result (graphene.Field[SourcePreviewType]): The created source preview.
+
+    Methods:
+        mutate(root, info, data)
+            Executes the mutation logic to create a source preview.
+
     """
 
     class Arguments:
@@ -214,6 +318,22 @@ FigureTagUpdateInputType = generate_input_type_for_serializer(
 
 
 class CreateFigureTag(graphene.Mutation):
+    """
+    CreateFigureTag
+
+    This class represents a GraphQL mutation to create a FigureTag instance.
+
+    Attributes:
+        - Arguments:
+            - data: An instance of FigureTagCreateInputType that contains the data for creating a FigureTag.
+        - errors: A list of CustomErrorType objects representing any error that occurred during the mutation.
+        - ok: A boolean indicating the success of the mutation.
+        - result: An instance of FigureTagType representing the created FigureTag.
+
+    Methods:
+        - mutate: A static method decorated with various decorators that performs the mutation.
+
+    """
     class Arguments:
         data = FigureTagCreateInputType(required=True)
 
@@ -233,6 +353,34 @@ class CreateFigureTag(graphene.Mutation):
 
 
 class UpdateFigureTag(graphene.Mutation):
+    """
+
+    The UpdateFigureTag class represents a GraphQL mutation for updating a FigureTag object.
+
+    Attributes:
+    - errors: A list of CustomErrorType objects representing any errors that occurred during the mutation.
+    - ok: A boolean indicating whether the mutation was successful.
+    - result: A FigureTagType object representing the updated FigureTag.
+
+    Methods:
+    - mutate(root, info, data): A static method that performs the mutation based on the provided arguments.
+
+    Parameters:
+    - root: The root value.
+    - info: The GraphQL resolve info.
+    - data: An instance of FigureTagUpdateInputType representing the data to update the FigureTag with.
+
+    The mutate() method first tries to retrieve the FigureTag object with the provided ID from the database. If the object does not exist, it returns an UpdateFigureTag object with an error indicating that the tag does not exist.
+
+    Next, it creates a FigureTagCreateSerializer instance with the retrieved FigureTag object, the provided data, and the request context. The partial argument is set to True, indicating that only the provided fields should be updated.
+
+    If the serializer's validation fails, it returns an UpdateFigureTag object with the validation errors and a value of False for the ok attribute.
+
+    If the validation succeeds, it saves the serializer and assigns the updated FigureTag object to the instance variable.
+
+    Finally, it returns an UpdateFigureTag object with the updated FigureTag, a value of True for the ok attribute, and no errors.
+
+    """
     class Arguments:
         data = FigureTagUpdateInputType(required=True)
 
@@ -259,6 +407,63 @@ class UpdateFigureTag(graphene.Mutation):
 
 
 class DeleteFigureTag(graphene.Mutation):
+    """
+
+    `DeleteFigureTag` is a mutation class that is used to delete a specific `FigureTag` object from the database. This class is a part of a GraphQL schema.
+
+    ## Arguments
+    - `id`: Required argument of type `graphene.ID`. It represents the unique identifier of the `FigureTag` object that needs to be deleted.
+
+    ## Output
+    - `errors`: A list of `CustomErrorType` objects. It represents any errors that may have occurred during the deletion process.
+    - `ok`: A boolean value indicating the success of the deletion operation.
+    - `result`: A `FigureTagType` object representing the deleted `FigureTag` instance.
+
+    ## Usage
+
+    1. Import the necessary modules and dependencies:
+
+    ```python
+    import graphene
+    from your_module import is_authenticated, permission_checker
+    from your_module.models import FigureTag
+    from your_module.types import CustomErrorType, FigureTagType
+    ```
+
+    2. Define the `DeleteFigureTag` mutation class:
+
+    ```python
+    class DeleteFigureTag(graphene.Mutation):
+        class Arguments:
+            id = graphene.ID(required=True)
+
+        errors = graphene.List(graphene.NonNull(CustomErrorType))
+        ok = graphene.Boolean()
+        result = graphene.Field(FigureTagType)
+    ```
+
+    3. Implement the `mutate` method to perform the deletion operation:
+
+    ```python
+        @staticmethod
+        @is_authenticated()
+        @permission_checker(['entry.delete_figuretag'])
+        def mutate(root, info, id):
+            try:
+                instance = FigureTag.objects.get(id=id)
+            except FigureTag.DoesNotExist:
+                return DeleteFigureTag(errors=[
+                    dict(field='nonFieldErrors', messages=gettext('Tag does not exist.'))
+                ])
+            instance.delete()
+            instance.id = id
+
+            return DeleteFigureTag(result=instance, errors=None, ok=True)
+    ```
+
+    Note: The above code assumes that you have defined the `is_authenticated` and `permission_checker` decorators, as well as the `FigureTagType` and `CustomErrorType` types, in your module.
+
+    """
     class Arguments:
         id = graphene.ID(required=True)
 
@@ -282,12 +487,42 @@ class DeleteFigureTag(graphene.Mutation):
 
 
 class ExportEntries(ExportBaseMutation):
+    """A class for exporting entries to Excel format.
+
+    ExportEntries is a subclass of ExportBaseMutation and is used to export entries to Excel format. It takes the required `filters` argument of type EntryExtractionFilterDataInputType.
+
+    Example usage:
+        export = ExportEntries(filters={'type': 'book'})
+
+    Attributes:
+        DOWNLOAD_TYPE (str): The download type for exporting as Excel.
+
+    Args:
+        ExportBaseMutation (class): The base mutation class for exporting.
+        Arguments (class): The argument class for exporting.
+        filters (EntryExtractionFilterDataInputType): The required filters for exporting.
+
+    """
     class Arguments(ExportBaseMutation.Arguments):
         filters = EntryExtractionFilterDataInputType(required=True)
     DOWNLOAD_TYPE = ExcelDownload.DOWNLOAD_TYPES.ENTRY
 
 
 class ExportFigures(ExportBaseMutation):
+    """
+    Class: ExportFigures
+
+    Describes a class that is used to export figures in Excel format.
+
+    Inherits From: ExportBaseMutation
+
+    Attributes:
+        DOWNLOAD_TYPE (str): The download type for figures, set to 'FIGURE'.
+
+    Arguments:
+        filters (FigureExtractionFilterDataInputType): Required argument that specifies the filters for figure extraction.
+
+    """
     class Arguments(ExportBaseMutation.Arguments):
         # TODO: use Can we use ReportFigureExtractionFilterSet?
         filters = FigureExtractionFilterDataInputType(required=True)
@@ -297,7 +532,7 @@ class ExportFigures(ExportBaseMutation):
 
 class ExportFigureTags(ExportBaseMutation):
     """
-    Mutation to figure tags data based on provided filters.
+
     """
     class Arguments(ExportBaseMutation.Arguments):
         filters = FigureTagFilterDataInputType(required=True)
@@ -305,6 +540,30 @@ class ExportFigureTags(ExportBaseMutation):
 
 
 class DeleteFigure(graphene.Mutation):
+    """
+    The DeleteFigure class is a mutation class used to delete a figure object. It inherits from the graphene.Mutation class.
+
+    Attributes:
+        - Arguments (class): A nested class that defines the arguments required for the mutation.
+            - id (graphene.ID): The ID of the figure to be deleted.
+
+        - errors (graphene.List[graphene.NonNull(CustomErrorType)]): A list of custom error types, if any.
+        - ok (graphene.Boolean): A boolean indicating the success of the mutation.
+        - result (graphene.Field[FigureType]): The deleted figure object.
+
+    Methods:
+        - mutate(root, info, id): A static method used to perform the mutation. It takes the following parameters:
+            - root: The root value.
+            - info: The GraphQL ResolveInfo object.
+            - id (graphene.ID): The ID of the figure to be deleted.
+
+            Returns:
+                - If the figure with the provided ID does not exist, a DeleteFigure object with a list of errors is returned.
+                - If the figure is successfully deleted, a DeleteFigure object with ok set to True and errors set to None is returned.
+
+                Deletes the figure with the provided ID, and sends appropriate notifications based on the event's review status.
+                Updates the event's status and sends notifications.
+    """
     class Arguments:
         id = graphene.ID(required=True)
 
@@ -366,6 +625,31 @@ class DeleteFigure(graphene.Mutation):
 
 
 class ApproveFigure(graphene.Mutation):
+    """
+    This class represents a mutation to approve a figure. It is a sub-class of the `graphene.Mutation` class.
+
+    Attributes:
+        Arguments (nested class): Represents the arguments that can be passed to the mutation.
+        - id (graphene.ID): The ID of the figure to be approved.
+
+        errors (graphene.List): A list of error messages. Each error message is an instance of `CustomErrorType`.
+        ok (graphene.Boolean): Indicates whether the mutation was successful or not.
+        result (graphene.Field): Represents the approved figure. It is an instance of `FigureType`.
+
+    Methods:
+        mutate(root, info, id): Static method that performs the mutation logic. Called when the mutation is executed.
+
+    Note:
+        - The `mutate` method has the `@staticmethod` decorator and the `@permission_checker(['entry.approve_figure'])`
+          decorator, indicating that it can be called without creating an instance of the class and that the user must have
+          the 'entry.approve_figure' permission.
+        - The `mutate` method returns an instance of `ApproveFigure` with either the approved figure and no errors,
+          or a list of error messages and no result.
+        - The `mutate` method updates the review status of the figure to 'approved', sets the approved by and approved on
+          fields, and saves the changes to the database.
+        - The `mutate` method calls the static method `update_event_status_and_send_notifications` of the `Figure` class to
+          update the event status and send notifications for the event associated with the approved figure.
+    """
     class Arguments:
         id = graphene.ID(required=True)
 
@@ -400,6 +684,35 @@ class ApproveFigure(graphene.Mutation):
 
 
 class UnapproveFigure(graphene.Mutation):
+    """
+    UnapproveFigure
+    -----------
+
+    A class that represents a mutation for un-approving a figure.
+
+    Attributes:
+    -----------
+    - id (graphene.ID): The ID of the figure to be un-approved.
+
+    Returns:
+    -----------
+    - errors (List[CustomErrorType]): A list of errors, if any occurred during the mutation.
+    - ok (Boolean): Indicates whether the mutation was successful or not.
+    - result (FigureType): The updated figure object, if the mutation was successful.
+
+    Methods:
+    -----------
+    - staticmethod mutate(root, info, id):
+        Executes the mutation to un-approve a figure.
+
+        Parameters:
+            - root: The root value/handler
+            - info: The GraphQL resolution info
+            - id (str): The ID of the figure to be un-approved.
+
+        Returns:
+            - An instance of the UnapproveFigure class.
+    """
     class Arguments:
         id = graphene.ID(required=True)
 
@@ -470,6 +783,30 @@ class UnapproveFigure(graphene.Mutation):
 
 
 class ReRequestReviewFigure(graphene.Mutation):
+    """
+    Class: ReRequestReviewFigure
+
+    A GraphQL mutation class to re-request review for a figure.
+
+    Attributes:
+        - id: Required argument of type ID representing the ID of the figure.
+
+    Methods:
+        - mutate(root, info, id):
+            Static method to perform the mutation operation.
+            Args:
+                - root: The root object of the mutation.
+                - info: Information about the execution.
+                - id: The ID of the figure to re-request review for.
+            Returns:
+                An instance of the ReRequestReviewFigure class with the following attributes:
+                    - errors: A list of CustomErrorType objects representing any errors that occurred during the mutation.
+                    - ok: A boolean indicating if the mutation was successful.
+                    - result: A Field object of type FigureType representing the updated figure after re-requesting review.
+
+            Raises:
+                None
+    """
     class Arguments:
         id = graphene.ID(required=True)
 
@@ -515,6 +852,25 @@ class ReRequestReviewFigure(graphene.Mutation):
 
 
 class BulkUpdateFigures(BulkUpdateMutation):
+    """
+
+    Class: BulkUpdateFigures
+
+    This class is responsible for bulk updating the figures in the database.
+
+    Attributes:
+    - model (Figure): Specifies the model class to be updated.
+    - serializer_class (FigureSerializer): Specifies the serializer class to be used for serialization.
+    - result (List[FigureType]): Provides a list of figures after the bulk update operation.
+    - deleted_result (List[FigureType]): Provides a list of figures that were deleted during the bulk update operation.
+    - permissions (List[str]): Specifies the list of permissions required for performing the bulk update operation.
+
+    Methods:
+    - get_queryset(): Returns a QuerySet containing all the figures.
+    - delete_item(figure, context): Deletes the given figure and performs additional operations like sending notifications and adding an event to the bulk manager.
+    - mutate(*args, **kwargs): Executes the bulk update mutation operation using the BulkUpdateFigureManager.
+
+    """
     class Arguments(BulkUpdateMutation.Arguments):
         items = graphene.List(graphene.NonNull(FigureUpdateInputType))
 
@@ -551,6 +907,9 @@ class BulkUpdateFigures(BulkUpdateMutation):
 
 
 class Mutation(object):
+    """
+
+    """
     create_entry = CreateEntry.Field()
     update_entry = UpdateEntry.Field()
     delete_entry = DeleteEntry.Field()

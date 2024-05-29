@@ -6,6 +6,18 @@ from .models import ReportGeneration
 
 @receiver(post_save, sender=ReportGeneration)
 def update_report_reviewer_status(sender, instance, created, **kwargs):
+    """
+    Updates the reviewer status of a report after it is generated or updated.
+
+    Parameters:
+    - sender: The sender of the signal.
+    - instance: The instance of the ReportGeneration model that triggered the signal.
+    - created: A boolean indicating whether the instance is newly created.
+    - **kwargs: Additional keyword arguments.
+
+    Returns:
+    None
+    """
     if created:
         instance.report.is_signed_off = False
         instance.report.is_signed_off_by = None

@@ -42,6 +42,48 @@ from apps.common.enums import QA_RULE_TYPE
 
 class EventFilter(NameFilterMixin,
                   django_filters.FilterSet):
+    """
+    EventFilter class is used to filter event objects based on various criteria. It is a subclass of NameFilterMixin and django_filters.FilterSet.
+
+    Attributes:
+        - name: CharFilter to filter events by name
+        - crisis_by_ids: IDListFilter to filter events by crisis IDs
+        - event_types: StringListFilter to filter events by event types
+        - countries: IDListFilter to filter events by countries
+        - osv_sub_type_by_ids: IDListFilter to filter events by OSV sub types
+        - disaster_sub_types: IDListFilter to filter events by disaster sub types
+        - violence_types: IDListFilter to filter events by violence types
+        - violence_sub_types: IDListFilter to filter events by violence sub types
+        - created_by_ids: IDListFilter to filter events by created by user IDs
+        - qa_rule: CharFilter to filter events by QA rule
+        - context_of_violences: IDListFilter to filter events by context of violence IDs
+        - review_status: StringListFilter to filter events by review status
+        - assignees: IDListFilter to filter events by assignees IDs
+        - assigners: IDListFilter to filter events by assigners IDs
+        - filter_figures: SimpleInputFilter to filter events by figure extraction filter data input
+        - aggregate_figures: SimpleInputFilter to aggregate data using figure aggregate filter data input
+
+    Properties:
+        - qs: Queryset property that returns the filtered queryset of events
+
+    Methods:
+        - noop: Method used as a filter method for aggregate_figures filter, no operation is performed
+        - filter_by_figures: Method used as a filter method for filter_figures filter, filters events based on figure filters
+        - filter_countries: Method used as a filter method for countries filter, filters events by countries
+        - filter_disaster_sub_types: Method used as a filter method for disaster_sub_types filter, filters events by disaster sub types
+        - filter_violence_types: Method used as a filter method for violence_types filter, filters events by violence types
+        - filter_violence_sub_types: Method used as a filter method for violence_sub_types filter, filters events by violence sub types
+        - filter_crises: Method used as a filter method for crisis_by_ids filter, filters events by crisis IDs
+        - filter_event_types: Method used as a filter method for event_types filter, filters events by event types
+        - filter_review_status: Method used as a filter method for review_status filter, filters events by review status
+        - filter_name: Method used as a filter method for name filter, filters events by name
+        - filter_osv_sub_types: Method used as a filter method for osv_sub_type_by_ids filter, filters events by OSV sub types
+        - filter_qa_rule: Method used as a filter method for qa_rule filter, filters events by QA rule
+        - filter_context_of_violences: Method used as a filter method for context_of_violences filter, filters events by context of violence IDs
+        - filter_assigners: Method used as a filter method for assigners filter, filters events by assigners IDs
+        - filter_assignees: Method used as a filter method for assignees filter, filters events by assignees IDs
+        - filter_created_by: Method used as a filter method for created_by_ids filter, filters events by created by user IDs
+    """
     name = django_filters.CharFilter(method='filter_name')
     crisis_by_ids = IDListFilter(method='filter_crises')
     event_types = StringListFilter(method='filter_event_types')
@@ -245,6 +287,24 @@ class EventFilter(NameFilterMixin,
 
 
 class ActorFilter(django_filters.FilterSet):
+    """
+    ActorFilter is a class that represents a filter for the Actor model.
+
+    This class inherits from django_filters.FilterSet and is used to filter Actor objects based on certain criteria.
+
+    Attributes:
+        model (Model): The model this filter is associated with, in this case, Actor.
+
+    Example usage:
+        filter = ActorFilter(query_params, queryset=Actor.objects.all())
+
+    Methods:
+        Meta: A nested class that defines metadata for the filter.
+
+        Available Fields:
+            - name: Filters Actor objects by name using the 'unaccent__icontains' lookup.
+
+    """
     class Meta:
         model = Actor
         fields = {
@@ -253,6 +313,24 @@ class ActorFilter(django_filters.FilterSet):
 
 
 class DisasterSubTypeFilter(django_filters.FilterSet):
+    """
+    class DisasterSubTypeFilter(django_filters.FilterSet):
+        A filter class used to filter DisasterSubType objects based on their name.
+
+        Attributes:
+            model (DisasterSubType): The model class to be filtered.
+            fields (dict): The fields to be used in the filter.
+
+        Usage:
+            filter_class = DisasterSubTypeFilter
+            queryset = DisasterSubType.objects.all()
+            filter = filter_class(data=request.GET, queryset=queryset)
+            filtered_queryset = filter.qs
+
+        Example:
+            filter = DisasterSubTypeFilter(data={'name': 'earthquake'}, queryset=queryset)
+            filtered_queryset = filter.qs
+    """
     class Meta:
         model = DisasterSubType
         fields = {
@@ -261,6 +339,27 @@ class DisasterSubTypeFilter(django_filters.FilterSet):
 
 
 class DisasterTypeFilter(django_filters.FilterSet):
+    """
+    Class: DisasterTypeFilter
+
+    This class inherits from the django_filters.FilterSet class and is used to filter instances of the DisasterType model based on a specific criteria.
+
+    Parameters:
+    - model: The model class that the filter is associated with. In this case, it is the DisasterType model.
+    - fields: A dictionary that specifies the fields that will be used for filtering. In this case, the 'name' field is used with the 'unaccent__icontains' lookup to perform a case-insensitive containment match on the unaccented name.
+
+    Example usage:
+
+        filter = DisasterTypeFilter(data={'name': 'earthquake'})
+        queryset = filter.qs
+        # queryset now contains instances of the DisasterType model that have a name containing the word 'earthquake' (case-insensitive)
+
+    Note:
+    This class requires the django_filters package to be installed. You can install it using pip:
+
+        pip install django_filters
+
+    """
     class Meta:
         model = DisasterType
         fields = {
@@ -269,6 +368,21 @@ class DisasterTypeFilter(django_filters.FilterSet):
 
 
 class DisasterCategoryFilter(django_filters.FilterSet):
+    """
+    A class that defines a filter for the DisasterCategory model based on the name attribute
+
+    Attributes:
+        model (DisasterCategory): The model class to be filtered
+        fields (dict): A dictionary specifying the filter fields
+
+    Example Usage:
+        # Create an instance of DisasterCategoryFilter
+        category_filter = DisasterCategoryFilter(data=request.GET, queryset=DisasterCategory.objects.all())
+
+        # Apply the filter
+        filtered_categories = category_filter.qs
+
+    """
     class Meta:
         model = DisasterCategory
         fields = {
@@ -277,6 +391,22 @@ class DisasterCategoryFilter(django_filters.FilterSet):
 
 
 class DisasterSubCategoryFilter(django_filters.FilterSet):
+    """
+
+    DisasterSubCategoryFilter
+
+    A class that defines filtering options for the DisasterSubCategory model.
+
+    Usage:
+        filter = DisasterSubCategoryFilter(queryset)
+
+    Attributes:
+        model (Model): The model on which the filtering options are defined.
+
+    Methods:
+        N/A
+
+    """
     class Meta:
         model = DisasterSubCategory
         fields = {
@@ -285,6 +415,22 @@ class DisasterSubCategoryFilter(django_filters.FilterSet):
 
 
 class OsvSubTypeFilter(django_filters.FilterSet):
+    """
+    The OsvSubTypeFilter class is a FilterSet subclass for filtering OsvSubType instances based on their name attribute. It is designed to be used with Django's filtering functionality.
+
+    Attributes:
+        model (Model): The model class to be filtered.
+
+    Fields:
+        name (list): Specifies the filter condition for the 'name' attribute. The 'icontains' lookup type is used to perform a case-insensitive containment match.
+
+    Example usage:
+        filter_set = OsvSubTypeFilter(data=request.GET, queryset=OsvSubType.objects.all())
+        filtered_queryset = filter_set.qs
+
+        This code creates an instance of OsvSubTypeFilter with request.GET as the filter data and all OsvSubType instances as the initial queryset. It then applies the filtering based on the provided data and returns the filtered queryset.
+
+    """
     class Meta:
         model = OsvSubType
         fields = {
@@ -293,6 +439,22 @@ class OsvSubTypeFilter(django_filters.FilterSet):
 
 
 class OtherSubTypeFilter(django_filters.FilterSet):
+    """
+    Filter class for OtherSubType model.
+
+    This class is a subclass of `django_filters.FilterSet` and provides filtering options for the `OtherSubType` model based on the `name` field.
+
+    Attributes:
+        model (Model): The model class for which the filter is defined.
+
+    Fields:
+        - name (list[str]): Filter options for the `name` field. The filter is case-insensitive and performs a partial match.
+
+    Example usage:
+        filter_class = OtherSubTypeFilter
+        queryset = OtherSubType.objects.all()
+        filtered_queryset = filter_class(data=request.GET, queryset=queryset).qs
+    """
     class Meta:
         model = OtherSubType
         fields = {
@@ -301,6 +463,19 @@ class OtherSubTypeFilter(django_filters.FilterSet):
 
 
 class ContextOfViolenceFilter(django_filters.FilterSet):
+    """Filterset for filtering ContextOfViolence objects based on name.
+
+    Class:
+    ContextOfViolenceFilter
+
+    Attributes:
+    - model: The model class used for filtering (ContextOfViolence).
+    - fields: A dictionary defining the allowed filters and their lookup types for name field.
+
+    Methods:
+    None
+
+    """
     class Meta:
         model = ContextOfViolence
         fields = {
@@ -309,6 +484,18 @@ class ContextOfViolenceFilter(django_filters.FilterSet):
 
 
 class ViolenceFilter(django_filters.FilterSet):
+    """
+    Class: ViolenceFilter
+
+    This class is a filter for the Violence model.
+
+    Attributes:
+        model (class): The model that this filter is associated with.
+        fields (dict): A dictionary that maps field names to a list of filter
+                       lookups. The field names should be the names of the
+                       model's fields that need to be filtered.
+
+    """
     class Meta:
         model = Violence
         fields = {
@@ -317,6 +504,16 @@ class ViolenceFilter(django_filters.FilterSet):
 
 
 class ViolenceSubTypeFilter(django_filters.FilterSet):
+    """
+    This class is a FilterSet for the ViolenceSubType model. It is used to filter querysets based on the 'id' field of the ViolenceSubType model.
+
+    Attributes:
+        model (class): The model that the FilterSet is being applied to.
+
+    Example usage:
+        filter_set = ViolenceSubTypeFilter(data=request.GET, queryset=queryset)
+        filtered_queryset = filter_set.qs
+    """
     class Meta:
         model = ViolenceSubType
         fields = {

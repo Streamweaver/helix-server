@@ -9,6 +9,25 @@ from apps.entry.models import Figure
 
 
 class CountrySerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Country model.
+
+    Fields:
+    - iso2: The two-letter ISO code for the country.
+    - iso3: The three-letter ISO code for the country.
+    - country_name: The short name of the country.
+
+    Meta options:
+    - model: The model that this serializer is used for, which is Country.
+    - fields: The fields to include in the serialized representation of the model, which are iso2, iso3, and country_name.
+    - lookup_field: The field to use for lookups, which is the id field of the model.
+
+    Example usage:
+
+    serializer = CountrySerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+    """
     country_name = serializers.CharField(source='idmc_short_name')
 
     class Meta:
@@ -22,6 +41,9 @@ class CountrySerializer(serializers.ModelSerializer):
 
 
 class ConflictSerializer(serializers.ModelSerializer):
+    """
+
+    """
     class Meta:
         model = Conflict
         fields = (
@@ -37,6 +59,19 @@ class ConflictSerializer(serializers.ModelSerializer):
 
 
 class DisasterSerializer(serializers.ModelSerializer):
+    """
+
+    Class: DisasterSerializer
+
+    Description:
+    This class is a serializer for the Disaster model. It defines the fields that should be serialized and provides serialization and deserialization capabilities for instances of the Disaster model.
+
+    Attributes:
+    - model: The Disaster model that this serializer is associated with.
+    - fields: The fields of the Disaster model that should be serialized.
+    - lookup_field: The field used as the lookup parameter when retrieving a single instance of the Disaster model.
+
+    """
     class Meta:
         model = Disaster
         fields = (
@@ -68,6 +103,19 @@ class DisasterSerializer(serializers.ModelSerializer):
 
 
 class DisplacementDataSerializer(serializers.ModelSerializer):
+    """
+    Serializer for converting DisplacementData instances into JSON format.
+
+    Attributes:
+        Meta: Meta class for defining the model and fields to be serialized.
+
+    Example usage:
+        serializer = DisplacementDataSerializer(data=data)
+        if serializer.is_valid():
+            json_data = serializer.data
+        else:
+            print(serializer.errors)
+    """
     class Meta:
         model = DisplacementData
         fields = (
@@ -86,6 +134,12 @@ class DisplacementDataSerializer(serializers.ModelSerializer):
 
 
 class PublicFigureAnalysisSerializer(serializers.ModelSerializer):
+    """
+    Class: PublicFigureAnalysisSerializer
+
+    Serializes PublicFigureAnalysis objects
+
+    """
     figure_cause_name = serializers.SerializerMethodField('get_figure_cause_name')
     figure_category_name = serializers.SerializerMethodField('get_figure_category_name')
 
@@ -114,12 +168,39 @@ class PublicFigureAnalysisSerializer(serializers.ModelSerializer):
 
 
 class StatusLogSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the StatusLog model.
+
+    This serializer is used to convert StatusLog objects to JSON and vice versa.
+
+    Attributes:
+        model (django.db.models.Model): The StatusLog model that the serializer is based on.
+        fields (str): A string representing the fields from the model that should be included in the serialized representation. If set to '__all__', all fields will be included.
+
+    """
     class Meta:
         model = StatusLog
         fields = '__all__'
 
 
 class ReleaseMetadataSerializer(serializers.ModelSerializer):
+    """
+
+    Class: ReleaseMetadataSerializer
+
+    Description:
+        This class is responsible for serializing and deserializing ReleaseMetadata objects.
+
+    Methods:
+        - create(self, validated_data): This method is used to create a new ReleaseMetadata object with the given validated data.
+
+    Attributes:
+        - Meta (nested class): This is a nested class that defines the metadata for the serializer. It specifies the model to be used and the fields to include in the serialization process.
+
+    Authors:
+        [Your Name]
+
+    """
     class Meta:
         model = ReleaseMetadata
         fields = ('pre_release_year', 'release_year')
@@ -131,6 +212,16 @@ class ReleaseMetadataSerializer(serializers.ModelSerializer):
 
 
 class DisaggregationSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Disaggregation model.
+
+    Responsible for serializing and deserializing Disaggregation instances into JSON format.
+
+    Attributes:
+        model (model): The model to be used for serialization and deserialization.
+        fields (tuple): A tuple containing the fields to be serialized and deserialized.
+
+    """
     class Meta:
         model = GiddFigure
         fields = (
@@ -167,8 +258,25 @@ class DisaggregationSerializer(serializers.ModelSerializer):
 
 class IdpsSaddEstimateSerializer(serializers.ModelSerializer):
     """
-    Serializer for validating and processing data from IdpsSaddEstimate CSV files.
-    Automatically computes 'iso3' and 'country_name' from the associated country.
+    Class: IdpsSaddEstimateSerializer
+
+    This class is a serializer for the IdpsSaddEstimate model. It is used to serialize and validate data when creating or updating instances of the model.
+
+    Attributes:
+    - model: The model class associated with this serializer.
+    - exclude: A list of field names to be excluded from the serialized representation.
+
+    Methods:
+    - validate(validated_data): This method is called to perform validation on the input data. It is called after the default validation performed by the superclass. It takes the validated data as input and returns the validated data after performing additional validation. In this method, the country name and iso3 fields are calculated based on the country field and added to the validated data.
+
+    Example Usage:
+    serializer = IdpsSaddEstimateSerializer(data=data)
+    if serializer.is_valid():
+        validated_data = serializer.validated_data
+        # Perform further actions with the validated data
+    else:
+        errors = serializer.errors
+        # Handle validation errors
     """
 
     class Meta:

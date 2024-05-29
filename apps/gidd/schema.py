@@ -37,6 +37,20 @@ from .enums import GiddStatusLogEnum
 
 
 def custom_date_filters(start_year, end_year):
+    """
+
+    Method: custom_date_filters
+
+    This method generates custom date filters based on the given parameters.
+
+    Parameters:
+    - start_year: An integer representing the starting year for the date filter.
+    - end_year: An integer representing the ending year for the date filter.
+
+    Returns:
+    - filters: A dictionary containing custom date filters for 'idps_date_filters' and 'nd_date_filters'.
+
+    """
     filters = {
         'idps_date_filters': dict(),
         'nd_date_filters': dict(),
@@ -55,18 +69,47 @@ def custom_date_filters(start_year, end_year):
 
 
 class GiddDisasterCountryType(graphene.ObjectType):
+    """
+
+    Class: GiddDisasterCountryType
+
+    This class represents a disaster country type in GiddDisaster application.
+
+    Attributes:
+    - id (int): The unique identifier of the country type.
+    - iso3 (str): The ISO3 code of the country type.
+    - country_name (str): The name of the country type.
+
+    """
     id = graphene.Int(required=True)
     iso3 = graphene.String(required=True)
     country_name = graphene.String(required=True)
 
 
 class GiddTimeSeriesStatisticsByYearType(graphene.ObjectType):
+    """
+    Class representing the GiddTimeSeriesStatisticsByYearType.
+
+    Attributes:
+        year (graphene.Int): The year of the statistics.
+        total (graphene.Int): The total value of the statistics.
+        total_rounded (graphene.Int): The rounded total value of the statistics.
+    """
     year = graphene.Int(required=True)
     total = graphene.Int()
     total_rounded = graphene.Int()
 
 
 class GiddTimeSeriesStatisticsByCountryType(graphene.ObjectType):
+    """
+    This class represents the GiddTimeSeriesStatisticsByCountryType object.
+
+    Attributes:
+    - year: An integer representing the year of the statistics. It is a required attribute.
+    - total: An integer representing the total number of statistics. It is an optional attribute.
+    - total_rounded: An integer representing the rounded total number of statistics. It is an optional attribute.
+    - country: A GiddDisasterCountryType object representing the country associated with the statistics. It is a required attribute.
+    """
     year = graphene.Int(required=True)
     total = graphene.Int()
     total_rounded = graphene.Int()
@@ -74,6 +117,19 @@ class GiddTimeSeriesStatisticsByCountryType(graphene.ObjectType):
 
 
 class DisplacementByHazardType(graphene.ObjectType):
+    """
+
+    DisplacementByHazardType Class
+
+    Represents the displacement data for a specific hazard type.
+
+    Attributes:
+        id (graphene.ID): The unique identifier for the hazard type.
+        label (graphene.String): The label/name of the hazard type.
+        new_displacements (graphene.Int): The total number of new displacements for the hazard type.
+        new_displacements_rounded (graphene.Int): The rounded total number of new displacements for the hazard type.
+
+    """
     id = graphene.ID(required=True)
     label = graphene.String(required=True)
     new_displacements = graphene.Int()
@@ -81,6 +137,25 @@ class DisplacementByHazardType(graphene.ObjectType):
 
 
 class GiddConflictStatisticsType(graphene.ObjectType):
+    """
+
+    Class: GiddConflictStatisticsType
+
+    The GiddConflictStatisticsType class represents the statistics related to conflicts and displacements.
+
+    Attributes:
+    - new_displacements (int): The total number of new displacements.
+    - new_displacements_rounded (int): The rounded total number of new displacements.
+    - total_displacements (int): The total number of displacements.
+    - total_displacements_rounded (int): The rounded total number of displacements.
+    - total_displacement_countries (int): The total number of countries with displacement.
+    - internal_displacement_countries (int): The total number of countries with internal displacement.
+    - new_displacement_timeseries_by_year (List[GiddTimeSeriesStatisticsByYearType]): A list of GiddTimeSeriesStatisticsByYearType objects representing the new displacement statistics by year.
+    - new_displacement_timeseries_by_country (List[GiddTimeSeriesStatisticsByCountryType]): A list of GiddTimeSeriesStatisticsByCountryType objects representing the new displacement statistics by country.
+    - total_displacement_timeseries_by_year (List[GiddTimeSeriesStatisticsByYearType]): A list of GiddTimeSeriesStatisticsByYearType objects representing the total displacement statistics by year.
+    - total_displacement_timeseries_by_country (List[GiddTimeSeriesStatisticsByCountryType]): A list of GiddTimeSeriesStatisticsByCountryType objects representing the total displacement statistics by country.
+
+    """
     new_displacements = graphene.Int()
     new_displacements_rounded = graphene.Int()
     total_displacements = graphene.Int()
@@ -102,6 +177,27 @@ class GiddConflictStatisticsType(graphene.ObjectType):
 
 
 class GiddDisasterStatisticsType(graphene.ObjectType):
+    """
+    Represents the statistics of the GIDD disaster.
+
+    Attributes:
+        new_displacements (int): The number of new displacements.
+        new_displacements_rounded (int): The rounded number of new displacements.
+        total_events (int): The total number of events.
+        displacements_by_hazard_type (List[DisplacementByHazardType]): The list of displacements by hazard type.
+        total_displacement_countries (int): The total number of displacement countries.
+        internal_displacement_countries (int): The number of internal displacement countries.
+        total_displacements (int): The total number of displacements.
+        total_displacements_rounded (int): The rounded total number of displacements.
+        new_displacement_timeseries_by_year (List[GiddTimeSeriesStatisticsByYearType]):
+            The list of new displacement time series by year.
+        new_displacement_timeseries_by_country (List[GiddTimeSeriesStatisticsByCountryType]):
+            The list of new displacement time series by country.
+        total_displacement_timeseries_by_year (List[GiddTimeSeriesStatisticsByYearType]):
+            The list of total displacement time series by year.
+        total_displacement_timeseries_by_country (List[GiddTimeSeriesStatisticsByCountryType]):
+            The list of total displacement time series by country.
+    """
     new_displacements = graphene.Int()
     new_displacements_rounded = graphene.Int()
     total_events = graphene.Int()
@@ -127,6 +223,17 @@ class GiddDisasterStatisticsType(graphene.ObjectType):
 
 
 class GiddCombinedStatisticsType(graphene.ObjectType):
+    """
+    Represents the combined statistics for internal and total displacements in GIDD.
+
+    Attributes:
+        internal_displacements (int): The number of internal displacements.
+        total_displacements (int): The number of total displacements.
+        internal_displacements_rounded (int): The rounded number of internal displacements.
+        total_displacements_rounded (int): The rounded number of total displacements.
+        internal_displacement_countries (int): The number of countries with internal displacements.
+        total_displacement_countries (int): The number of countries with total displacements.
+    """
     internal_displacements = graphene.Int()
     total_displacements = graphene.Int()
     internal_displacements_rounded = graphene.Int()
@@ -136,6 +243,23 @@ class GiddCombinedStatisticsType(graphene.ObjectType):
 
 
 class GiddConflictType(DjangoObjectType):
+    """
+    A class representing a GraphQL object type for GiddConflictType.
+
+    Attributes:
+    - country_id (graphene.ID): Required field representing the ID of the country.
+
+    Meta:
+    - model (Conflict): The model class representing the conflict.
+    - fields (tuple): The fields to be included in the GiddConflictType object.
+
+    Methods:
+    - resolve_country_id(root, info, **kwargs): A static method that returns the country_id.
+
+    Example Usage:
+        gidd_conflict_type = GiddConflictType()
+        country_id = gidd_conflict_type.resolve_country_id(root, info)
+    """
     country_id = graphene.ID(required=True)
 
     class Meta:
@@ -157,12 +281,50 @@ class GiddConflictType(DjangoObjectType):
 
 
 class GiddConflictListType(CustomDjangoListObjectType):
+    """
+    A custom class for creating a Django List Object Type for GiddConflictListType.
+
+    """
     class Meta:
         model = Conflict
         filterset_class = ConflictFilter
 
 
 class GiddDisasterType(DjangoObjectType):
+    """
+
+    GiddDisasterType
+
+    A class representing the GraphQL object type for GIDD disaster data.
+
+    Attributes:
+        country_id (graphene.ID): The ID of the country related to the disaster.
+        event_id (graphene.ID): The ID of the event related to the disaster.
+        hazard_category_id (graphene.ID): The ID of the hazard category related to the disaster.
+        hazard_sub_category_id (graphene.ID): The ID of the hazard sub-category related to the disaster.
+        hazard_type_id (graphene.ID): The ID of the hazard type related to the disaster.
+        hazard_sub_type_id (graphene.ID): The ID of the hazard sub-type related to the disaster.
+
+    Methods:
+        resolve_country_id(root, info, **kwargs: Any) -> graphene.ID:
+            Resolves the country ID of the GIDD disaster data.
+
+        resolve_event_id(root, info, **kwargs: Any) -> graphene.ID:
+            Resolves the event ID of the GIDD disaster data.
+
+        resolve_hazard_category_id(root, info, **kwargs: Any) -> graphene.ID:
+            Resolves the hazard category ID of the GIDD disaster data.
+
+        resolve_hazard_sub_category_id(root, info, **kwargs: Any) -> graphene.ID:
+            Resolves the hazard sub-category ID of the GIDD disaster data.
+
+        resolve_hazard_type_id(root, info, **kwargs: Any) -> graphene.ID:
+            Resolves the hazard type ID of the GIDD disaster data.
+
+        resolve_hazard_sub_type_id(root, info, **kwargs: Any) -> graphene.ID:
+            Resolves the hazard sub-type ID of the GIDD disaster data.
+
+    """
     country_id = graphene.ID(required=True)
     event_id = graphene.ID()
     hazard_category_id = graphene.ID()
@@ -221,12 +383,34 @@ class GiddDisasterType(DjangoObjectType):
 
 
 class GiddDisasterListType(CustomDjangoListObjectType):
+    """
+    GiddDisasterListType
+
+    Class representing a GraphQL object type for listing GIDD disasters.
+
+    Inherits from CustomDjangoListObjectType.
+
+    Attributes:
+        Meta:
+            model (django.db.models.Model): The Django model for disasters.
+            filterset_class (django_filters.FilterSet): The filterset class for disasters.
+
+    """
     class Meta:
         model = Disaster
         filterset_class = DisasterFilter
 
 
 class GiddStatusLogType(DjangoObjectType):
+    """
+    The GiddStatusLogType class is a subclass of DjangoObjectType and represents a GraphQL type for the StatusLog model.
+
+    Attributes:
+        model (class): The Django model associated with this type (StatusLog).
+        status (graphene.Field): A field representing the status of the status log.
+        status_display (EnumDescription): An EnumDescription object used for obtaining the display value of the status.
+
+    """
     class Meta:
         model = StatusLog
     status = graphene.Field(GiddStatusLogEnum)
@@ -234,12 +418,32 @@ class GiddStatusLogType(DjangoObjectType):
 
 
 class GiddStatusLogListType(CustomDjangoListObjectType):
+    """
+    A class representing a list of GiddStatusLogType objects.
+
+    Inherits from CustomDjangoListObjectType.
+
+    Attributes:
+        model (Model): The Django model associated with the list.
+        filterset_class (class): The filterset class used for filtering the list.
+
+    """
     class Meta:
         model = StatusLog
         filterset_class = GiddStatusLogFilter
 
 
 class GiddPublicFigureAnalysisType(DjangoObjectType):
+    """
+    A class representing the GiddPublicFigureAnalysisType.
+
+    Attributes:
+        figure_cause (graphene.Field): A field representing the CrisisTypeGrapheneEnum.
+        figure_cause_display (EnumDescription): An EnumDescription object representing the display of figure_cause.
+        figure_category (graphene.Field): A field representing the FigureCategoryTypeEnum.
+        figure_category_display (EnumDescription): An EnumDescription object representing the display of figure_category.
+
+    """
     class Meta:
         model = PublicFigureAnalysis
         fields = (
@@ -258,22 +462,64 @@ class GiddPublicFigureAnalysisType(DjangoObjectType):
 
 
 class GiddPublicFigureAnalysisListType(CustomDjangoListObjectType):
+    """
+    GiddPublicFigureAnalysisListType
+
+    This class is a custom Django list object type for handling PublicFigureAnalysis data.
+
+    Attributes:
+        Meta: A nested class that defines metadata for the GiddPublicFigureAnalysisListType class.
+
+    """
     class Meta:
         model = PublicFigureAnalysis
         filterset_class = PublicFigureAnalysisFilter
 
 
 class GiddReleaseMetadataType(DjangoObjectType):
+    """
+    Class GiddReleaseMetadataType inherits from DjangoObjectType.
+
+    This class represents the GraphQL type for the ReleaseMetadata model.
+
+    Attributes:
+        model (Model): The ReleaseMetadata model that this class maps to.
+
+    """
     class Meta:
         model = ReleaseMetadata
 
 
 class GiddPublicCountryRegionType(graphene.ObjectType):
+    """
+
+    GiddPublicCountryRegionType class
+
+    This class represents a country or region in the Gidd Public API.
+
+    Attributes:
+        id (graphene.ID): The ID of the country or region.
+        name (graphene.String): The name of the country or region.
+
+    """
     id = graphene.ID(required=True)
     name = graphene.String(required=True)
 
 
 class GiddPublicCountryType(graphene.ObjectType):
+    """
+
+    GiddPublicCountryType
+
+    This class represents a country in the GiddPublic system.
+
+    Attributes:
+    - id (str): The ID of the country.
+    - iso3 (str): The ISO3 code of the country.
+    - idmc_short_name (str): The short name of the country in the International Displacement Monitoring Centre (IDMC) system.
+    - region (GiddPublicCountryRegionType): The region that the country belongs to.
+
+    """
     id = graphene.ID(required=True)
     iso3 = graphene.String(required=True)
     idmc_short_name = graphene.String(required=True)
@@ -281,16 +527,45 @@ class GiddPublicCountryType(graphene.ObjectType):
 
 
 class GiddHazardType(graphene.ObjectType):
+    """
+    Class: GiddHazardType
+
+    Represents a hazard type in the GiddHazard system.
+
+    Attributes:
+      - id (str): The unique identifier of the hazard type.
+      - name (str): The name of the hazard type.
+
+    Methods:
+      None
+    """
     id = graphene.ID(required=True)
     name = graphene.String(required=True)
 
 
 class GiddHazardSubCategoryType(graphene.ObjectType):
+    """
+    GiddHazardSubCategoryType
+
+    Represents a GraphQL object type for a Gidd Hazard Sub Category.
+
+    Attributes:
+        id (graphene.ID): The unique identifier of the Gidd Hazard Sub Category. (required)
+        name (graphene.String): The name of the Gidd Hazard Sub Category. (required)
+    """
     id = graphene.ID(required=True)
     name = graphene.String(required=True)
 
 
 class GiddDisplacementDataType(DjangoObjectType):
+    """
+    A class representing a GraphQL Type for GiddDisplacementDataType.
+
+    Attributes:
+        model (Model): The Django model used to map the type to the corresponding database table.
+        fields (tuple): The fields of the type that are exposed in the GraphQL schema.
+
+    """
     class Meta:
         model = DisplacementData
         fields = (
@@ -310,16 +585,44 @@ class GiddDisplacementDataType(DjangoObjectType):
 
 
 class GiddDisplacementDataListType(CustomDjangoListObjectType):
+    """
+    A custom GraphQL list object type for GiddDisplacementData.
+
+    Inherits from CustomDjangoListObjectType.
+
+    Attributes:
+        model (Model): The Django model used for this object type.
+        filterset_class (FilterSet): The filter class used for this object type.
+    """
     class Meta:
         model = DisplacementData
         filterset_class = DisplacementDataFilter
 
 
 class GiddYearType(graphene.ObjectType):
+    """
+    GiddYearType is a class representing a GraphQL Object Type for a year.
+
+    Attributes:
+        year (int): The year value.
+
+    """
     year = graphene.Int(required=True)
 
 
 class GiddEventAffectedCountryType(graphene.ObjectType):
+    """
+    Class: GiddEventAffectedCountryType
+
+    Represents a GraphQL object type for a country affected by a GiddEvent.
+
+    Attributes:
+    - iso3 (str): The ISO3 code of the country.
+    - country_name (str): The name of the country.
+    - new_displacement (int): The number of new displacements in the country.
+    - new_displacement_rounded (int): The rounded number of new displacements in the country.
+
+    """
     iso3 = graphene.String(required=True)
     country_name = graphene.String(required=True)
     new_displacement = graphene.Int()
@@ -327,6 +630,31 @@ class GiddEventAffectedCountryType(graphene.ObjectType):
 
 
 class GiddEventType(graphene.ObjectType):
+    """
+    Class representing a Gidd Event Type.
+
+    Attributes:
+        event_name (str): The name of the event.
+        new_displacement (int): The new displacement value.
+        new_displacement_rounded (int): The rounded new displacement value.
+        start_date (datetime.date): The start date of the event.
+        end_date (datetime.date): The end date of the event.
+        glide_numbers (List[str]): The list of glide numbers associated with the event.
+        event_codes (List[str]): The list of event codes associated with the event.
+        event_codes_type (List[str]): The list of event code types associated with the event.
+        affected_countries (List[GiddEventAffectedCountryType]): The list of affected countries associated with the event.
+        hazard_types (List[GiddHazardType]): The list of hazard types associated with the event.
+
+    Note:
+        - The 'event_name' attribute is required.
+        - The 'start_date' attribute is required.
+        - The 'end_date' attribute is required.
+        - The 'glide_numbers' attribute is required.
+        - The 'event_codes' attribute is required.
+        - The 'event_codes_type' attribute is required.
+        - The 'affected_countries' attribute is optional.
+        - The 'hazard_types' attribute is optional.
+    """
     event_name = graphene.String(required=True)
     new_displacement = graphene.Int()
     new_displacement_rounded = graphene.Int()
@@ -353,6 +681,38 @@ class GiddEventType(graphene.ObjectType):
 
 
 class Query(graphene.ObjectType):
+    """
+    Class Query
+
+    This class represents a GraphQL query object that defines various fields that can be queried. Each field corresponds to a specific data query or operation.
+
+    Fields:
+    - gidd_public_conflicts: A DjangoPaginatedListObjectField representing a paginated list of GiddConflictListType objects. Requires the 'client_id' parameter.
+    - gidd_public_disasters: A DjangoPaginatedListObjectField representing a paginated list of GiddDisasterListType objects. Requires the 'client_id' parameter.
+    - gidd_public_conflict_statistics: A graphene.Field representing GiddConflictStatisticsType object. Requires the 'client_id' parameter and additional filtering parameters.
+    - gidd_public_disaster_statistics: A graphene.Field representing GiddDisasterStatisticsType object. Requires the 'client_id' parameter and additional filtering parameters.
+    - gidd_log: A DjangoObjectField representing a GiddStatusLogType object.
+    - gidd_logs: A DjangoPaginatedListObjectField representing a paginated list of GiddStatusLogListType objects.
+    - gidd_public_release_meta_data: A graphene.Field representing a GiddReleaseMetadataType object. Requires the 'client_id' parameter.
+    - gidd_release_meta_data: A graphene.Field representing a GiddReleaseMetadataType object.
+    - gidd_public_countries: A graphene.List of GiddPublicCountryType objects. Requires the 'client_id' parameter.
+    - gidd_public_hazard_types: A graphene.List of GiddHazardType objects. Requires the 'client_id' parameter.
+    - gidd_public_figure_analysis_list: A DjangoPaginatedListObjectField representing a paginated list of GiddPublicFigureAnalysisListType objects. Requires the 'client_id' parameter.
+    - gidd_public_displacements: A DjangoPaginatedListObjectField representing a paginated list of GiddDisplacementDataListType objects. Requires the 'client_id' parameter.
+    - gidd_public_year: A graphene.Field representing a GiddYearType object. Requires the 'release_environment' and 'client_id' parameters.
+    - gidd_public_event: A graphene.Field representing a GiddEventType object. Requires the 'event_id', 'client_id' parameters, and additional filtering parameters.
+    - gidd_public_combined_statistics: A graphene.Field representing a GiddCombinedStatisticsType object. Requires the 'client_id' parameter and additional filtering parameters.
+
+    Methods:
+    - resolve_gidd_public_release_meta_data: Resolves the 'gidd_public_release_meta_data' field by retrieving the last ReleaseMetadata object from the database. Requires the 'client_id' parameter.
+    - resolve_gidd_release_meta_data: Resolves the 'gidd_release_meta_data' field by retrieving the last ReleaseMetadata object from the database.
+    - resolve_gidd_public_countries: Resolves the 'gidd_public_countries' field by retrieving a list of GiddPublicCountryType objects from the database. Requires the 'client_id' parameter.
+    - resolve_gidd_public_conflict_statistics: Resolves the 'gidd_public_conflict_statistics' field by performing various queries and aggregations on the ConflictStatistics model. Requires the 'client_id' parameter and additional filtering parameters.
+    - ... (continues for each method)
+
+    Note: More detailed documentation can be found in the source code for each method.
+
+    """
     gidd_public_conflicts = DjangoPaginatedListObjectField(
         GiddConflictListType,
         pagination=PageGraphqlPaginationWithoutCount(

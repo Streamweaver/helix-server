@@ -16,6 +16,17 @@ SELENIUM_TIMEOUT = 60  # seconds
 
 
 def __get_pdf_from_html(path, timeout=SELENIUM_TIMEOUT, print_options={}):
+    """
+
+    Parameters:
+        path (str): The URL or local file path of the HTML page to convert to PDF.
+        timeout (int, optional): The maximum time in seconds to wait for the HTML page to load. Default is the value of SELENIUM_TIMEOUT.
+        print_options (dict, optional): Additional options to customize the PDF generation. Default is an empty dictionary.
+
+    Returns:
+        bytes: The PDF document as bytes.
+
+    """
     browser_options = webdriver.ChromeOptions()
     browser_options.add_argument('no-sandbox')
     browser_options.add_argument('headless')
@@ -48,6 +59,20 @@ def __get_pdf_from_html(path, timeout=SELENIUM_TIMEOUT, print_options={}):
 
 @celery_app.task(time_limit=PDF_TASK_TIMEOUT)
 def generate_pdf(pk):
+    """
+
+    Generate a PDF for a given source preview.
+
+    Parameters:
+    - pk (int): The primary key of the source preview.
+
+    Returns:
+    None
+
+    Example usage:
+    generate_pdf(1)
+
+    """
     from apps.contrib.models import SourcePreview
 
     source_preview = SourcePreview.objects.get(pk=pk)

@@ -25,6 +25,16 @@ from apps.common.utils import format_event_codes_as_string, EXTERNAL_ARRAY_SEPAR
 
 
 class NameAttributedModels(models.Model):
+    """
+    A class representing abstract models with a name attribute.
+
+    Attributes:
+        name (str): The name of the model.
+
+    Methods:
+        __str__(): Returns a string representation of the model object.
+
+    """
     name = models.CharField(_('Name'), max_length=256)
 
     class Meta:
@@ -39,13 +49,34 @@ class NameAttributedModels(models.Model):
 
 class Violence(NameAttributedModels):
     """
-    Holds the possible violence choices
+    This class represents a model for violence instances. It inherits from the NameAttributedModels class.
+
+    Attributes:
+        id (int): The unique identifier for the violence instance.
+        name (str): The name of the violence instance.
+        attributes (dict): A dictionary containing additional attributes of the violence instance.
+
+    Methods:
+        get_id: Returns the unique identifier of the violence instance.
+        set_id: Sets the unique identifier of the violence instance.
+        get_name: Returns the name of the violence instance.
+        set_name: Sets the name of the violence instance.
+        get_attributes: Returns the additional attributes of the violence instance.
+        set_attributes: Sets the additional attributes of the violence instance.
+
     """
 
 
 class ViolenceSubType(NameAttributedModels):
     """
-    Holds the possible violence sub types
+    Class representing a subtype of violence.
+
+    This class extends the NameAttributedModels class and represents a specific subtype of violence. Each subtype is associated with a parent violence instance.
+
+    Attributes:
+        violence (ForeignKey): The parent violence instance to which this subtype belongs.
+        name (CharField): The name of the violence subtype.
+
     """
     violence = models.ForeignKey('Violence',
                                  related_name='sub_types', on_delete=models.CASCADE)
@@ -53,7 +84,16 @@ class ViolenceSubType(NameAttributedModels):
 
 class ContextOfViolence(MetaInformationAbstractModel, NameAttributedModels):
     """
-    Holds the context of violence
+
+    This class represents the context of violence. It extends the MetaInformationAbstractModel and NameAttributedModels classes.
+
+    Attributes:
+        None
+
+    Methods:
+        get_excel_sheets_data(cls, user_id, filters)
+            This method retrieves the excel sheets data for the given user and filters.
+
     """
     @classmethod
     def get_excel_sheets_data(cls, user_id, filters):
@@ -86,13 +126,34 @@ class ContextOfViolence(MetaInformationAbstractModel, NameAttributedModels):
 
 class OtherSubType(MetaInformationAbstractModel, NameAttributedModels):
     """
-    Holds the other sub type
+    A class representing OtherSubType.
+
+    This class inherits from MetaInformationAbstractModel and NameAttributedModels.
+
+    Attributes:
+    - None
+
+    Methods:
+    - None
     """
 
 
 class Actor(MetaInformationAbstractModel, NameAttributedModels):
     """
-    Conflict related actors
+    `Actor` class represents an actor in the system.
+
+    Attributes:
+        country (ForeignKey): A foreign key to the 'Country' model, representing the country of the actor.
+        torg (CharField): A character field representing the Torg of the actor.
+
+    Methods:
+        get_excel_sheets_data(cls, user_id, filters):
+            Retrieves data from the 'Actor' model based on the provided filters and user ID.
+            Returns a dictionary containing the headers, data, formulae, and transformer for exporting to Excel.
+
+    Usage Example:
+        actor = Actor()
+        data = actor.get_excel_sheets_data(user_id, filters)
     """
     country = models.ForeignKey('country.Country', verbose_name=_('Country'),
                                 null=True,
@@ -135,13 +196,23 @@ class Actor(MetaInformationAbstractModel, NameAttributedModels):
 
 class DisasterCategory(NameAttributedModels):
     """
-    Holds the possible hazard category choices
+
+    This class represents a Disaster Category.
+
+    Attributes:
+    - id (int): The unique identifier of the Disaster Category.
+    - name (str): The name of the Disaster Category.
+
     """
 
 
 class DisasterSubCategory(NameAttributedModels):
     """
-    Holds the possible hazard sub categories
+    A class representing a disaster subcategory.
+
+    Attributes:
+        category (ForeignKey): The foreign key to the parent disaster category.
+
     """
     category = models.ForeignKey('DisasterCategory', verbose_name=_('Hazard Category'),
                                  related_name='sub_categories', on_delete=models.CASCADE)
@@ -149,7 +220,10 @@ class DisasterSubCategory(NameAttributedModels):
 
 class DisasterType(NameAttributedModels):
     """
-    Holds the possible hazard types
+    Initialize a new instance of DisasterType class.
+
+    Args:
+        disaster_sub_category (DisasterSubCategory): The disaster sub category related to this disaster type.
     """
     disaster_sub_category = models.ForeignKey('DisasterSubCategory',
                                               verbose_name=_('Hazard Sub Category'),
@@ -157,14 +231,71 @@ class DisasterType(NameAttributedModels):
 
 
 class DisasterSubType(NameAttributedModels):
-    """
-    Holds the possible hazard sub types
+    """A class representing a disaster sub-type.
+
+    This class extends the NameAttributedModels class and is used to store information about a specific sub-type of a disaster. Each sub-type belongs to a particular disaster type.
+
+    Attributes:
+        type (ForeignKey): A foreign key to the DisasterType model, representing the disaster type that this sub-type belongs to.
+
     """
     type = models.ForeignKey('DisasterType', verbose_name=_('Hazard Type'),
                              related_name='sub_types', on_delete=models.CASCADE)
 
 
 class Event(MetaInformationArchiveAbstractModel, models.Model):
+    """
+    The Event class represents an event in the system.
+
+    Attributes:
+        EVENT_REVIEW_STATUS (enum.Enum): Enumerated type that represents the status of event review.
+        ND_FIGURES_ANNOTATE (str): Variable that stores the annotation for total flow ND figures.
+        IDP_FIGURES_ANNOTATE (str): Variable that stores the annotation for total stock IDP figures.
+        IDP_FIGURES_REFERENCE_DATE_ANNOTATE (str): Variable that stores the annotation for the reference date of IDP figures.
+        crisis (models.ForeignKey): ForeignKey to the Crisis model representing the crisis associated with the event.
+        name (models.CharField): CharField representing the name of the event.
+        event_type (enum.EnumField): EnumField representing the cause of the event.
+        other_sub_type (models.ForeignKey): ForeignKey to the OtherSubType model representing the other sub type of the event.
+        glide_numbers (ArrayField): ArrayField of CharFields representing the event codes of the event.
+        violence (models.ForeignKey): ForeignKey to the Violence model representing the violence associated with the event.
+        violence_sub_type (models.ForeignKey): ForeignKey to the ViolenceSubType model representing the violence sub type of the event.
+        actor (models.ForeignKey): ForeignKey to the Actor model representing the actors associated with the event.
+        disaster_category (models.ForeignKey): ForeignKey to the DisasterCategory model representing the hazard category of the event.
+        disaster_sub_category (models.ForeignKey): ForeignKey to the DisasterSubCategory model representing the hazard sub category of the event.
+        disaster_type (models.ForeignKey): ForeignKey to the DisasterType model representing the hazard type of the event.
+        disaster_sub_type (models.ForeignKey): ForeignKey to the DisasterSubType model representing the hazard sub type of the event.
+        countries (models.ManyToManyField): ManyToManyField to the Country model representing the countries associated with the event.
+        start_date (models.DateField): DateField representing the start date of the event.
+        start_date_accuracy (enum.EnumField): EnumField representing the accuracy of the start date.
+        end_date (models.DateField): DateField representing the end date of the event.
+        end_date_accuracy (enum.EnumField): EnumField representing the accuracy of the end date.
+        event_narrative (models.TextField): TextField representing the narrative of the event.
+        osv_sub_type (models.ForeignKey): ForeignKey to the OsvSubType model representing the OSV sub type of the event.
+        ignore_qa (models.BooleanField): BooleanField indicating whether QA should be ignored for the event.
+        context_of_violence (models.ManyToManyField): ManyToManyField to the ContextOfViolence model representing the context of violence associated with the event.
+        assigner (models.ForeignKey): ForeignKey to the User model representing the assigner of the event.
+        assignee (models.ForeignKey): ForeignKey to the User model representing the assignee of the event.
+        assigned_at (models.DateTimeField): DateTimeField representing the date and time when the event was assigned.
+        review_status (enum.EnumField): EnumField representing the status of the event.
+        include_triangulation_in_qa (models.BooleanField): BooleanField indicating whether triangulation should be included in QA for the event.
+
+    Methods:
+        _total_figure_disaggregation_subquery(cls, figures=None, reference_date=None):
+            Builds and returns a subquery for total figure disaggregation.
+            Args:
+                figures (QuerySet, optional): QuerySet of Figure objects. Defaults to None.
+                reference_date (date, optional): The reference date for the figure disaggregation. Defaults to None.
+            Returns:
+                dict: Dictionary containing the subqueries for total flow ND figures, total stock IDP figures, and the reference date of IDP figures.
+
+        annotate_review_figures_count(cls):
+            Builds and returns a dictionary with the annotations for review figures count.
+            Returns:
+                dict: Dictionary containing annotations for the counts of figures in review.
+
+    Note:
+        This class inherits from the MetaInformationArchiveAbstractModel and models.Model classes.
+    """
     class EVENT_REVIEW_STATUS(enum.Enum):
         REVIEW_NOT_STARTED = 0
         REVIEW_IN_PROGRESS = 1
@@ -544,7 +675,32 @@ class Event(MetaInformationArchiveAbstractModel, models.Model):
 
 
 class EventCode(UUIDAbstractModel, models.Model):
+    """
+    Class to represent an event code.
 
+    This class extends the `UUIDAbstractModel` and `models.Model` classes.
+
+    Attributes:
+        EVENT_CODE_TYPE (enum.Enum): Enumeration of event code types.
+            - GLIDE_NUMBER: Represents the glide number event code type.
+            - GOV_ASSIGNED_IDENTIFIER: Represents the government assigned identifier event code type.
+            - IFRC_APPEAL_ID: Represents the IFRC appeal ID event code type.
+            - ACLED_ID: Represents the ACLED ID event code type.
+            - LOCAL_IDENTIFIER: Represents the local identifier event code type.
+
+    Methods:
+        N/A
+
+    Attributes:
+        event (models.ForeignKey): ForeignKey to the Event model.
+        country (models.ForeignKey): ForeignKey to the Country model.
+        event_code_type (enum.EnumField): Integer field to store the event code type.
+        event_code (models.CharField): CharField to store the event code.
+        event_id (int): ID of the event.
+
+    Meta:
+        ordering (list[str]): List of fields to be used to order the EventCode objects.
+    """
     class EVENT_CODE_TYPE(enum.Enum):
         GLIDE_NUMBER = 1
         GOV_ASSIGNED_IDENTIFIER = 2
@@ -583,5 +739,17 @@ class EventCode(UUIDAbstractModel, models.Model):
 
 class OsvSubType(NameAttributedModels):
     """
-    Holds the possible OSV sub types
+    Subtype class for operating system versions.
+
+    This class extends the NameAttributedModels class and represents a subtype of operating system versions.
+
+    Attributes:
+        id (int): The unique identifier for the subtype.
+        name (str): The name of the subtype.
+
+    Methods:
+        get_id(): Get the unique identifier of the subtype.
+        set_id(id: int): Set the unique identifier of the subtype.
+        get_name(): Get the name of the subtype.
+        set_name(name: str): Set the name of the subtype.
     """

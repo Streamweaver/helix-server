@@ -5,6 +5,24 @@ from utils.filters import StringListFilter
 
 
 class ParkingLotFilter(df.FilterSet):
+    """
+    ParkingLotFilter
+
+    Subclass of df.FilterSet used to filter parking lot items.
+
+    Attributes:
+        status_in (StringListFilter): Filter for selecting items with specific statuses.
+        assigned_to_in (StringListFilter): Filter for selecting items assigned to specific users.
+
+    Methods:
+        filter_status_in: Method for filtering items based on status.
+        filter_assigned_to: Method for filtering items based on assigned user.
+        qs: Property that returns the filtered queryset.
+
+    Example Usage:
+        filter = ParkingLotFilter(data=request.GET, queryset=items)
+        queryset = filter.qs
+    """
     status_in = StringListFilter(method='filter_status_in')
     # assigned_to_in = StringListFilter(field_name='assigned_to', lookup_expr='in')
     assigned_to_in = StringListFilter(method='filter_assigned_to')

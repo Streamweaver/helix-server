@@ -33,6 +33,24 @@ from .utils import (
 
 
 class DisaggregatedAgeSerializer(serializers.ModelSerializer):
+    """
+    Serializer for DisaggregatedAge model.
+
+    This serializer allows updating of DisaggregatedAge instances. It validates the provided data and returns any errors
+    encountered during the validation process.
+
+    Attributes:
+        id (IntegerField): Field to allow updating of the DisaggregatedAge instance (optional).
+
+    Methods:
+        validate(attrs): Validates the provided attributes and returns any errors encountered.
+
+    Meta:
+        model (DisaggregatedAge): The model class associated with the serializer.
+        fields (str or tuple): The fields to be serialized.
+        extra_kwargs (dict): Additional arguments for specific fields.
+
+    """
     # to allow updating
     id = IntegerIDField(required=False)
 
@@ -59,6 +77,22 @@ class DisaggregatedAgeSerializer(serializers.ModelSerializer):
 
 
 class DisaggregatedStratumSerializer(serializers.Serializer):
+    """
+
+    Class Name: DisaggregatedStratumSerializer
+
+    Class Description:
+    This class is a serializer for the DisaggregatedStratum model. It is responsible for validating and serializing the data for a DisaggregatedStratum object.
+
+    Attributes:
+    - uuid: A UUIDField that represents the UUID of the DisaggregatedStratum object. It is required.
+    - date: A DateField that represents the date of the DisaggregatedStratum object. It is required.
+    - value: An IntegerField that represents the value of the DisaggregatedStratum object. It is required and must be greater than or equal to 0.
+
+    Methods:
+    - validate: A method that validates the attributes of the serializer. It converts the 'uuid' and 'date' attributes to strings before returning the validated attributes.
+
+    """
     uuid = serializers.UUIDField(required=True)
     date = serializers.DateField(required=True)
     value = serializers.IntegerField(validators=[MinValueValidator(0, _("Minimum value is 1. "))],
@@ -72,6 +106,32 @@ class DisaggregatedStratumSerializer(serializers.Serializer):
 
 
 class OSMNameSerializer(serializers.ModelSerializer):
+    """
+    Class: OSMNameSerializer
+
+    The OSMNameSerializer class is responsible for serializing and deserializing OSMName objects.
+
+    Attributes:
+    - id: An IntegerIDField that allows updating. It is not required.
+
+    Methods:
+    - validate(attrs: dict) -> dict:
+        Validates the attributes of the object and returns the validated attributes as a dictionary.
+        If the 'country' attribute is not provided, it retrieves the country from the 'country_code' attribute.
+        If the country is not found, it raises a ValidationError with the message 'Country field is required'.
+        Returns the validated attributes as a dictionary.
+
+    Meta:
+    - model: The OSMName model that the serializer is based on.
+    - fields: A string that specifies all fields to include in the serialized output.
+      The value '__all__' means all fields are included.
+    - extra_kwargs: A dictionary that allows specifying extra attributes for certain fields.
+      In this case, it specifies that the 'uuid' field is required and has no validators.
+
+    Note:
+    - In some cases, the osmname API does not provide the 'country' attribute.
+      In this case, the country is obtained from the 'country_code' attribute.
+    """
     # to allow updating
     id = IntegerIDField(required=False)
     country = CharField(required=False, allow_blank=True)
@@ -101,6 +161,125 @@ class OSMNameSerializer(serializers.ModelSerializer):
 
 
 class CommonFigureValidationMixin:
+    """
+    Class: CommonFigureValidationMixin
+
+    Mixin class for validating figure data.
+
+    Methods:
+    1. validate_disaggregation_age(self, age_groups)
+       - Validates the age groups in the disaggregation data.
+       - Parameters:
+         - age_groups (list): List of dictionaries containing age range and sex information.
+       - Returns:
+         - Validated age groups.
+
+    2. _validate_unit_and_household_size(self, instance, attrs)
+       - Validates the unit and household size fields.
+       - Parameters:
+         - instance: Figure model instance.
+         - attrs: Dictionary containing figure attributes.
+       - Returns:
+         - Dictionary of validation errors.
+
+    3. _validate_figure_geo_locations(self, instance, attrs)
+       - Validates the figure's geo locations.
+       - Parameters:
+         - instance: Figure model instance.
+         - attrs: Dictionary containing figure attributes.
+       - Returns:
+         - Dictionary of validation errors.
+
+    4. _validate_disaggregated_sum_against_total_figures(self, instance, attrs, fields, verbose_names)
+       - Validates the sum of disaggregated figures against the total figures.
+       - Parameters:
+         - instance: Figure model instance.
+         - attrs: Dictionary containing figure attributes.
+         - fields: List of field names for disaggregated figures.
+         - verbose_names: List of verbose names for the disaggregated figures.
+       - Returns:
+         - Dictionary of validation errors.
+
+    5. _validate_disaggregated_json_sum_against_total_figures(self, instance, attrs, field, verbose_name)
+       - Validates the sum of disaggregated JSON figures against the total figures.
+       - Parameters:
+         - instance: Figure model instance.
+         - attrs: Dictionary containing figure attributes.
+         - field: Field name for the JSON field containing disaggregated figures.
+         - verbose_name: Verbose name for the disaggregated figures.
+       - Returns:
+         - Dictionary of validation errors.
+
+    6. _validate_geo_locations(self, instance, attrs) -> dict
+       - Validates the figure's geo locations.
+       - Parameters:
+         - instance: Figure model instance.
+         - attrs: Dictionary containing figure attributes.
+       - Returns:
+         - Dictionary of validation errors.
+
+    7. _validate_figure_country(self, instance, attrs)
+       - Validates the figure's country.
+       - Parameters:
+         - instance: Figure model instance.
+         - attrs: Dictionary containing figure attributes.
+       - Returns:
+         - Dictionary of validation errors.
+
+    8. _validate_dates(self, instance, attrs)
+       - Validates the figure's dates.
+       - Parameters:
+         - instance: Figure model instance.
+         - attrs: Dictionary containing figure attributes.
+       - Returns:
+         - Dictionary of validation errors.
+
+    9. _validate_idu(self, instance, attrs)
+       - Validates the include_idu field and excerpt_idu field.
+       - Parameters:
+         - instance: Figure model instance.
+         - attrs: Dictionary containing figure attributes.
+       - Returns:
+         - Dictionary of validation errors.
+
+    10. _validate_figure_cause(self, instance, attrs)
+        - Validates the figure's cause.
+        - Parameters:
+          - instance: Figure model instance.
+          - attrs: Dictionary containing figure attributes.
+        - Returns:
+          - Dictionary of validation errors
+
+    11. clean_total_figures(self, instance, attrs)
+        - Calculates the total figures based on unit and reported values.
+        - Parameters:
+          - instance: Figure model instance.
+          - attrs: Dictionary containing figure attributes.
+        - Returns:
+          - Updated dictionary of attributes.
+
+    12. clean_term_with_displacement_occur(self, instance, attrs)
+        - Cleans the term with displacement occurred field.
+        - Parameters:
+          - instance: Figure model instance.
+          - attrs: Dictionary containing figure attributes.
+        - Returns:
+          - Updated dictionary of attributes.
+
+    13. _update_parent_fields(self, attrs)
+        - Updates the parent fields based on sub type fields.
+        - Parameters:
+          - attrs: Dictionary containing figure attributes.
+        - Returns:
+          - None.
+
+    14. validate(self, attrs: dict) -> dict
+        - Validates the figure attributes.
+        - Parameters:
+          - attrs: Dictionary containing figure attributes.
+        - Returns:
+          - Dictionary of validation errors.
+    """
     def validate_disaggregation_age(self, age_groups):
         age_groups = age_groups or []
         values = []
@@ -351,6 +530,9 @@ class CommonFigureValidationMixin:
 
 
 class FigureTagSerializer(MetaInformationSerializerMixin, serializers.ModelSerializer):
+    """
+
+    """
     class Meta:
         model = FigureTag
         fields = '__all__'
@@ -361,7 +543,23 @@ class FigureSerializer(
     CommonFigureValidationMixin,
     serializers.ModelSerializer,
 ):
+    """
+    Define a class called `FigureSerializer` that serializes and deserializes instances of the `Figure` model.
 
+    Attributes:
+    - `id`: An `IntegerField` representing the ID of the figure (optional).
+    - `disaggregation_age`: A `DisaggregatedAgeSerializer` that serializes and deserializes instances of the `DisaggregatedAge` model (many, optional, not nullable).
+    - `geo_locations`: An `OSMNameSerializer` that serializes and deserializes instances of the `OSMName` model (many, optional, not nullable).
+    - `Meta`: A nested class that contains metadata for the serializer, including the `model` (set to `Figure`), `fields` (a list of field names to include in serialization), and `extra_kwargs` (extra options for specific fields).
+
+    Methods:
+    - `create(self, validated_data: dict) -> Figure`: Creates a new `Figure` instance with the provided validated data. This method adds the currently authenticated user as the `created_by` field and handles related models such as `geo_locations`, `tags`, `context_of_violence`, `disaggregation_age`, and `sources`. It also sends notifications and updates the `BulkUpdateFigureManager`.
+    - `_update_locations(self, instance, attr: str, data: list)`: Private method that updates the `geo_locations` field of the given `instance` with the provided `data`. It handles creating, updating, and deleting related `OSMName` instances.
+    - `_update_disaggregation_age(self, instance, attr: str, data: list)`: Private method that updates the `disaggregation_age` field of the given `instance` with the provided `data`. It handles creating, updating, and deleting related `DisaggregatedAge` instances.
+    - `_send_event_change_notification(self, figure, existing_event, new_event)`: Private method that sends notifications when the `event` field of the given `figure` is changed.
+    - `update(self, instance: Figure, validated_data)`: Updates an existing `Figure` instance with the provided validated data. This method handles updates to the `geo_locations`, `disaggregation_age`, `tags`, `context_of_violence`, and `sources` fields. It also sends notifications, updates the `BulkUpdateFigureManager`, and updates the `Figure` status.
+
+    Note: This documentation does not include example code."""
     id = IntegerIDField(required=False)
     disaggregation_age = DisaggregatedAgeSerializer(many=True, required=False, allow_null=False)
     geo_locations = OSMNameSerializer(many=True, required=False, allow_null=False)
@@ -568,6 +766,23 @@ class EntryCreateSerializer(
     MetaInformationSerializerMixin,
     serializers.ModelSerializer,
 ):
+    """
+    Serializer class for creating a new Entry object.
+
+    This class inherits from MetaInformationSerializerMixin
+    and serializers.ModelSerializer.
+
+    Attributes:
+        Meta (class): Inner class to define model and exclude fields.
+            model (class): The model class to be serialized.
+            exclude (tuple): Fields to be excluded from serialization.
+
+    Methods:
+        validate_figures(figures): Validates the figures field.
+        validate_calculation_logic(value): Validates the calculation_logic field.
+        validate(attrs: dict) -> dict: Validates the entire serializer data.
+
+    """
     class Meta:
         model = Entry
         exclude = (
@@ -611,12 +826,31 @@ class EntryCreateSerializer(
 
 class EntryUpdateSerializer(UpdateSerializerMixin,
                             EntryCreateSerializer):
-    """Created for update mutation input type"""
+    """
+    This class, EntryUpdateSerializer, is a serializer used for updating an entry.
+
+    Attributes:
+        id (IntegerField): The ID of the entry to be updated.
+
+    """
     id = IntegerIDField(required=True)
 
 
 class FigureTagCreateSerializer(MetaInformationSerializerMixin,
                                 serializers.ModelSerializer):
+    """
+    Serializer for creating a FigureTag instance.
+
+    This serializer extends MetaInformationSerializerMixin and ModelSerializer to provide a way to serialize and validate FigureTag data when creating a new instance.
+
+    Attributes:
+        Meta (class): Inner class that defines the metadata options for the serializer.
+
+        model (class): Specifies the model class that the serializer is based on, which in this case is FigureTag.
+
+        fields (str or tuple): Specifies the fields to include in the serialized output. Using '__all__' includes all fields.
+
+    """
     class Meta:
         model = FigureTag
         fields = '__all__'
@@ -624,10 +858,60 @@ class FigureTagCreateSerializer(MetaInformationSerializerMixin,
 
 class FigureTagUpdateSerializer(UpdateSerializerMixin,
                                 FigureTagCreateSerializer):
+    """
+    Serializer for updating a figure tag.
+
+    Inherits from the UpdateSerializerMixin and FigureTagCreateSerializer classes.
+
+    Attributes:
+        id (integer): The ID of the figure tag to be updated.
+
+    """
     id = IntegerIDField(required=True)
 
 
 class FigureReadOnlySerializer(serializers.ModelSerializer):
+    """
+    Serializer for the FigureReadOnlySerializer class.
+
+    Serializes the Figure model into a JSON representation.
+
+    Attributes:
+        country (serializers.CharField): Serializes the 'country_name' field of the Figure model.
+        iso3 (serializers.CharField): Serializes the 'iso3' field of the Figure model.
+        latitude (serializers.FloatField): Serializes the 'centroid_lat' field of the Figure model as a float.
+        longitude (serializers.FloatField): Serializes the 'centroid_lon' field of the Figure model as a float.
+        centroid (serializers.CharField): Serializes the 'centroid' field of the Figure model.
+        displacement_type (serializers.CharField): Serializes the 'figure_cause' field of the Figure model.
+        qualifier (serializers.CharField): Serializes the 'quantifier_label' field of the Figure model.
+        figure (serializers.IntegerField): Serializes the 'total_figures' field of the Figure model as an integer.
+        displacement_start_date (serializers.CharField): Serializes the 'displacement_start_date' field of the Figure model.
+        displacement_end_date (serializers.CharField): Serializes the 'displacement_end_date' field of the Figure model.
+        displacement_date (serializers.CharField): Serializes the 'displacement_date' field of the Figure model.
+        event_name (serializers.CharField): Serializes the 'event_name' field of the Figure model.
+        event_codes (serializers.CharField): Serializes the 'event_codes' field of the Figure model.
+        event_code_types (serializers.CharField): Serializes the 'event_code_types' field of the Figure model.
+        event_start_date (serializers.CharField): Serializes the 'event_start_date' field of the Figure model.
+        event_end_date (serializers.CharField): Serializes the 'event_end_date' field of the Figure model.
+        category (serializers.CharField): Serializes the 'disaster_category_name' field of the Figure model.
+        subcategory (serializers.CharField): Serializes the 'disaster_sub_category_name' field of the Figure model.
+        type (serializers.CharField): Serializes the 'disaster_type_name' field of the Figure model.
+        subtype (serializers.CharField): Serializes the 'disaster_sub_type_name' field of the Figure model.
+        year (serializers.IntegerField): Serializes the 'year' field of the Figure model as an integer.
+        standard_popup_text (serializers.CharField): Serializes the 'standard_popup_text' field of the Figure model.
+        standard_info_text (serializers.CharField): Serializes the 'standard_info_text' field of the Figure model.
+        role (serializers.CharField): Serializes the 'role' field of the Figure model.
+        sources (serializers.CharField): Serializes the 'sources_name' field of the Figure model.
+        source_url (serializers.CharField): Serializes the 'entry_url_or_document_url' field of the Figure model.
+        locations_name (serializers.CharField): Serializes the 'locations_name' field of the Figure model.
+        locations_coordinates (serializers.CharField): Serializes the 'locations_coordinates' field of the Figure model.
+        locations_accuracy (serializers.CharField): Serializes the 'locations_accuracy' field of the Figure model.
+        locations_type (serializers.CharField): Serializes the 'locations_type' field of the Figure model.
+        displacement_occurred (serializers.CharField): Serializes the 'displacement_occurred_transformed' field of the Figure model.
+
+        Meta (class): Meta class for configuring the serializer.
+
+    """
     country = serializers.CharField(source='country_name')
     iso3 = serializers.CharField()
     latitude = serializers.FloatField(source='centroid_lat')

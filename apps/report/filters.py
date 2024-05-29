@@ -16,6 +16,37 @@ from utils.filters import IDListFilter, StringListFilter, generate_type_for_filt
 
 
 class ReportFilter(df.FilterSet):
+    """
+
+    The ReportFilter class is a subclass of df.FilterSet and is used to filter the queryset of Report objects.
+
+    Attributes:
+        - filter_figure_countries: IDListFilter - a filter for filtering reports by countries.
+        - review_status: StringListFilter - a filter for filtering reports by review status.
+        - start_date_after: DateFilter - a filter for filtering reports by start date.
+        - end_date_before: DateFilter - a filter for filtering reports by end date.
+        - is_public: BooleanFilter - a filter for filtering reports by public visibility.
+        - is_gidd_report: BooleanFilter - a filter for filtering reports by GIDD report status.
+        - is_pfa_visible_in_gidd: BooleanFilter - a filter for filtering reports by PFA visibility in GIDD.
+
+        Meta:
+            - model: Report - the model class to filter.
+            - fields: a dictionary specifying the fields to filter and the filter options for each field.
+
+    Methods:
+        - filter_countries(qs, name, value): filters the queryset qs by the selected countries.
+        - filter_by_review_status(qs, name, value): filters the queryset qs by the selected review status.
+        - filter_date_after(qs, name, value): filters the queryset qs by the start date.
+        - filter_end_date_before(qs, name, value): filters the queryset qs by the end date.
+        - filter_is_public(qs, name, value): filters the queryset qs by the public visibility.
+        - filter_is_gidd_report(qs, name, value): filters the queryset qs by the GIDD report status.
+        - filter_is_pfa_visible_in_gidd(qs, name, value): filters the queryset qs by the PFA visibility in GIDD.
+
+        - qs: a property that returns the filtered queryset based on the filter options.
+
+    Note: This class does not return a queryset by default if the filter is not applied. To include private reports in the queryset by default, the `is_public` filter option should be set to None in the filter form.
+
+    """
     filter_figure_countries = IDListFilter(method='filter_countries')
     review_status = StringListFilter(method='filter_by_review_status')
     start_date_after = df.DateFilter(method='filter_date_after')
@@ -126,24 +157,96 @@ class ReportFilter(df.FilterSet):
 
 class DummyFilter(df.FilterSet):
     """
-    NOTE: Created to override the default filters of list types
+    Class DummyFilter:
+
+        Inherits from df.FilterSet
+
+        Description:
+            This class defines a DummyFilter that can be used to filter data based on the 'id' field using an exact match.
+
+        Attributes:
+            id (df.CharFilter):
+                A CharFilter instance that filters data based on the 'id' field using an exact match.
+
     """
     id = df.CharFilter(field_name='id', lookup_expr='exact')
 
 
 class ReportApprovalFilter(df.FilterSet):
+    """
+    The `ReportApprovalFilter` class is a subclass of `FilterSet` that provides filtering capabilities for the `ReportApproval` model. It allows filtering based on the `is_approved` field.
+
+    Attributes:
+        - model: The model that the filter is applied on.
+        - fields: The fields on which the filter is allowed.
+
+    Example usage:
+    ```python
+    # Create an instance of the ReportApprovalFilter
+    filter = ReportApprovalFilter(data=request.GET, queryset=ReportApproval.objects.all())
+
+    # Apply the filter
+    filtered_queryset = filter.qs
+    ```
+    """
     class Meta:
         model = ReportApproval
         fields = ('is_approved',)
 
 
 class ReportGenerationFilter(df.FilterSet):
+    """
+    Class: ReportGenerationFilter
+
+    Inherits from: df.FilterSet
+
+    Purpose:
+    This class is a filter set used for generating reports based on specified filters.
+
+    Attributes:
+    - model (class): The model class for which the filter set is defined.
+    - fields (tuple): The fields on which filters will be applied.
+
+    Usage:
+
+    1. Instantiate the ReportGenerationFilter class:
+
+        filter_set = ReportGenerationFilter()
+
+    2. Apply filters using the filter set:
+
+        filtered_results = filter_set.filter(query_params)
+
+    3. Retrieve filtered results:
+
+        for result in filtered_results:
+            # Perform required operations on the result
+
+    Note:
+    - This class is specifically designed for working with the ReportGeneration model.
+    - The 'fields' attribute specifies the fields on which filters can be applied.
+    - This class is part of the df (Django Filters) library.
+
+    """
     class Meta:
         model = ReportGeneration
         fields = ('report',)
 
 
 class ReportCommentFilter(df.FilterSet):
+    """
+    Filter class for filtering report comments.
+
+    This class extends the `df.FilterSet` class and provides filters for the `ReportComment` model.
+
+    Attributes:
+        ids (IDListFilter): Filter for filtering report comments by ID.
+
+    Meta:
+        model (ReportComment): The model class to be filtered.
+        fields (list): The list of fields in the model that can be filtered.
+
+    """
     ids = IDListFilter(field_name='id')
 
     class Meta:
