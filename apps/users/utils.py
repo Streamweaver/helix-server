@@ -12,11 +12,34 @@ from apps.users.models import User, Portfolio
 
 
 def send_activation_email(user, request) -> None:
+    """
+
+    Sends an activation email to the user.
+
+    Parameters:
+    - user: The user object for whom the activation email needs to be sent.
+    - request: The request object associated with the current activation request.
+
+    Return type: None
+
+    """
     to = [get_user_email(user)]
     ActivationEmail(request, {'user': user}).send(to)
 
 
 def get_user_from_activation_token(uid, token) -> Union[User, None]:
+    """
+
+    Method to retrieve a user object based on an activation token.
+
+    Parameters:
+    - uid (str): The encoded user ID.
+    - token (str): The activation token.
+
+    Returns:
+    - User or None: If the user is found and the token is valid, the corresponding User object is returned. If not found or the token is not valid, None is returned.
+
+    """
     try:
         uid = decode_uid(uid)
     except DjangoUnicodeDecodeError:
@@ -31,6 +54,18 @@ def get_user_from_activation_token(uid, token) -> Union[User, None]:
 
 
 class HelixInternalBot:
+    """
+
+    A class representing the HelixInternalBot.
+
+    Attributes:
+    - user (User): The user associated with the internal bot.
+
+    Methods:
+    - __init__(): Initializes the internal bot and sets the user attribute.
+    - temporary_role(): A context manager that temporarily assigns a role to the internal bot's user.
+
+    """
     user: User
 
     def __init__(self):

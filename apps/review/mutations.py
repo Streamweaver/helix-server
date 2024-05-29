@@ -17,11 +17,38 @@ UnifiedReviewCommentCreateInputType = generate_input_type_for_serializer(
 
 
 class UnifiedReviewCommentUpdateInputType(graphene.InputObjectType):
+    """
+    A class representing the input data for updating a unified review comment.
+
+    Attributes:
+        id (str): The ID of the review comment that needs to be updated.
+        comment (str): The new comment for the review.
+    """
     id = graphene.ID(required=True)
     comment = graphene.String(required=True)
 
 
 class CreateUnifiedReviewComment(graphene.Mutation):
+    """
+    Class: CreateUnifiedReviewComment
+
+    This class represents a graphene Mutation for creating a unified review comment. It is used to create a new review comment in the system.
+
+    Properties:
+    - ok (Boolean): Indicates if the mutation was successful or not.
+    - errors (List[CustomErrorType]): List of errors that occurred during the mutation process.
+    - result (UnifiedReviewCommentType): The created unified review comment instance.
+
+    Methods:
+    - mutate(root, info, data): Static method that handles the mutation process. It takes the root, info, and data arguments. The root argument is the root value for the query. The info argument provides information about the execution state of the query. The data argument is an instance of the UnifiedReviewCommentCreateInputType class, which contains the data for creating the review comment.
+
+    Dependencies:
+    - graphene.Mutation: The base class for creating mutations in graphene.
+
+    Example Usage:
+    data = UnifiedReviewCommentCreateInputType(required=True)
+    mutation = CreateUnifiedReviewComment.mutate(None, None, data)
+    """
     class Arguments:
         data = UnifiedReviewCommentCreateInputType(required=True)
 
@@ -103,6 +130,29 @@ class CreateUnifiedReviewComment(graphene.Mutation):
 
 
 class UpdateUnifiedReviewComment(graphene.Mutation):
+    """
+    Class: UpdateUnifiedReviewComment
+
+    Description:
+        This class is responsible for updating a unified review comment. It is a graphene mutation class that takes in a UnifiedReviewCommentUpdateInputType object as an argument.
+
+    Attributes:
+        - ok (graphene.Boolean): A boolean indicating whether the update operation was successful or not.
+        - errors (graphene.List[CustomErrorType]): A list of custom error types that occurred during the update operation.
+        - result (graphene.Field[UnifiedReviewCommentType]): A field containing the updated unified review comment.
+
+    Methods:
+        mutate(root, info, data):
+            This method is a static method and is decorated with a permission checker. It is responsible for performing the update operation on the unified review comment.
+
+            Parameters:
+                - root: The root value, corresponding to the top-level value passed to the schema's executor.
+                - info: The GraphQL ResolveInfo object containing information about the execution state.
+                - data: The input data of type UnifiedReviewCommentUpdateInputType.
+
+            Returns:
+                An instance of UpdateUnifiedReviewComment with the updated unified review comment, any errors that occurred, and a boolean indicating the success of the operation.
+    """
     class Arguments:
         data = UnifiedReviewCommentUpdateInputType(required=True)
 
@@ -137,6 +187,24 @@ class UpdateUnifiedReviewComment(graphene.Mutation):
 
 
 class DeleteUnifiedReviewComment(graphene.Mutation):
+    """
+
+    DeleteUnifiedReviewComment
+
+    mutation class used to delete a unified review comment.
+
+    Args:
+        id (str): The ID of the unified review comment to be deleted. (required)
+
+    Returns:
+        ok (bool): Indicates whether the deletion was successful.
+        errors (list): A list of custom error messages, if any.
+        result (UnifiedReviewCommentType): The deleted unified review comment instance.
+
+    Raises:
+        N/A
+
+    """
     class Arguments:
         id = graphene.ID(required=True)
 
@@ -168,6 +236,18 @@ class DeleteUnifiedReviewComment(graphene.Mutation):
 
 
 class Mutation(object):
+    """
+
+    Mutation class
+
+    This class represents a collection of GraphQL mutation operations.
+
+    Attributes:
+        create_review_comment (Field): A field for creating a review comment.
+        update_review_comment (Field): A field for updating a review comment.
+        delete_review_comment (Field): A field for deleting a review comment.
+
+    """
     create_review_comment = CreateUnifiedReviewComment.Field()
     update_review_comment = UpdateUnifiedReviewComment.Field()
     delete_review_comment = DeleteUnifiedReviewComment.Field()

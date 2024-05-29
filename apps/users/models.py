@@ -19,6 +19,68 @@ logger = logging.getLogger(__name__)
 
 
 class User(AbstractUser):
+    """
+    This class represents a User in the application.
+
+    Attributes:
+        email (EmailField): The email address of the user. It is unique and serves as the username for authentication.
+        username (CharField): The username of the user. It must be unique and should contain only letters, digits, and characters @/./+/-/_.
+        full_name (CharField): The full name of the user. It is auto-generated.
+        USERNAME_FIELD (str): The field to use as the username for authentication. In this case, it is 'email'.
+        REQUIRED_FIELDS (list[str]): The required fields in addition to the username for creating a user.
+
+    Methods:
+        can_update_user(cls, user_id: int, authenticated_user: User) -> bool:
+            Checks if the authenticated user can update the user with the given user_id.
+            Returns True if the authenticated user has the 'users.change_user' permission or if the user_id matches the authenticated user's primary key.
+            Returns False otherwise.
+
+        get_excel_sheets_data(cls, user_id, filters):
+            Generates data for Excel sheets based on the filters applied to the user queryset.
+            Parameters:
+                user_id (int): The ID of the user requesting the data.
+                filters (dict): A dictionary of filters to apply to the user queryset.
+            Returns:
+                dict: A dictionary containing headers, data, formulae, and a transformer function for Excel sheet generation.
+
+        _reset_login_cache(email: str):
+            Resets the login cache for the user with the given email.
+
+        _set_login_attempt(email: str, value: int):
+            Sets the login attempt value for the user with the given email.
+
+        _get_login_attempt(email: str):
+            Gets the login attempt value for the user with the given email.
+
+        _set_last_login_attempt(email: str, value: float):
+            Sets the last login attempt value for the user with the given email.
+
+        _get_last_login_attempt(email: str):
+            Gets the last login attempt value for the user with the given email.
+
+        permissions(self) -> list[dict]:
+            Returns a list of dictionaries representing the user's permissions.
+            Each permission dictionary contains the action and the entities.
+            The permissions are based on the user's highest role.
+
+        set_highest_role(self):
+            Sets the highest role for the user based on the roles in the user's portfolios.
+            This is done by assigning the appropriate groups to the user.
+
+        highest_role(self) -> USER_ROLE:
+            Returns the highest role of the user based on the roles in the user's portfolios.
+
+        get_full_name(self):
+            Returns the full name of the user.
+            If the first name and last name are both empty, returns the email address.
+
+        get_short_name(self):
+            Returns the short name of the user, which is the first name.
+
+        save(self, *args, **kwargs):
+            Overrides the save method to automatically update the full name based on the first name and last name.
+
+    """
     email = models.EmailField(verbose_name=_('Email Address'), unique=True)
     username = models.CharField(
         verbose_name=_('Username'),
@@ -180,6 +242,29 @@ class User(AbstractUser):
 
 
 class Portfolio(models.Model):
+    """
+
+    This class represents a portfolio, which is a collection of roles and permissions for a user in the system.
+
+    Attributes:
+        user (ForeignKey): The user associated with the portfolio.
+        role (EnumField): The role of the user in the portfolio.
+        monitoring_sub_region (ForeignKey, optional): The monitoring sub-region associated with the portfolio. Only applicable for regional coordinators. Defaults to None.
+        country (OneToOneField, optional): The country associated with the portfolio. Only applicable for monitoring experts. Defaults to None.
+
+    Methods:
+        user_can_alter(user: User) -> bool: Check if the given user has permission to alter the portfolio.
+        get_role_allows_region_map() -> dict: Get a mapping of roles and their permissions for regions and countries.
+        get_coordinators() -> QuerySet: Get all the portfolios of regional coordinators.
+        get_coordinator(ms_region: int) -> Optional[Portfolio]: Get the portfolio of the regional coordinator for the given monitoring sub-region.
+        get_highest_role(user: User) -> USER_ROLE: Get the highest role of the user based on their portfolios.
+        permissions -> list[dict]: The list of permissions associated with the portfolio.
+        save(*args, **kwargs): Save the portfolio.
+
+    Meta:
+        constraints -> List[UniqueConstraint]: The constraints for the portfolio class, defining uniqueness rules based on role and associations with monitoring sub-regions and countries.
+
+    """
     user = models.ForeignKey(
         'User', verbose_name=_('User'),
         related_name='portfolios', on_delete=models.CASCADE

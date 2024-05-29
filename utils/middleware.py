@@ -14,6 +14,22 @@ _HTML_TYPES = ("text/html", "application/xhtml+xml", "text/plain")
 
 
 class DebugToolbarMiddleware(BaseMiddleware):
+    """
+    Middleware class for integrating the Debug Toolbar into Django applications.
+
+    This class is responsible for intercepting incoming requests and generating the necessary debugging information and toolbar. It inherits from the `BaseMiddleware` class and overrides the `__call__` method.
+
+    Example usage:
+        middleware = DebugToolbarMiddleware(get_response)
+        response = middleware(request)
+
+    Attributes:
+        None
+
+    Methods:
+        - __call__(self, request): Handles the incoming request and generates the necessary debugging information and toolbar. Returns the response.
+
+    """
     # https://github.com/flavors/django-graphiql-debug-toolbar/issues/9
     # https://gist.github.com/ulgens/e166ad31ec71e6b1f0777a8d81ce48ae
     def __call__(self, request):
@@ -57,8 +73,7 @@ class DebugToolbarMiddleware(BaseMiddleware):
 
 class DisableIntrospectionSchemaMiddleware:
     """
-    This middleware should use for production mode. This class hide the
-    introspection.
+    DisableIntrospectionSchemaMiddleware class.
     """
     def resolve(self, next, root, info, **args):
         if info.field_name == '__schema':
@@ -67,6 +82,11 @@ class DisableIntrospectionSchemaMiddleware:
 
 
 class HealthCheckMiddleware:
+    """HealthCheckMiddleware class.
+
+    Middleware to handle health check requests.
+
+    """
     def __init__(self, get_response):
         self.get_response = get_response
 

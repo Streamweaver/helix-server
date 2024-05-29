@@ -16,7 +16,30 @@ from apps.contrib.bulk_operations.tasks import generate_dummy_request
 
 @RuntimeProfile('merge_events')
 def merge_events(event_ids_mapping, figure_event_map=None):
+    """Merge events
 
+        Merge events into a single event using the given event IDs mapping and figure event map.
+        This method performs the following steps:
+
+        1. Migrate event data from non-figure tables to the destination event.
+        2. Generate a dummy API request.
+        3. Create a figure event map if not provided.
+        4. Prepare the data payload for the bulk operation API request.
+        5. Serialize the payload using BulkApiOperationSerializer.
+        6. Query the events to be processed and annotate the figure counts.
+        7. Start the bulk operation using the serialized payload.
+        8. Migrate events for non-figures tables.
+        9. Delete events with zero figures.
+        10. Print the summary of the operation.
+
+        Args:
+            event_ids_mapping (dict): A dictionary mapping primary event IDs to lists of other event IDs.
+            figure_event_map (dict): A dictionary mapping figure IDs to event IDs. (default: None)
+
+        Raises:
+            AssertionError: If the serializer is not valid.
+
+    """
     def _migrate_event_non_figure_tables(destination_event_id, source_event_ids):
         print('-' * 10, source_event_ids, '---->', destination_event_id)
 

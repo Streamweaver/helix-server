@@ -13,6 +13,37 @@ User = get_user_model()
 
 
 class Contact(MetaInformationArchiveAbstractModel, models.Model):
+    """
+
+    Module: contact
+
+    This module contains the Contact class which represents a contact person.
+
+    Classes:
+    - Contact: Represents a contact person.
+
+    Methods:
+    - __str__: Returns a string representation of the contact.
+    - get_full_name: Returns the full name of the contact.
+    - get_excel_sheets_data: Retrieves data for Excel sheets.
+    - save: Saves the contact to the database.
+
+    Attributes:
+    - designation: Enum field representing the designation of the contact (e.g., Mr, Ms, Mrs).
+    - first_name: Char field representing the first name of the contact.
+    - last_name: Char field representing the last name of the contact.
+    - full_name: Char field representing the full name of the contact.
+    - gender: Enum field representing the gender of the contact.
+    - job_title: Char field representing the job title of the contact.
+    - organization: Foreign key field representing the organization the contact belongs to.
+    - countries_of_operation: Many-to-many field representing the countries in which the contact operates.
+    - country: Foreign key field representing the country of the contact.
+    - email: Email field representing the email of the contact.
+    - skype: Char field representing the Skype ID of the contact.
+    - phone: Char field representing the phone number of the contact.
+    - comment: Text field representing additional comments about the contact.
+
+    """
     class DESIGNATION(enum.Enum):
         MR = 0
         MS = 1
@@ -125,6 +156,16 @@ class Contact(MetaInformationArchiveAbstractModel, models.Model):
 
 
 class CommunicationMedium(models.Model):
+    """
+    A class representing a communication medium.
+
+    Attributes:
+        name (str): The name of the communication medium.
+
+    Methods:
+        __str__(): Returns a string representation of the communication medium.
+
+    """
     name = models.CharField(verbose_name=_('Name'), max_length=256)
 
     def __str__(self):
@@ -132,6 +173,23 @@ class CommunicationMedium(models.Model):
 
 
 class Communication(MetaInformationArchiveAbstractModel, models.Model):
+    """
+
+    Communication class is a model class that represents a communication between a contact and a user. It extends the MetaInformationArchiveAbstractModel and models.Model classes.
+
+    Attributes:
+    - contact (ForeignKey): Represents the related contact for the communication.
+    - country (ForeignKey): Represents the related country for the communication. Can be blank and null.
+    - subject (CharField): Represents the subject of the communication. Has a maximum length of 512.
+    - content (TextField): Represents the content of the communication.
+    - date (DateField): Represents the date on which the communication occurred. Can be null and blank.
+    - medium (ForeignKey): Represents the medium of communication. Can be null and blank.
+    - attachment (ForeignKey): Represents the attachment related to the communication. Can be null and blank.
+
+    Methods:
+    - __str__(): Returns a string representation of the communication object.
+
+    """
     class COMMUNICATION_MEDIUM(enum.Enum):
         # keeping for the sake of migrations, remove it when recreating all migrations
         pass

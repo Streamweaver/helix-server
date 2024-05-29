@@ -21,9 +21,24 @@ from apps.contrib.models import (
 
 class MetaInformationSerializerMixin(serializers.Serializer):
     """
-    Responsible to add following fields into the validated data
-    - created_by
-    - last_modified_by
+    A mixin class for including meta information fields in a serializer.
+
+    Attributes:
+        created_at (DateTimeField): A read-only field representing the timestamp of creation.
+        modified_at (DateTimeField): A read-only field representing the timestamp of the last modification.
+        created_by (PrimaryKeyRelatedField): A read-only field representing the user who created the instance.
+        last_modified_by (PrimaryKeyRelatedField): A read-only field representing the user who last modified the instance.
+
+    Methods:
+        validate(attrs: dict) -> dict:
+            Validates the attribute dictionary and adds the appropriate meta information based on the instance.
+
+            Parameters:
+                attrs (dict): The attribute dictionary to be validated.
+
+            Returns:
+                dict: The validated attribute dictionary with meta information added.
+
     """
     created_at = serializers.DateTimeField(read_only=True)
     modified_at = serializers.DateTimeField(read_only=True)
@@ -44,6 +59,47 @@ class MetaInformationSerializerMixin(serializers.Serializer):
 
 
 class AttachmentSerializer(serializers.ModelSerializer):
+    """
+
+    AttachmentSerializer
+
+    This class is responsible for serializing/deserializing Attachment objects.
+
+    Usage:
+        You can instantiate the AttachmentSerializer class and use it to validate and serialize Attachment objects.
+
+    Attributes:
+        - model (required): The model class to be used for serialization/deserialization.
+        - fields (optional): The fields to be included in the serialized output. If not specified, all fields will be included.
+
+    Methods:
+        - _validate_file_size(file_content)
+            Description:
+                This method is used to validate the size of the file content.
+            Parameters:
+                - file_content: The file content to be validated.
+            Raises:
+                - serializers.ValidationError: If the file size exceeds the maximum file size allowed.
+
+        - _validate_mimetype(mimetype)
+            Description:
+                This method is used to validate the mimetype of the file.
+            Parameters:
+                - mimetype: The mimetype to be validated.
+            Raises:
+                - serializers.ValidationError: If the mimetype is not allowed.
+
+        - validate(attrs) -> dict
+            Description:
+                This method is used to validate the attributes of the Attachment object.
+            Parameters:
+                - attrs: The attributes to be validated.
+            Returns:
+                - dict: The validated attributes.
+            Raises:
+                - serializers.ValidationError: If any of the attributes fail validation.
+
+    """
     class Meta:
         model = Attachment
         fields = '__all__'
@@ -77,6 +133,22 @@ class AttachmentSerializer(serializers.ModelSerializer):
 
 class SourcePreviewSerializer(MetaInformationSerializerMixin,
                               serializers.ModelSerializer):
+    """
+    The SourcePreviewSerializer class is responsible for serializing and deserializing instances of SourcePreview model into JSON and vice versa.
+
+    The class inherits from the MetaInformationSerializerMixin and the serializers.ModelSerializer classes.
+
+    Attributes:
+        - model: The model attribute is set to the SourcePreview model.
+        - fields: The fields attribute is set to '__all__', which means that all fields of the SourcePreview model will be serialized.
+
+    Methods:
+        - create(self, validated_data): This method is called when creating a new SourcePreview instance. It takes the validated data as input and returns a new SourcePreview instance. It first checks if there is an existing SourcePreview instance with the same url, created_by, and status equal to 'IN_PROGRESS' within the specified timeout. If such an instance exists, it returns the first matching instance. Otherwise, it calls the get_pdf method of the SourcePreview model to generate a PDF preview for the validated data and returns the result.
+
+        - update(self, instance, validated_data): This method is called when updating an existing SourcePreview instance. It takes the existing instance and the validated data as input and returns the updated instance. It calls the get_pdf method of the SourcePreview model to generate a PDF preview for the validated data, using the existing instance if provided.
+
+    Note: The SourcePreview model and the MetaInformationSerializerMixin class are not defined in the given code, so it is assumed that they are imported from somewhere else.
+    """
     class Meta:
         model = SourcePreview
         fields = '__all__'
@@ -103,6 +175,23 @@ class SourcePreviewSerializer(MetaInformationSerializerMixin,
 
 class ExcelDownloadSerializer(MetaInformationSerializerMixin,
                               serializers.ModelSerializer):
+    """
+    ExcelDownloadSerializer class is responsible for serializing and deserializing ExcelDownload objects.
+
+    Attributes:
+    - model_instance_id (serializers.IntegerField, optional): ID of the model instance associated with the ExcelDownload object.
+
+    Meta:
+    - model (ExcelDownload): The model class associated with the serializer.
+    - fields (str): A string representing the fields to include in the serialized output. In this case, all fields are included.
+
+    Methods:
+    - validate_concurrent_downloads(attrs: dict) -> None: Validates the number of concurrent downloads for the current user. Raises a ValidationError if the limit is exceeded.
+    - validate(attrs: dict) -> dict: Validates the input data. Calls the superclass validate method and performs additional validation for concurrent downloads.
+    - create(validated_data) -> ExcelDownload: Creates a new ExcelDownload instance. Triggers the generation of the Excel file and returns the instance.
+
+    Note: This class inherits from the MetaInformationSerializerMixin and serializers.ModelSerializer.
+    """
     model_instance_id = serializers.IntegerField(required=False)
 
     class Meta:
@@ -134,7 +223,19 @@ class ExcelDownloadSerializer(MetaInformationSerializerMixin,
 
 
 class UpdateSerializerMixin:
-    """Makes all fields not required apart from the id field"""
+    """
+
+    UpdateSerializerMixin
+
+    Mixin class for patch updates in serializers.
+
+    Attributes:
+        - fields (dict): A dictionary containing the fields of the serializer.
+
+    Methods:
+        - __init__(*args, **kwargs): Initializes the mixin.
+
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # all updates will be a patch update
@@ -148,7 +249,29 @@ class ClientSerializer(
     serializers.ModelSerializer
 ):
     """
-    Serializer for Client objects, including custom validation and creation logic.
+    Serializer for the Client model.
+
+    Fields:
+    - contact_name (CharField): The name of the contact person for the client. Required.
+    - contact_email (EmailField): The email address of the contact person for the client. Required.
+    - use_cases (ListField): The list of use cases for the client. Required. Each use case should be one of the choices in Client.USE_CASE_TYPES.
+    - id (IntegerField): The ID of the client.
+    - name (CharField): The name of the client.
+    - is_active (BooleanField): Indicates whether the client is active or not.
+    - acronym (CharField): The acronym of the client.
+    - contact_website (CharField): The website of the contact person for the client.
+    - other_notes (CharField): Additional notes about the client.
+    - opted_out_of_emails (BooleanField): Indicates whether the client has opted out of receiving emails.
+
+    Meta:
+    - model (Client): The Client model.
+    - fields (Tuple): The fields to be included in the serialized output.
+
+    Methods:
+    - validate(self, attrs): Custom validation method. Ensures 'other_notes' is provided when 'Other' is selected in use_cases.
+    - create(self, validated_data): Creates a new Client instance. Generates a unique client code before creating the instance.
+    - _generate_unique_client_code(self, code_length=16, max_attempts=5): Generates a unique client code consisting of uppercase letters and digits.
+
     """
     contact_name = serializers.CharField(required=True)
     contact_email = serializers.EmailField(required=True)
@@ -216,4 +339,13 @@ class ClientSerializer(
 
 
 class ClientUpdateSerializer(UpdateSerializerMixin, ClientSerializer):
+    """
+    Client Update Serializer class.
+
+    This class is used to serialize and validate data for updating a client.
+
+    Attributes:
+        id (IntegerIDField): The client ID field.
+
+    """
     id = IntegerIDField(required=True)

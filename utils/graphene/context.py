@@ -45,6 +45,57 @@ from apps.organization.dataloaders import OrganizationCountriesLoader, Organizat
 
 
 class GQLContext:
+    """
+
+
+    GQLContext
+
+    This class is used to manage the GraphQL context for each request.
+
+    Attributes:
+        request (HttpRequest): The request object for the current request.
+        one_to_many_dataloaders (dict): A dictionary to store OneToManyLoader objects for different references.
+        count_dataloaders (dict): A dictionary to store CountLoader objects for different references.
+
+    Methods:
+        user(): Returns the user object associated with the current request.
+        get_dataloader(parent: str, related_name: str): Returns a OneToManyLoader object for the given parent and related name.
+        get_count_loader(parent: str, child: str): Returns a CountLoader object for the given parent and child.
+        entry_entry_total_stock_idp_figures(): Returns a TotalIDPFigureByEntryLoader object.
+        entry_entry_total_flow_nd_figures(): Returns a TotalNDFigureByEntryLoader object.
+        crisis_crisis_total_stock_idp_figures(): Returns a TotalIDPFigureByCrisisLoader object.
+        crisis_crisis_total_flow_nd_figures(): Returns a TotalNDFigureByCrisisLoader object.
+        crisis_stock_idp_figures_max_end_date(): Returns a MaxStockIDPFigureEndDateByCrisisLoader object.
+        event_event_total_stock_idp_figures(): Returns a TotalIDPFigureByEventLoader object.
+        event_event_total_flow_nd_figures(): Returns a TotalNDFigureByEventLoader object.
+        event_stock_idp_figures_max_end_date(): Returns a MaxStockIDPFigureEndDateByEventLoader object.
+        country_country_this_year_idps_disaster_loader(): Returns a TotalFigureThisYearByCountryCategoryEventTypeLoader object for IDPs in disaster.
+        country_country_this_year_idps_conflict_loader(): Returns a TotalFigureThisYearByCountryCategoryEventTypeLoader object for IDPs in conflict.
+        country_country_this_year_nd_conflict_loader(): Returns a TotalFigureThisYearByCountryCategoryEventTypeLoader object for new displacements in conflict.
+        country_country_this_year_nd_disaster_loader(): Returns a TotalFigureThisYearByCountryCategoryEventTypeLoader object for new displacements in disaster.
+        monitoring_sub_region_country_loader(): Returns a MonitoringSubRegionCountryLoader object.
+        monitoring_sub_region_country_count_loader(): Returns a MonitoringSubRegionCountryCountLoader object.
+        event_entry_count_dataloader(): Returns an EventEntryCountLoader object.
+        event_typology_dataloader(): Returns an EventTypologyLoader object.
+        event_figure_typology_dataloader(): Returns an EventFigureTypologyLoader object.
+        figure_typology_dataloader(): Returns a FigureTypologyLoader object.
+        figure_geolocations_loader(): Returns a FigureGeoLocationLoader object.
+        figure_sources_reliability_loader(): Returns a FigureSourcesReliability object.
+        last_review_comment_status_loader(): Returns a FigureLastReviewCommentStatusLoader object.
+        event_count_dataloader(): Returns an EventCountLoader object.
+        event_review_count_dataloader(): Returns an EventReviewCountLoader object.
+        crisis_review_count_dataloader(): Returns a CrisisReviewCountLoader object.
+        event_code_loader(): Returns an EventCodeLoader object.
+        bulk_api_operation_success_list_loader(): Returns a BulkApiOperationSuccessListLoader object.
+        bulk_api_operation_failure_list_loader(): Returns a BulkApiOperationFailureListLoader object.
+        event_crisis_loader(): Returns an EventCrisisLoader object.
+        figure_entry_loader(): Returns a FigureEntryLoader object.
+        entry_document_loader(): Returns an EntryDocumentLoader object.
+        organization_countries_loader(): Returns an OrganizationCountriesLoader object.
+        organization_organization_kind_loader(): Returns an OrganizationOrganizationKindLoader object.
+        entry_preview_loader(): Returns an EntryPreviewLoader object.
+        user_portfolios_metadata(): Returns a UserPortfoliosMetadataLoader object.
+    """
     def __init__(self, request):
         self.request = request
         # global dataloaders

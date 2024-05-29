@@ -22,6 +22,23 @@ User = get_user_model()
 
 
 class UserPasswordSerializer(serializers.ModelSerializer):
+    """
+
+    The UserPasswordSerializer class is a serializer class for handling password changes for a User model.
+
+    Attributes:
+        - old_password: A CharField for the old password.
+        - new_password: A CharField for the new password.
+
+    Meta:
+        - model: Specifies the User model to be used.
+        - fields: Specifies the fields to be included in the serializer.
+
+    Methods:
+        - validate_old_password: Validates the old password. If the password is invalid, it raises a ValidationError.
+        - validate_new_password: Validates the new password using the validate_password function.
+        - save: Sets the new password for the User instance and saves it.
+    """
     old_password = serializers.CharField(required=True, write_only=True)
     new_password = serializers.CharField(required=True, write_only=True)
 
@@ -44,6 +61,25 @@ class UserPasswordSerializer(serializers.ModelSerializer):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    """
+
+    RegisterSerializer class is a serializer class used for registering a user. It is a subclass of the ModelSerializer class provided by the Django Rest Framework.
+
+    Attributes:
+        - password: A CharField used for storing the user's password. It is required and write-only.
+        - captcha: A CharField used for storing the captcha value entered by the user. It is required and write-only.
+        - site_key: A CharField used for storing the site key of the captcha. It is required and write-only.
+        - Meta: A class attribute specifying the model used for registration and the fields to be serialized.
+
+    Methods:
+        - validate_password(password: str) -> str: A method used for validating the password entered by the user. It calls the validate_password() function to perform the validation and returns the password.
+        - validate_email(email: str) -> str: A method used for validating the email entered by the user. It checks if the email is already taken and returns the email if it is not.
+        - validate_captcha(captcha: str): A method used for validating the captcha entered by the user. It calls the validate_hcaptcha() function to perform the validation and raises a ValidationError if the captcha is invalid.
+        - save(**kwargs): A method used for saving the user's registration data. It creates a new User instance with the validated data and returns the instance.
+
+    Note: This class assumes the existence of the User model and the validate_password(), validate_hcaptcha(), and gettext() functions used in the code.
+
+    """
     password = serializers.CharField(required=True, write_only=True)
     captcha = serializers.CharField(required=True, write_only=True)
     site_key = serializers.CharField(required=True, write_only=True)
@@ -81,6 +117,22 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
+    """
+    Class: LoginSerializer
+
+    Serializer for validating and serializing login data.
+
+    Attributes:
+    - email (serializers.EmailField): Required email field for login.
+    - password (serializers.CharField): Required password field for login.
+    - captcha (serializers.CharField): Optional captcha field for login.
+    - site_key (serializers.CharField): Optional site_key field for login.
+
+    Methods:
+    - _validate_captcha(attrs): Private method for validating captcha.
+    - validate(attrs): Method for validating login data.
+
+    """
     email = serializers.EmailField(required=True, write_only=True)
     password = serializers.CharField(required=True, write_only=True)
     captcha = serializers.CharField(required=False, allow_null=True, write_only=True)
@@ -139,6 +191,18 @@ class LoginSerializer(serializers.Serializer):
 
 
 class ActivateSerializer(serializers.Serializer):
+    """
+
+    ActivateSerializer class is a subclass of serializers.Serializer and is used for activating a user account by validating and saving user data.
+
+    Attributes:
+    - uid: A CharField representing the user ID required for activation (write-only).
+    - token: A CharField representing the activation token required for activation (write-only).
+
+    Methods:
+    - validate(attrs): This method is used to validate the user data and activate the user account. It takes the attrs parameter, which is a dictionary containing the user ID and activation token. It returns the validated attributes.
+
+    """
     uid = serializers.CharField(required=True, write_only=True)
     token = serializers.CharField(required=True, write_only=True)
 
@@ -156,6 +220,25 @@ class ActivateSerializer(serializers.Serializer):
 
 
 class MonitoringExpertPortfolioSerializer(serializers.ModelSerializer):
+    """
+
+    Class: MonitoringExpertPortfolioSerializer
+
+    Serializes and deserializes the Monitoring Expert portfolio data.
+
+    Attributes:
+    - country: PrimaryKeyRelatedField: A field that represents the related country for the portfolio.
+    - Meta: Meta class that specifies the model and fields for serialization.
+
+    Methods:
+    - validate(attrs: dict) -> dict:
+      Validates the serializer data and performs additional validation.
+      Parameters:
+        - attrs: dict: The serializer data dictionary.
+      Returns:
+        - dict: The validated data dictionary.
+
+    """
     country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), required=True)
 
     def validate(self, attrs: dict) -> dict:
@@ -168,6 +251,41 @@ class MonitoringExpertPortfolioSerializer(serializers.ModelSerializer):
 
 
 class BulkMonitoringExpertPortfolioSerializer(serializers.Serializer):
+    """
+
+    BulkMonitoringExpertPortfolioSerializer
+
+    Class responsible for serializing and validating bulk monitoring expert portfolio data.
+
+    Attributes:
+    - portfolios: MonitoringExpertPortfolioSerializer - Serializer for monitoring expert portfolios.
+    - region: PrimaryKeyRelatedField - Field for the monitoring sub region.
+
+    Methods:
+    - _validate_region_countries(attrs: dict) -> None:
+        Validates if all the provided countries belong to the region.
+
+        Parameters:
+        - attrs: dict - Dictionary of attributes for validation.
+
+    - _validate_can_add(attrs: dict) -> None:
+        Validates if the user is allowed to add portfolios to the region.
+
+        Parameters:
+        - attrs: dict - Dictionary of attributes for validation.
+
+    - validate(attrs: dict) -> dict:
+        Validates the attributes of the serializer.
+
+        Parameters:
+        - attrs: dict - Dictionary of attributes for validation.
+
+        Returns:
+        - dict - Validated attributes.
+
+    - save(*args, **kwargs):
+        Saves the validated portfolios and updates the user roles.
+    """
     portfolios = MonitoringExpertPortfolioSerializer(many=True)
     region = serializers.PrimaryKeyRelatedField(
         queryset=MonitoringSubRegion.objects.all()
@@ -220,6 +338,26 @@ class BulkMonitoringExpertPortfolioSerializer(serializers.Serializer):
 
 
 class RegionalCoordinatorPortfolioSerializer(serializers.ModelSerializer):
+    """
+    Class: RegionalCoordinatorPortfolioSerializer
+
+    This class is a serializer for the RegionalCoordinatorPortfolio model. It is responsible for serializing and deserializing instances of the model for use in views and forms.
+
+    Methods:
+    - _validate_can_add()
+        - Validates if the current user has the permission to add a regional coordinator portfolio. Raises a ValidationError if the user does not have the required permission.
+
+    - validate(attrs: dict) -> dict
+        - Validates the input data and returns the validated attributes. This method calls _validate_can_add() to ensure the user has the permission to add a regional coordinator portfolio. It also sets the 'role' attribute to USER_ROLE.REGIONAL_COORDINATOR and fetches the portfolio instance based on the monitoring sub region and role.
+
+    - save()
+        - Saves the serialized data to the database. It calls the superclass's save() method to handle the actual saving. After saving, it triggers a background task to recalculate user roles.
+
+    Attributes:
+    - Meta
+        - A nested class that defines metadata for the serializer. It specifies the model to serializer, the fields to include, and extra kwargs for certain fields.
+
+    """
     def _validate_can_add(self) -> None:
         if self.context['request'].user.highest_role != USER_ROLE.ADMIN:
             raise serializers.ValidationError(
@@ -250,6 +388,35 @@ class RegionalCoordinatorPortfolioSerializer(serializers.ModelSerializer):
 
 
 class AdminPortfolioSerializer(serializers.Serializer):
+    """
+    AdminPortfolioSerializer
+
+    Serializer class for managing portfolios of admin users.
+
+    Attributes:
+        register (bool): Flag indicating whether to register or unregister a portfolio.
+        user (PrimaryKeyRelatedField): Primary key related field for the user associated with the portfolio.
+
+    Methods:
+        _validate_unique(attrs: dict) -> None:
+            Validates that a unique portfolio does not already exist for the specified user.
+            Raises a serializers.ValidationError if a duplicate portfolio is found.
+
+        _validate_is_admin() -> None:
+            Validates that the current user has the role of an admin.
+            Raises a serializers.ValidationError if the user is not an admin.
+
+        validate(attrs: dict) -> dict:
+            Validates the serializer input.
+            Calls _validate_is_admin() and _validate_unique(attrs) methods.
+            Returns the validated attributes.
+
+        save() -> Any:
+            Saves the portfolio based on the validated data.
+            If register is True, creates a new portfolio with the specified user and admin role.
+            If register is False, deletes the existing portfolio for the specified user and admin role.
+            Returns the user associated with the saved portfolio.
+    """
     register = serializers.BooleanField(required=True)
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
@@ -294,6 +461,37 @@ class AdminPortfolioSerializer(serializers.Serializer):
 
 
 class DirectorsOfficePortfolioSerializer(serializers.Serializer):
+    """
+    Class: DirectorsOfficePortfolioSerializer
+
+    Description:
+    This class is a serializer used for handling the creation and deletion of a portfolio in the director's office. It allows registering or unregistering a user for the director's office portfolio.
+
+    Attributes:
+    - register (serializers.BooleanField): Indicates whether the user should be registered or unregistered for the portfolio.
+    - user (serializers.PrimaryKeyRelatedField): The related user object for the portfolio.
+
+    Methods:
+    - _validate_unique(attrs: dict) -> None:
+        This method validates whether a portfolio with the same user and role (DIRECTORS_OFFICE) already exists. If it does, a validation error is raised.
+
+    - _validate_is_admin() -> None:
+        This method validates whether the current user performing the action is an admin. If not, a validation error is raised.
+
+    - validate(attrs: dict) -> dict:
+        This method is called to validate the serializer's fields. It calls the _validate_is_admin() and _validate_unique() methods to perform the necessary validations.
+
+    - save() -> Any:
+        This method is called to save the validated data. If the `register` field is True, a new portfolio is created with the given user and role (DIRECTORS_OFFICE). If `register` is False, the existing portfolio for the user and role is retrieved and deleted.
+
+    Returns:
+    - user (Any): The validated user object.
+
+    Example usage:
+    serializer = DirectorsOfficePortfolioSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    """
     register = serializers.BooleanField(required=True)
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
@@ -338,6 +536,33 @@ class DirectorsOfficePortfolioSerializer(serializers.Serializer):
 
 
 class ReportingTeamPortfolioSerializer(serializers.Serializer):
+    """
+    Serializer for creating and deleting reporting team portfolios.
+
+    Attributes:
+        register (serializers.BooleanField): a boolean field indicating whether to register or delete the portfolio.
+        user (serializers.PrimaryKeyRelatedField): a field that represents the related user.
+
+    Methods:
+        _validate_unique(attrs) -> None:
+            Validates if the user already has a reporting team portfolio.
+            Raises a ValidationError if a portfolio already exists for the user.
+
+        _validate_is_admin() -> None:
+            Validates if the user making the request is an admin.
+            Raises a ValidationError if the user is not an admin.
+
+        validate(attrs: dict) -> dict:
+            Validates the serializer's data.
+            Calls _validate_is_admin() and _validate_unique(attrs) to perform the validation.
+            Returns the validated data.
+
+        save() -> Any:
+            Saves the validated data by creating or deleting a reporting team portfolio.
+            If register is True in the validated data, creates a new portfolio for the user.
+            If register is False, deletes the existing portfolio for the user.
+            Returns the user associated with the portfolio.
+    """
     register = serializers.BooleanField(required=True)
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
@@ -384,6 +609,26 @@ class ReportingTeamPortfolioSerializer(serializers.Serializer):
 
 
 class UserSerializer(UpdateSerializerMixin, serializers.ModelSerializer):
+    """
+    UserSerializer class is used for serializing and deserializing User objects. It extends UpdateSerializerMixin and
+    serializers.ModelSerializer.
+
+    Attributes:
+        id (IntegerField): The ID of the user. Required.
+
+    Meta:
+        model (User): The model class that this serializer is based on.
+        fields (List[str]): The fields to include in the serialized representation of the user.
+
+    Methods:
+        validate_is_active(is_active): Validates the 'is_active' field of the user. Raises a serializers.ValidationError
+            if the user being updated is the same as the current user.
+        validate(attrs): Validates the entire set of attributes on the user. Raises a serializers.ValidationError
+            if the current user is not allowed to update the user being serialized.
+        update(instance, validated_data): Updates the user instance with the validated data. Also creates new portfolios
+            if any are provided in the validated data.
+
+    """
     id = IntegerIDField(required=True)
 
     class Meta:
@@ -413,7 +658,20 @@ class UserSerializer(UpdateSerializerMixin, serializers.ModelSerializer):
 
 class GenerateResetPasswordTokenSerializer(serializers.Serializer):
     """
-    Serializer for password forgot endpoint.
+
+    The GenerateResetPasswordTokenSerializer class is responsible for validating the input data and generating a password reset token for a user.
+
+    Attributes:
+    - captcha (CharField): A required field representing the captcha value.
+    - email (EmailField): A required field representing the user's email.
+    - site_key (CharField): A required field representing the site key.
+
+    Methods:
+    - validate_captcha(captcha): Validates the captcha value and raises a ValidationError if it is invalid.
+    - validate(attrs): Validates the input data and generates a password reset token for the user. If a user with the given email exists, it generates the token and sends a password reset email. If no user exists, it raises a ValidationError indicating that the user does not exist.
+
+    Note: This class does not provide any example code and does not contain any @author or @version tags.
+
     """
     captcha = serializers.CharField(required=True, write_only=True)
     email = serializers.EmailField(write_only=True, required=True)
@@ -463,7 +721,17 @@ class GenerateResetPasswordTokenSerializer(serializers.Serializer):
 
 class ResetPasswordSerializer(serializers.Serializer):
     """
-    Serializer for password reset endpoints.
+
+    The ResetPasswordSerializer class is responsible for serializing and validating data related to resetting a password.
+
+    Attributes:
+    - password_reset_token (CharField): Write-only field for the password reset token.
+    - uid (CharField): Write-only field for the user ID.
+    - new_password (CharField): Write-only field for the new password.
+
+    Methods:
+    - validate_new_password: This method validates the new password by calling the validate_password function and returning the password.
+    - validate: This method validates the attributes of the serializer. It retrieves the uid, token, and new_password from the attributes dictionary. It then calls the get_user_from_activation_token function to retrieve the user object. If the user object is None, it raises a serializers.ValidationError with the message 'The token is invalid'. Otherwise, it sets the new password for the user and saves the user object. It finally returns the attrs dictionary.
     """
 
     password_reset_token = serializers.CharField(write_only=True, required=True)

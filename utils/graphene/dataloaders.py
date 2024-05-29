@@ -12,6 +12,16 @@ from django.db.models import (
 
 
 def get_relations(model1, model2):
+    """
+    Retrieve a list of relation fields between two models.
+
+    Args:
+        model1 (django.db.models.Model): The first model.
+        model2 (django.db.models.Model): The second model.
+
+    Returns:
+        list: A list of relation field names between the two models.
+    """
     relations = []
     for field in model1._meta.get_fields():
         if field.is_relation and field.related_model == model2:
@@ -20,24 +30,57 @@ def get_relations(model1, model2):
 
 
 def get_related_name(model1, model2):
-    '''
-    To be used with models with single relationship in between
-    Returns the first relation found
+    """
+    Returns the related name between two models.
 
-    If multiple relations exists, pass related_name and reverse_related_name explicitly
-    '''
+    Parameters:
+    - model1 (str): The name of the first model.
+    - model2 (str): The name of the second model.
+
+    Returns:
+    str: The related name between the two models.
+
+    """
     relations = get_relations(model1, model2)
     if relations:
         return relations[0]
 
 
 class DataLoaderException(Exception):
-    '''
-    Unable to batch load
-    '''
+    """
+
+    The DataLoaderException class is a custom exception class that is used to raise exceptions related to data loading operations.
+
+    Attributes:
+        message (str): The error message associated with the exception.
+
+    """
 
 
 class CountLoader(DataLoader):
+    """
+
+    Class CountLoader
+
+    A DataLoader subclass for loading the count of related objects.
+
+    Methods:
+    - load: Loads the count of related objects for the given parent and child models.
+    - batch_load_fn: Retrieves the count of related objects for multiple parent keys.
+
+    Attributes:
+    - parent: The parent model.
+    - child: The child model.
+    - related_name: The related name used in the child model to refer to the parent model.
+    - reverse_related_name: The related name used in the parent model to refer to the child model.
+    - accessor: The accessor used to access the related objects in the parent model.
+    - pagination: The pagination configuration.
+    - filterset_class: The filterset class to apply to the queryset.
+    - filter_kwargs: The filter kwargs to apply to the queryset.
+    - request: The request object.
+    - kwargs: Additional kwargs passed for pagination.
+
+    """
     def load(
         self,
         key,
@@ -97,6 +140,31 @@ class CountLoader(DataLoader):
 
 
 class OneToManyLoader(DataLoader):
+    """
+
+    Class OneToManyLoader
+
+    A data loader class that loads related objects in a one-to-many relationship.
+
+    Attributes:
+    - parent: The parent model class.
+    - child: The child model class.
+    - related_name: The name of the related field in the parent model (defaults to None).
+    - reverse_related_name: The name of the reverse related field in the child model (defaults to None).
+    - accessor: A custom accessor function to retrieve the related objects (defaults to None).
+    - pagination: The pagination class to use for paginating the related objects (defaults to None).
+    - filterset_class: The filterset class to use for filtering the related objects (defaults to None).
+    - filter_kwargs: The filter kwargs to use for filtering the related objects (defaults to None).
+    - request: The current request object (defaults to None).
+
+    Methods:
+    - load(key, parent, child, related_name=None, reverse_related_name=None, accessor=None, pagination=None, filterset_class=None, filter_kwargs=None, request=None, **kwargs):
+      Loads the related objects for the given key and returns the result.
+
+    - batch_load_fn(keys):
+      Loads the related objects for the batch of keys and returns the result.
+
+    """
     def load(
         self,
         key,

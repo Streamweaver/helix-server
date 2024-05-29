@@ -36,6 +36,22 @@ from utils.figure_filter import (
 
 class GeographicalGroupFilter(NameFilterMixin,
                               django_filters.FilterSet):
+    """
+    Filter class for GeographicalGroup model.
+
+    Inherits from NameFilterMixin and django_filters.FilterSet.
+
+    Attributes:
+        name (django_filters.CharFilter): Filter for filtering by name.
+
+    Meta:
+        model (class): The model this filter is associated with (GeographicalGroup).
+        fields (dict): A dictionary specifying the fields to filter on and the lookup types.
+
+    Usage:
+        filter = GeographicalGroupFilter(data=request.GET, queryset=queryset)
+        filtered_queryset = filter.qs
+    """
     name = django_filters.CharFilter(method='_filter_name')
 
     class Meta:
@@ -47,6 +63,18 @@ class GeographicalGroupFilter(NameFilterMixin,
 
 class CountryRegionFilter(NameFilterMixin,
                           django_filters.FilterSet):
+    """
+    Filter class for filtering CountryRegion instances.
+    Inherits from NameFilterMixin and django_filters.FilterSet.
+
+    Attributes:
+    - name: A CharFilter field used for filtering by name.
+    - Meta: A class defining the metadata of the filter, including the model and fields to be filtered.
+
+    Example usage:
+    filter_set = CountryRegionFilter(data=request.GET, queryset=CountryRegion.objects.all())
+    filtered_queryset = filter_set.qs
+    """
     name = django_filters.CharFilter(method='_filter_name')
 
     class Meta:
@@ -57,6 +85,38 @@ class CountryRegionFilter(NameFilterMixin,
 
 
 class CountryFilter(django_filters.FilterSet):
+    """
+
+    Class to filter Country objects based on different criteria.
+
+    Filters:
+    - country_name: Filters countries by name. Uses '_filter_name' method.
+    - region_name: Filters countries by region name. Uses 'filter_region_name' method.
+    - geographical_group_name: Filters countries by geographical group name. Uses 'filter_geo_group_name' method.
+    - region_by_ids: Filters countries by a list of region ids. Uses 'filter_regions' method.
+    - geo_group_by_ids: Filters countries by a list of geographical group ids. Uses 'filter_geo_groups' method.
+    - filter_figures: Filters countries based on figure filters. Uses 'filter_by_figures' method.
+    - aggregate_figures: No operation method.
+    - events: Filters countries based on a list of event ids. Uses 'filter_by_events' method.
+    - crises: Filters countries based on a list of crisis ids. Uses 'filter_by_crisis' method.
+
+    Attributes:
+    - request: HttpRequest object.
+    - qs: QuerySet of Country objects.
+
+    Methods:
+    - noop: No operation method.
+    - filter_by_figures: Filters countries based on figure filters.
+    - filter_by_events: Filters countries based on a list of event ids.
+    - filter_by_crisis: Filters countries based on a list of crisis ids.
+    - _filter_name: Filters countries by name.
+    - filter_geo_group_name: Filters countries by geographical group name.
+    - filter_region_name: Filters countries by region name.
+    - filter_regions: Filters countries by a list of region ids.
+    - filter_geo_groups: Filters countries by a list of geographical group ids.
+    - filter_year: No operation method.
+
+    """
     country_name = django_filters.CharFilter(method='_filter_name')
     region_name = django_filters.CharFilter(method='filter_region_name')
     geographical_group_name = django_filters.CharFilter(method='filter_geo_group_name')
@@ -172,6 +232,18 @@ class CountryFilter(django_filters.FilterSet):
 
 
 class MonitoringSubRegionFilter(django_filters.FilterSet):
+    """
+    Class: MonitoringSubRegionFilter
+
+    A class that defines a filter set for the MonitoringSubRegion model in Django.
+
+    Attributes:
+    - name (django_filters.CharFilter): A character filter for the name field.
+
+    Methods:
+    - _filter_name(queryset, name, value): A private method that filters the queryset based on the name field.
+
+    """
     name = django_filters.CharFilter(method='_filter_name')
 
     class Meta:
@@ -189,6 +261,16 @@ class MonitoringSubRegionFilter(django_filters.FilterSet):
 
 
 class CountrySummaryFilter(django_filters.FilterSet):
+    """
+    FilterSet class for filtering summary objects by country.
+
+    Filters the summary objects based on the selected country using the 'lte' and 'gte' operators on the 'created_at' field.
+
+    Attributes:
+        model (django.db.models.Model): The model class to which the filterset will be applied
+        fields (dict): The fields on which the filters will be applied
+
+    """
     class Meta:
         model = Summary
         fields = {
@@ -197,6 +279,32 @@ class CountrySummaryFilter(django_filters.FilterSet):
 
 
 class ContextualAnalysisFilter(django_filters.FilterSet):
+    """
+
+    The `ContextualAnalysisFilter` class is a filter set class that is used for filtering data from the `ContextualAnalysis` model.
+
+    Attributes:
+        model (django.db.models.Model): The `ContextualAnalysis` model that will be filtered.
+
+    Fields:
+        The following fields are used for filtering the `ContextualAnalysis` data:
+            - 'created_at': ['lte', 'gte'] (Filter by the 'created_at' attribute using the 'less than or equal to' and 'greater than or equal to' conditions)
+
+    Example usage:
+
+        # Create an instance of the filter set
+        filter_set = ContextualAnalysisFilter(data=request.GET, queryset=ContextualAnalysis.objects.all())
+
+        # Apply filters on the queryset
+        filtered_queryset = filter_set.qs
+
+        # Iterate over the filtered queryset
+        for analysis in filtered_queryset:
+            # Do something with the filtered `ContextualAnalysis` objects
+
+    Note: This documentation does not contain the actual example code.
+
+    """
     class Meta:
         model = ContextualAnalysis
         fields = {

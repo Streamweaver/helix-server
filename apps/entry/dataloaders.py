@@ -11,6 +11,14 @@ from apps.review.models import UnifiedReviewComment
 
 
 def batch_load_fn_by_category(keys, category):
+    """
+
+    Parameters:
+    - keys (list): A list of entry keys to load figures for.
+    - category (str): The figure category type.
+
+    Returns:
+    - Promise: A promise that resolves to a list of"""
     qs = Entry.objects.filter(
         id__in=keys
     ).annotate(
@@ -33,6 +41,9 @@ def batch_load_fn_by_category(keys, category):
 
 
 class TotalIDPFigureByEntryLoader(DataLoader):
+    """
+    class TotalIDPFigureByEntryLoader(DataLoader):
+        """
     def batch_load_fn(self, keys):
         return batch_load_fn_by_category(
             keys, Figure.FIGURE_CATEGORY_TYPES.IDPS
@@ -40,6 +51,18 @@ class TotalIDPFigureByEntryLoader(DataLoader):
 
 
 class TotalNDFigureByEntryLoader(DataLoader):
+    """
+    Class TotalNDFigureByEntryLoader
+
+    This class is a DataLoader that loads the total ND figure by entry.
+
+    Attributes:
+    - None
+
+    Methods:
+    - batch_load_fn(keys): Returns the total ND figure batch loaded by entry.
+
+    """
     def batch_load_fn(self, keys):
         return batch_load_fn_by_category(
             keys, Figure.FIGURE_CATEGORY_TYPES.NEW_DISPLACEMENT
@@ -47,6 +70,11 @@ class TotalNDFigureByEntryLoader(DataLoader):
 
 
 class FigureTypologyLoader(DataLoader):
+    """
+
+    class FigureTypologyLoader(DataLoader):
+        def batch_load_fn(self, keys: list) -> list:
+            """
     def batch_load_fn(self, keys: list):
         qs = Figure.objects.filter(
             id__in=keys
@@ -68,6 +96,15 @@ class FigureTypologyLoader(DataLoader):
 
 
 class FigureGeoLocationLoader(DataLoader):
+    """
+
+    Class: FigureGeoLocationLoader(DataLoader)
+
+    This class is a subclass of DataLoader and is responsible for loading the geo-locations of figures.
+
+    Methods:
+    - batch_load_fn(keys)
+        - Parameters"""
     def batch_load_fn(self, keys):
         qs = Figure.objects.filter(
             id__in=keys
@@ -84,6 +121,14 @@ class FigureGeoLocationLoader(DataLoader):
 
 
 class FigureSourcesReliability(DataLoader):
+    """
+
+    Class: FigureSourcesReliability
+
+    This class extends the DataLoader class and provides a method for batch loading the sources reliability of figure objects.
+
+    Methods:
+    - batch_load_fn(keys): This method loads the sources reliability for a batch of figure objects specified by the"""
     def batch_load_fn(self, keys):
         qs = Figure.objects.filter(
             id__in=keys
@@ -100,6 +145,13 @@ class FigureSourcesReliability(DataLoader):
 
 
 class FigureLastReviewCommentStatusLoader(DataLoader):
+    """
+    class FigureLastReviewCommentStatusLoader(DataLoader):
+        A data loader class for retrieving the last review comment status for figures.
+
+        DataLoader Subclass Methods:
+            - batch_load_fn(keys):
+                Retrieves the last review comment"""
     def batch_load_fn(self, keys):
         review_comment_qs = UnifiedReviewComment.objects.filter(
             Q(figure__in=keys) and
@@ -136,6 +188,12 @@ class FigureLastReviewCommentStatusLoader(DataLoader):
 
 
 class FigureEntryLoader(DataLoader):
+    """
+    Class FigureEntryLoader
+
+    This class is a DataLoader subclass used for loading FigureEntry objects based on a list of figure IDs.
+
+    """
     def batch_load_fn(self, keys: list):
         qs = Figure.objects.filter(id__in=keys).select_related('entry').only('id', 'entry')
         _map = {}
@@ -145,6 +203,12 @@ class FigureEntryLoader(DataLoader):
 
 
 class EntryDocumentLoader(DataLoader):
+    """
+    EntryDocumentLoader extends DataLoader class and is responsible for loading Entry documents based on a list of key values.
+
+    Methods:
+        - batch_load_fn(keys: list) -> Promise[List[Document]]:
+            - This method takes a list of key values"""
     def batch_load_fn(self, keys: list):
         qs = Entry.objects.filter(id__in=keys).select_related('document').only('id', 'document')
         _map = {}
@@ -154,6 +218,14 @@ class EntryDocumentLoader(DataLoader):
 
 
 class EntryPreviewLoader(DataLoader):
+    """
+
+    EntryPreviewLoader
+
+    This class is a DataLoader subclass that is responsible for loading preview data for Entry objects.
+
+    Public Methods:
+    - batch_load_fn(keys: list): This method takes in a list of keys and loads the preview data"""
     def batch_load_fn(self, keys: list):
         qs = Entry.objects.filter(id__in=keys).select_related('preview').only('id', 'preview')
         _map = {}

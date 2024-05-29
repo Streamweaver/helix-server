@@ -10,6 +10,23 @@ from .enums import BulkApiOperationActionEnum, BulkApiOperationStatusEnum
 
 
 class ExcelExportFilter(django_filters.FilterSet):
+    """
+    FilterSet for exporting data to Excel.
+
+    This class extends the `django_filters.FilterSet` class and provides additional filtering options for exporting data to Excel.
+
+    Attributes:
+        status_list (StringListFilter): Filter for status list.
+
+    Meta:
+        model (ExcelDownload): The model to filter on.
+        fields (dict): A dictionary of fields and their lookup types.
+
+    Methods:
+        filter_status(qs, name, value): Filters the queryset based on the status values provided.
+        qs: Get the filtered queryset based on the current filter set and user.
+
+    """
     status_list = StringListFilter(method='filter_status')
 
     class Meta:
@@ -37,6 +54,21 @@ class ExcelExportFilter(django_filters.FilterSet):
 
 
 class ClientFilter(django_filters.FilterSet):
+    """ClientFilter class
+
+    This class is used to filter the Client model based on various fields.
+
+    Attributes:
+        name (django_filters.CharFilter): A filter for the 'name' field of the Client model.
+        is_active (django_filters.BooleanFilter): A filter for the 'is_active' field of the Client model.
+        use_cases (StringListFilter): A filter for the 'use_cases' field of the Client model.
+
+    Methods:
+        filter_name(queryset, name, value): Filter the queryset based on the 'name' field.
+        filter_use_cases(qs, name, value): Filter the queryset based on the 'use_cases' field.
+        qs: Get the filtered queryset based on the user's role.
+
+    """
     name = django_filters.CharFilter(method='filter_name')
     is_active = django_filters.BooleanFilter()
     use_cases = StringListFilter(method='filter_use_cases')
@@ -68,6 +100,30 @@ class ClientFilter(django_filters.FilterSet):
 
 
 class ClientTrackInfoFilter(django_filters.FilterSet):
+    """
+
+    ClientTrackInfoFilter is a class that extends django_filters.FilterSet. It provides filtering options for the fields api_type, client_codes, start_track_date, and end_track_date.
+
+    Attributes:
+      - api_type: A filter for the api_type field.
+      - client_codes: A filter for the client_codes field.
+      - start_track_date: A filter for the start_track_date field.
+      - end_track_date: A filter for the end_track_date field.
+
+    Methods:
+      - filter_api_type(qs, name, value): A method that filters the queryset based on the api_type field.
+      - filter_client_codes(qs, name, value): A method that filters the queryset based on the client_codes field.
+      - filter_start_track_date(qs, name, value): A method that filters the queryset based on the start_track_date field.
+      - filter_end_track_date(qs, name, value): A method that filters the queryset based on the end_track_date field.
+      - qs: A property that returns the filtered queryset based on the user role.
+
+    Usage:
+      - Create an instance of ClientTrackInfoFilter and pass it to a FilterSet or a Django view for filtering the queryset.
+
+    Example:
+      filter = ClientTrackInfoFilter(data=request.GET, queryset=ClientTrackInfo.objects.all())
+
+    """
     api_type = StringListFilter(method='filter_api_type')
     client_codes = StringListFilter(method='filter_client_codes')
     start_track_date = django_filters.DateFilter(method='filter_start_track_date')
@@ -106,6 +162,22 @@ class ClientTrackInfoFilter(django_filters.FilterSet):
 
 
 class BulkApiOperationFilter(django_filters.FilterSet):
+    """
+    Class: BulkApiOperationFilter
+
+    This class is a subclass of django_filters.FilterSet and is used to filter instances of the BulkApiOperation model.
+
+    Attributes:
+        action_list: A MultipleInputFilter instance that filters the BulkApiOperation instances based on the action field.
+        status_list: A MultipleInputFilter instance that filters the BulkApiOperation instances based on the status field.
+
+    Methods:
+        qs:
+            This method is a property decorator that returns the filtered queryset of BulkApiOperation instances based on the provided filters.
+            It filters the queryset based on the created_by field, considering only the bulk operations created by the current user.
+            It also defers the loading of the success_list and failure_list fields to improve performance.
+
+    """
     action_list = MultipleInputFilter(BulkApiOperationActionEnum, field_name='action')
     status_list = MultipleInputFilter(BulkApiOperationStatusEnum, field_name='status')
 
