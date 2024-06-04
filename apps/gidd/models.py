@@ -341,6 +341,7 @@ class GiddEvent(MetaInformationAbstractModel):
         null=True,
     )
 
+    # Deprecated
     glide_numbers = ArrayField(
         models.CharField(
             verbose_name=_('Event Codes'), max_length=256
