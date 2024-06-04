@@ -1,6 +1,5 @@
 import csv
 import os
-import logging
 from decimal import Decimal
 
 from django.core.management.base import BaseCommand
@@ -9,6 +8,7 @@ from helix.managers import BulkUpdateManager
 
 from apps.entry.models import Figure
 from utils.common import round_half_up
+
 
 class Command(BaseCommand):
 
