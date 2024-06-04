@@ -10,9 +10,6 @@ from helix.managers import BulkUpdateManager
 from apps.entry.models import Figure
 from utils.common import round_half_up
 
-logger = logging.getLogger(__name__)
-
-
 class Command(BaseCommand):
 
     help = "Patch AHHS household size data."
@@ -60,7 +57,8 @@ class Command(BaseCommand):
                         ),
                     ),
                 )
-            bulk_mgr.done()
+                patched_figure_ids.append(row['figure_id'])
+        bulk_mgr.done()
 
         if figure_id_not_found:
             self.stdout.write(self.style.ERROR(f"Figure id not found ids: {figure_id_not_found}"))
@@ -72,9 +70,9 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR(f"Change in reported value figure ids: {change_in_reported_value_figures}"))
 
         if no_change_in_household_figures:
-            logger.info(f"No change in household size figure ids: {no_change_in_household_figures}")
+            self.stdout.write(f"No change in household size figure ids: {no_change_in_household_figures}")
 
-        self.stdout.write(f"Total number of figures patched: {len(patched_figure_ids)}")
+        self.stdout.write(self.style.SUCCESS(f'Bulk update summary: {bulk_mgr.summary()}'))
         self.stdout.write(f"IDs of figures patched: {patched_figure_ids}")
 
     @transaction.atomic()
