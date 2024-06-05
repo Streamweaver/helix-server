@@ -22,7 +22,7 @@ YEAR = 2024
 
 def format_date(date: str) -> typing.Union[datetime.datetime, str]:
     try:
-        return datetime.datetime.strptime(date, "%d/%m/%Y")
+        return datetime.datetime.strptime(date, "%Y-%m-%d")
     except ValueError:
         return date
 
@@ -34,7 +34,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('csv_file_path', type=str, help="Path to the CSV file containing the data.")
 
-    def iso3_to_household_sizes(self) -> CaseInsensitiveDict[HouseholdSize]:
+    def iso3_to_household_sizes(self) -> CaseInsensitiveDict:
         """
         Retrieves active household sizes for certain year, mapped by their respective countries.
         Returns:
@@ -60,7 +60,7 @@ class Command(BaseCommand):
     def admin_user(self) -> User:
         return HelixInternalBot().user
 
-    def create_household_size(self, validated_data: typing.List[dict]):
+    def create_household_sizes(self, validated_data: typing.List[dict]):
         for item in validated_data:
             new_ahhs = HouseholdSize.objects.create(
                 **item,
@@ -71,9 +71,9 @@ class Command(BaseCommand):
                 last_modified_by=item['last_modified_by'],
                 modified_at=item['modified_at'],
             )
-        self.stdout.write(self.style.NOTICE("Processed {len(validated_data)} new entries."))
+        self.stdout.write(self.style.SUCCESS(f"Created {len(validated_data)} AHHS items."))
 
-    def process_household_size_row(self, row: dict) -> typing.Optional[dict]:
+    def process_household_size_row(self, row: dict) -> typing.Optional:
         """
         Convert a CSV row into a dictionary suitable for serialization.
         Args:
@@ -124,12 +124,15 @@ class Command(BaseCommand):
                 if processed_row := self.process_household_size_row(row):
                     processed_rows.append(processed_row)
             self.stdout.write(self.style.NOTICE(
-                f"Processed {len(processed_rows)} out of {total}"
+                f"Processed {len(processed_rows)} out of {total} AHHS items from CSV"
             ))
+
+            household_values = []
 
             serializer = HouseholdSizeCliImportSerializer(data=processed_rows, many=True)
             if serializer.is_valid():
-                self.create_household_size(serializer.validated_data)
+                household_values = serializer.validated_data
+                self.create_household_sizes(serializer.validated_data)
             else:
                 for i, errors in enumerate(serializer.errors):
                     if errors:
@@ -138,13 +141,14 @@ class Command(BaseCommand):
                     for field, error in errors.items():
                         self.stdout.write(self.style.ERROR(f"'{field}': {error}"))
                 raise Exception('Import failed')
+            return household_values
 
     def update_figure_with_new_household_size(
         self,
         bulk_mgr: BulkUpdateManager,
         figure: Figure,
-        old_household_sizes: CaseInsensitiveDict[HouseholdSize],
-        new_household_sizes: CaseInsensitiveDict[HouseholdSize],
+        old_household_sizes: CaseInsensitiveDict,
+        new_household_sizes: CaseInsensitiveDict,
     ):
         """
         Updates the household size of a figure if it differs from the current size stored.
@@ -153,10 +157,10 @@ class Command(BaseCommand):
         """
 
         old_household_size = old_household_sizes.get(figure.country.iso3)
-        if old_household_size and figure.household_size != old_household_size:
+        if old_household_size and figure.household_size != old_household_size.size:
             self.stdout.write(self.style.WARNING(
                 f"In figure <{figure.pk}>, household size manually changed"
-                " from {old_household_size} to {figure.country.iso3}"
+                f" from {old_household_size.size} to {figure.household_size}"
             ))
             return
 
@@ -166,11 +170,11 @@ class Command(BaseCommand):
             return
 
         if figure.household_size == new_household_size.size:
-            self.stdout.write(self.style.NOTICE(f"In figure <{figure.pk}, household size has not changed"))
+            self.stdout.write(self.style.NOTICE(f"In figure <{figure.pk}, household size has not changed {figure.household_size}"))
             return
 
         self.stdout.write(self.style.NOTICE(
-            f"In figure <{figure.pk}>, updating household size from " f"{figure.household_size} to {new_household_size.size}"
+            f"In figure <{figure.pk}>, updating household size from {figure.household_size} to {new_household_size.size}"
         ))
         figure.household_size = new_household_size.size
         figure.total_figures = round_half_up(figure.reported * Decimal(str(figure.household_size)))
@@ -178,14 +182,16 @@ class Command(BaseCommand):
 
     def update_figures(
         self,
-        old_household_sizes: CaseInsensitiveDict[HouseholdSize],
-        new_household_sizes: CaseInsensitiveDict[HouseholdSize],
+        old_household_sizes: CaseInsensitiveDict,
+        new_household_sizes: CaseInsensitiveDict,
+        filter_countries: typing.Set[str],
     ):
         bulk_mgr = BulkUpdateManager(['household_size', 'total_figures'], chunk_size=1000)
         figures = Figure.objects.filter(
             unit=Figure.UNIT.HOUSEHOLD,
             # Year can be calculated from the end_date (for both flow and stock figures)
-            end_date__year=YEAR
+            end_date__year=YEAR,
+            country__in=filter_countries,
         )
         for figure in figures:
             self.update_figure_with_new_household_size(
@@ -196,7 +202,7 @@ class Command(BaseCommand):
             )
 
         bulk_mgr.done()
-        self.stdout.write(self.style.SUCCESS(f'Bulk update summary: {bulk_mgr.summary()}'))
+        self.stdout.write(self.style.SUCCESS(f'Updated figures: {bulk_mgr.summary()}'))
 
     @transaction.atomic()
     def handle(self, *args, **kwargs):
@@ -207,15 +213,14 @@ class Command(BaseCommand):
         if not os.path.exists(csv_file_path):
             self.stdout.write(self.style.ERROR(f"CSV file path does not exist: {csv_file_path}"))
             return
-        try:
-            old_household_sizes = self.iso3_to_household_sizes()
-            self.updates_household_sizes_from_csv(csv_file_path)
-            self.stdout.write(self.style.SUCCESS("AHHS data updated successfully."))
-            # FIXME: We may need to clear cache
-            new_household_sizes = self.iso3_to_household_sizes()
-            self.update_figures(old_household_sizes, new_household_sizes)
-            self.stdout.write(self.style.ERROR("Figures data updated successfully."))
-        except FileNotFoundError:
-            self.stdout.write(self.style.ERROR(f"CSV file at {csv_file_path} not found."))
-        except Exception:
-            self.stdout.write(self.style.ERROR("Failed to update AHHS data:"))
+
+        old_household_sizes = self.iso3_to_household_sizes()
+        household_sizes = self.updates_household_sizes_from_csv(csv_file_path)
+        # FIXME: We may need to clear cache
+        new_household_sizes = self.iso3_to_household_sizes()
+
+        self.update_figures(
+            old_household_sizes,
+            new_household_sizes,
+            set([x['country'].pk for x in household_sizes])
+        )
