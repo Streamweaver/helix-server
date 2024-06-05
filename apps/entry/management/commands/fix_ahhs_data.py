@@ -1,6 +1,5 @@
 import csv
 import os
-import logging
 from decimal import Decimal
 
 from django.core.management.base import BaseCommand
@@ -9,6 +8,7 @@ from helix.managers import BulkUpdateManager
 
 from apps.entry.models import Figure
 from utils.common import round_half_up
+
 
 class Command(BaseCommand):
 
@@ -81,10 +81,6 @@ class Command(BaseCommand):
         if not os.path.exists(csv_file_path):
             self.stdout.write(self.style.ERROR(f"CSV file path does not exist: {csv_file_path}"))
             return
-        try:
-            self.patch_figure_household_from_csv(csv_file_path)
-            self.stdout.write("AHHS data patched successfully.")
-        except FileNotFoundError:
-            self.stdout.write(self.style.ERROR(f"CSV file at {csv_file_path} not found."))
-        except Exception:
-            self.stdout.write(self.style.ERROR("Failed to patch AHHS data:", exc_info=True))
+
+        self.patch_figure_household_from_csv(csv_file_path)
+        self.stdout.write("AHHS data patched successfully.")
