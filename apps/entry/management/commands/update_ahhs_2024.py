@@ -61,7 +61,16 @@ class Command(BaseCommand):
         return HelixInternalBot().user
 
     def create_household_sizes(self, validated_data: typing.List[dict]):
+        updated_count = 0
         for item in validated_data:
+            # NOTE: deactivating previous values
+            updated_households = HouseholdSize.objects.filter(
+                country=item['country'],
+                year=item['year'],
+                is_active=True,
+            ).update(is_active=False)
+            updated_count += updated_households
+
             new_ahhs = HouseholdSize.objects.create(
                 **item,
             )
@@ -72,6 +81,7 @@ class Command(BaseCommand):
                 modified_at=item['modified_at'],
             )
         self.stdout.write(self.style.SUCCESS(f"Created {len(validated_data)} AHHS items."))
+        self.stdout.write(self.style.SUCCESS(f"Updated {updated_count} previous AHHS items as inactive."))
 
     def process_household_size_row(self, row: dict) -> typing.Optional:
         """
@@ -170,7 +180,9 @@ class Command(BaseCommand):
             return
 
         if figure.household_size == new_household_size.size:
-            self.stdout.write(self.style.NOTICE(f"In figure <{figure.pk}, household size has not changed {figure.household_size}"))
+            self.stdout.write(self.style.NOTICE(
+                f"In figure <{figure.pk}, household size has not changed {figure.household_size}"
+            ))
             return
 
         self.stdout.write(self.style.NOTICE(
