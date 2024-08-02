@@ -185,11 +185,14 @@ class CreateResourceGroup(graphene.Mutation):
             - A static method that is responsible for executing the mutation
             - Parameters:
                 - root: The root value passed for the mutation (not used in this implementation)
-                - info: GraphQLResolveInfo representing the information about the execution (not used in this implementation)
+                - info: GraphQLResolveInfo representing the information about the execution (not used in this
+                implementation)
                 - data: Represents the input data for creating a resource group
             - Returns:
-                - An instance of CreateResourceGroup with the result field set to the created resource group and errors field set to None, and ok field set to True if the mutation was successful
-                - An instance of CreateResourceGroup with errors field set to a list of errors and ok field set to False if the mutation was not valid
+                - An instance of CreateResourceGroup with the result field set to the created resource group and errors
+                field set to None, and ok field set to True if the mutation was successful
+                - An instance of CreateResourceGroup with errors field set to a list of errors and ok field set to False
+                if the mutation was not valid
     """
     class Arguments:
         data = ResourceGroupCreateInputType(required=True)
@@ -255,7 +258,8 @@ class UpdateResourceGroup(graphene.Mutation):
 
 class DeleteResourceGroup(graphene.Mutation):
     """
-    The `DeleteResourceGroup` class is a mutation class in a GraphQL schema that is used to delete a resource group. It takes an `id` argument and deletes the resource group with the corresponding ID.
+    The `DeleteResourceGroup` class is a mutation class in a GraphQL schema that is used to delete a resource group. It
+    takes an `id` argument and deletes the resource group with the corresponding ID.
 
     Attributes:
         - `errors`: A list of custom error types.
@@ -263,7 +267,13 @@ class DeleteResourceGroup(graphene.Mutation):
         - `result`: A field of type `ResourceGroupType` that represents the deleted resource group.
 
     Methods:
-        - `mutate(root, info, id)`: This is a static method decorated with the `permission_checker` decorator. It is called when the mutation is executed. It takes the `root` object, `info` object, and the `id` argument as parameters. In this method, it tries to retrieve the resource group instance from the database based on the provided ID and the authenticated user. If the resource group does not exist, it returns an error with a message indicating that the resource group does not exist. If the resource group can be deleted, it deletes the instance from the database. Finally, it returns the result of the deletion along with any errors that occurred during the deletion process.
+        - `mutate(root, info, id)`: This is a static method decorated with the `permission_checker` decorator. It is
+        called when the mutation is executed. It takes the `root` object, `info` object, and the `id` argument as
+        parameters. In this method, it tries to retrieve the resource group instance from the database based on the
+        provided ID and the authenticated user. If the resource group does not exist, it returns an error with a message
+        indicating that the resource group does not exist. If the resource group can be deleted, it deletes the instance
+        from the database. Finally, it returns the result of the deletion along with any errors that occurred during the
+        deletion process.
 
     Usage Example:
         mutation {
@@ -312,7 +322,8 @@ class Mutation:
 
     Mutation class
 
-    This class defines the mutations available in the system for creating, updating, and deleting resources and resource groups.
+    This class defines the mutations available in the system for creating, updating, and deleting resources and resource
+    groups.
 
     Attributes:
         create_resource: Mutation field for creating a resource.

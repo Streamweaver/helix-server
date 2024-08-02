@@ -104,7 +104,8 @@ def annotate_conflict(qs, year):
 def update_gidd_legacy_data():
     """
 
-    This method update_gidd_legacy_data updates the GIDD legacy data in the system. It performs two main bulk operations to create Conflict and Disaster objects.
+    This method update_gidd_legacy_data updates the GIDD legacy data in the system. It performs two main bulk operations
+    to create Conflict and Disaster objects.
 
     Parameters:
     - None
@@ -203,7 +204,8 @@ def update_gidd_legacy_data():
 def update_conflict_and_disaster_data():
     """
 
-    This method updates the conflict and disaster data by querying the Figure model and creating new Conflict and Disaster objects.
+    This method updates the conflict and disaster data by querying the Figure model and creating new Conflict and
+    Disaster objects.
 
     Parameters:
         None
@@ -377,7 +379,8 @@ def update_public_figure_analysis():
 
     Update Public Figure Analysis
 
-    Update the public figure analysis for reports that are visible in the GIDD. This method retrieves the necessary data from the reports and creates or updates the corresponding PublicFigureAnalysis objects.
+    Update the public figure analysis for reports that are visible in the GIDD. This method retrieves the necessary data
+    from the reports and creates or updates the corresponding PublicFigureAnalysis objects.
 
     Parameters:
         None
@@ -478,7 +481,8 @@ def update_displacement_data():
 
     Update Displacement Data
 
-    This method updates the displacement data for each country by calculating the total and new displacements caused by conflicts and disasters for each year.
+    This method updates the displacement data for each country by calculating the total and new displacements caused by
+    conflicts and disasters for each year.
 
     Parameters:
         None
@@ -580,7 +584,8 @@ def update_idps_sadd_estimates_country_names():
 
     Update IDPs SADD Estimates Country Names
 
-    This method updates the country names for IDPs SADD (Sudden-Onset Disasters) estimates based on the IDMC short name of the country.
+    This method updates the country names for IDPs SADD (Sudden-Onset Disasters) estimates based on the IDMC short name
+    of the country.
 
     Parameters:
         None
@@ -601,7 +606,8 @@ def update_gidd_event_and_gidd_figure_data():
     """
     Update Gidd Event and Gidd Figure Data
 
-    This method updates the GiddEvent and GiddFigure models in the database based on the Event and Figure models. It performs the following actions:
+    This method updates the GiddEvent and GiddFigure models in the database based on the Event and Figure models. It
+    performs the following actions:
 
     1. Retrieves all the events from the Event model and annotates them with event codes for referencing.
     2. Creates new GiddEvent instances in bulk based on the annotated event queryset.

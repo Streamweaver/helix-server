@@ -71,7 +71,8 @@ class ArchiveAbstractModel(models.Model):
       - old_id (CharField): The old primary key for the model. This field is optional and can be null or blank.
 
     Meta:
-      - abstract: This model should not be instantiated directly, as it is intended to be used as a base for other models.
+      - abstract: This model should not be instantiated directly, as it is intended to be used as a base for other
+      models.
 
     """
     old_id = models.CharField(verbose_name=_('Old primary key'), max_length=32,
@@ -215,7 +216,8 @@ class SoftDeleteManager(models.Manager):
     """
     Class representing a manager for soft deleting models.
 
-    This class extends the `models.Manager` class and provides a custom `get_queryset` method to filter out deleted instances.
+    This class extends the `models.Manager` class and provides a custom `get_queryset` method to filter out deleted
+    instances.
 
     Attributes:
         None
@@ -232,21 +234,26 @@ class SoftDeleteModel(models.Model):
     """
     Class for implementing soft delete functionality in models.
 
-    SoftDeleteModel is an abstract base class that can be used to implement soft delete functionality in models. It adds a `deleted_on` field to the model to track the deletion date and time.
+    SoftDeleteModel is an abstract base class that can be used to implement soft delete functionality in models. It adds
+    a `deleted_on` field to the model to track the deletion date and time.
 
     Attributes:
-        deleted_on (DateTimeField): A field to store the deletion date and time. It is set to `null=True` and `blank=True` to allow for undeletion.
+        deleted_on (DateTimeField): A field to store the deletion date and time. It is set to `null=True` and
+        `blank=True` to allow for undeletion.
 
     Methods:
-        delete(*args, **kwargs): Soft deletes the model instance. Sets the `deleted_on` field to the current date and time using the `timezone.now()` function and saves the instance. Returns the updated instance.
+        delete(*args, **kwargs): Soft deletes the model instance. Sets the `deleted_on` field to the current date and
+        time using the `timezone.now()` function and saves the instance. Returns the updated instance.
 
-        undelete(*args, **kwargs): Restores a soft deleted model instance. Sets the `deleted_on` field to `None` and saves the instance. Returns the updated instance.
+        undelete(*args, **kwargs): Restores a soft deleted model instance. Sets the `deleted_on` field to `None` and
+        saves the instance. Returns the updated instance.
 
     Meta:
         abstract = True: Specifies that this is an abstract base class and should not be created as a database table.
 
     Note:
-        This class should be used as a base class for models that require the soft delete functionality. It provides the necessary methods and field for soft deletion and undeletion.
+        This class should be used as a base class for models that require the soft delete functionality. It provides the
+        necessary methods and field for soft deletion and undeletion.
     """
     deleted_on = models.DateTimeField(null=True, blank=True)
 
@@ -282,7 +289,8 @@ class SourcePreview(MetaInformationAbstractModel):
     - PREVIEW_STATUS (enum.Enum): The possible statuses of a preview.
 
     Methods:
-    - get_pdf(cls, data: dict, instance: 'SourcePreview' = None) -> 'SourcePreview': Generates and stores a PDF based on the URL.
+    - get_pdf(cls, data: dict, instance: 'SourcePreview' = None) -> 'SourcePreview': Generates and stores a PDF based on
+    the URL.
     """
     class PREVIEW_STATUS(enum.Enum):
         PENDING = 0
@@ -832,7 +840,8 @@ class BulkApiOperation(models.Model):
         filters (JSONField): JSONField representing the filters for the bulk operation.
         payload (JSONField): JSONField representing the operation payload of the bulk operation.
         status (enum.EnumField): EnumField representing the status of the bulk operation.
-        success_count (models.PositiveIntegerField): PositiveIntegerField representing the count of successful operations.
+        success_count (models.PositiveIntegerField): PositiveIntegerField representing the count of successful
+        operations.
         success_list (models.JSONField): JSONField representing the list of successful operations.
         failure_count (models.PositiveIntegerField): PositiveIntegerField representing the count of failed operations.
         failure_list (models.JSONField): JSONField representing the list of failed operations.

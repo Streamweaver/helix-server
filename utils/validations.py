@@ -8,7 +8,8 @@ import requests
 class MissingCaptchaException(Exception):
     """Exception raised when a captcha value is missing.
 
-    This exception is raised when a captcha value is missing in a form submission or any other scenario where a captcha is required.
+    This exception is raised when a captcha value is missing in a form submission or any other scenario where a captcha
+    is required.
 
     Attributes:
         None
@@ -33,9 +34,13 @@ def is_child_parent_dates_valid(
 
     :return: An OrderedDict of errors, if any.
 
-    The function first checks if the child start date, child end date, and parent start date are provided and if the child start date is later than the child end date. If so, it adds errors for both the start date and end date, indicating that the start date should be earlier than the end date.
+    The function first checks if the child start date, child end date, and parent start date are provided and if the
+    child start date is later than the child end date. If so, it adds errors for both the start date and end date,
+    indicating that the start date should be earlier than the end date.
 
-    If the child start date and parent start date are provided and if the parent start date is later than the child start date, it adds an error for the start date, indicating that the child start date should be after the parent start date.
+    If the child start date and parent start date are provided and if the parent start date is later than the child
+    start date, it adds an error for the start date, indicating that the child start date should be after the parent
+    start date.
 
     Otherwise, it returns an empty OrderedDict, indicating that there are no errors.
 

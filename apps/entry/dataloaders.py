@@ -125,7 +125,8 @@ class FigureSourcesReliability(DataLoader):
 
     Class: FigureSourcesReliability
 
-    This class extends the DataLoader class and provides a method for batch loading the sources reliability of figure objects.
+    This class extends the DataLoader class and provides a method for batch loading the sources reliability of figure
+    objects.
 
     Methods:
     - batch_load_fn(keys): This method loads the sources reliability for a batch of figure objects specified by the"""
@@ -204,7 +205,8 @@ class FigureEntryLoader(DataLoader):
 
 class EntryDocumentLoader(DataLoader):
     """
-    EntryDocumentLoader extends DataLoader class and is responsible for loading Entry documents based on a list of key values.
+    EntryDocumentLoader extends DataLoader class and is responsible for loading Entry documents based on a list of key
+    values.
 
     Methods:
         - batch_load_fn(keys: list) -> Promise[List[Document]]:

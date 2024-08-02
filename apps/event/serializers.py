@@ -27,7 +27,8 @@ class ActorSerializer(MetaInformationSerializerMixin,
 
     Attributes:
         model: The model class that this serializer is associated with (Actor).
-        fields: A list of field names to include in the serialized representation of an Actor object. Use '__all__' to include all fields.
+        fields: A list of field names to include in the serialized representation of an Actor object. Use '__all__' to
+        include all fields.
 
     """
     class Meta:
@@ -63,7 +64,8 @@ class EventCodeSerializer(MetaInformationSerializerMixin,
 
     Example usage:
 
-        >>> serializer = EventCodeSerializer(data={'country': 'US', 'uuid': '123456789', 'event_code': 'ABC', 'event_code_type': 'TypeA'})
+        >>> serializer = EventCodeSerializer(data={'country': 'US', 'uuid': '123456789', 'event_code': 'ABC',
+        'event_code_type': 'TypeA'})
         >>> serializer.is_valid()
         True
         >>> serializer.save()
@@ -89,7 +91,8 @@ class EventCodeUpdateSerializer(serializers.ModelSerializer):
     """
     Serializer for updating an EventCode instance.
 
-    This serializer is used to validate and deserialize the JSON data received for updating an EventCode instance. It also provides the necessary fields to be included in the serialized response.
+    This serializer is used to validate and deserialize the JSON data received for updating an EventCode instance. It
+    also provides the necessary fields to be included in the serialized response.
 
     Attributes:
         id (IntegerField): ID field for the EventCode instance (optional).
@@ -127,7 +130,8 @@ class EventSerializer(MetaInformationSerializerMixin,
                       serializers.ModelSerializer):
     """
 
-    This class is used to serialize and deserialize Event instances. It inherits from MetaInformationSerializerMixin and serializers.ModelSerializer.
+    This class is used to serialize and deserialize Event instances. It inherits from MetaInformationSerializerMixin and
+    serializers.ModelSerializer.
 
     Declaration:
 
@@ -171,7 +175,8 @@ class EventSerializer(MetaInformationSerializerMixin,
             - errors: The dictionary containing any validation errors.
 
     - validate_figures_dates(self, attrs)
-        - This method validates the start_date field against the minimum start_date value of the related Figure instances.
+        - This method validates the start_date field against the minimum start_date value of the related Figure
+        instances.
         - Parameters:
             - attrs: The input attributes to validate.
         - Returns:
@@ -540,7 +545,8 @@ class ContextOfViolenceUpdateSerializer(UpdateSerializerMixin, ContextOfViolence
     This class is used for serializing and validating updates to an existing ContextOfViolence object.
 
     Attributes:
-        id: An IntegerIDField attribute that specifies the ID of the ContextOfViolence object to be updated. It is required.
+        id: An IntegerIDField attribute that specifies the ID of the ContextOfViolence object to be updated. It is
+        required.
 
     """
     id = IntegerIDField(required=True)

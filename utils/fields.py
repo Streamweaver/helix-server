@@ -52,7 +52,10 @@ class CachedFieldFile(FieldFile):
 
     Methods:
     - url:
-        Returns the URL of the file. If the default file storage is S3Boto3Storage and AWS_QUERYSTRING_AUTH is True, the URL is cached using the CACHE_KEY and returned. Otherwise, the URL is fetched using the super() method from FieldFile. If the URL is not found in the cache, it is fetched using the super() method and cached for future use.
+        Returns the URL of the file. If the default file storage is S3Boto3Storage and AWS_QUERYSTRING_AUTH is True, the
+        URL is cached using the CACHE_KEY and returned. Otherwise, the URL is fetched using the super() method from
+        FieldFile. If the URL is not found in the cache, it is fetched using the super() method and cached for future
+        use.
 
     Example usage:
 
@@ -86,7 +89,8 @@ class CachedFileField(FileField):
     The `CachedFileField` class is a subclass of `FileField` that adds caching functionality to file uploads in Django.
 
     Attributes:
-        attr_class (object): The class used to store the file and the cache key in the cache backend. It defaults to `CachedFieldFile`.
+        attr_class (object): The class used to store the file and the cache key in the cache backend. It defaults to
+        `CachedFieldFile`.
 
     """
     attr_class = CachedFieldFile
@@ -94,11 +98,13 @@ class CachedFileField(FileField):
 
 class BleachedTextField(TextField):
     """
-    BleachedTextField class extends the TextField class and overrides the get_db_prep_value method to sanitize and bleach any user input.
+    BleachedTextField class extends the TextField class and overrides the get_db_prep_value method to sanitize and
+    bleach any user input.
 
     Methods:
         get_db_prep_value(self, *args, **kwargs) -> Any:
-            Overrides the get_db_prep_value method of the TextField class to sanitize and bleach the user input value before saving it to the database.
+            Overrides the get_db_prep_value method of the TextField class to sanitize and bleach the user input value
+            before saving it to the database.
 
             Parameters:
                 *args (Any): Variable-length argument list.

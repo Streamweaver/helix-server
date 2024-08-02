@@ -49,11 +49,17 @@ def format_locations_raw(
     """
     Format raw locations data.
 
-    This method takes a list of tuples as input, where each tuple represents a raw location data. Each tuple contains 5 elements in the following order: location_id (str), location_name (str), location (str), accuracy (str), and type_of_point (str).
+    This method takes a list of tuples as input, where each tuple represents a raw location data. Each tuple contains 5
+    elements in the following order: location_id (str), location_name (str), location (str), accuracy (str), and
+    type_of_point (str).
 
-    The method iterates over each tuple and extracts the required elements. It converts `location_id` and `accuracy` to integers and strips leading and trailing spaces from `location_name`. The transformed elements are then appended to a new list.
+    The method iterates over each tuple and extracts the required elements. It converts `location_id` and `accuracy` to
+    integers and strips leading and trailing spaces from `location_name`. The transformed elements are then appended to
+    a new list.
 
-    The method returns a list of tuples, where each tuple represents a formatted location. Each tuple contains 5 elements in the following order: formatted_location_id (int), formatted_location_name (str), location (str), formatted_accuracy (int), and formatted_type_of_point (int).
+    The method returns a list of tuples, where each tuple represents a formatted location. Each tuple contains 5
+    elements in the following order: formatted_location_id (int), formatted_location_name (str), location (str),
+    formatted_accuracy (int), and formatted_type_of_point (int).
 
     Example usage:
     ```
@@ -173,10 +179,13 @@ def extract_location_data_list(
     Extracts the location data from a list of tuples and returns a dictionary.
 
     Parameters:
-        data (List[Tuple[str, str, str, str]]): A list of tuples containing formatted location data. Each tuple should have four elements representing display name, latitude and longitude, accuracy, and type of points.
+        data (List[Tuple[str, str, str, str]]): A list of tuples containing formatted location data. Each tuple should
+        have four elements representing display name, latitude and longitude, accuracy, and type of points.
 
     Returns:
-        ExtractLocationData: A dictionary containing the extracted location data. The dictionary has four keys: 'display_name', 'lat_lon', 'accuracy', and 'type_of_points'. The corresponding values are lists that contain the extracted data from the input tuples.
+        ExtractLocationData: A dictionary containing the extracted location data. The dictionary has four keys:
+        'display_name', 'lat_lon', 'accuracy', and 'type_of_points'. The corresponding values are lists that contain the
+        extracted data from the input tuples.
 
     Example:
         data = [
@@ -250,7 +259,8 @@ def extract_location_data(
     Extracts location data from a list and returns the extracted data as a string.
 
     Parameters:
-    - data: A list of tuples containing location data. Each tuple should have four elements in the order of display name, lat-lon, accuracy, and type of points.
+    - data: A list of tuples containing location data. Each tuple should have four elements in the order of display
+    name, lat-lon, accuracy, and type of points.
 
     Returns:
     - A dictionary containing the extracted location data as strings. The dictionary has the following keys:
@@ -337,7 +347,8 @@ def format_event_codes_raw(
 
     Returns:
         List[Tuple[int, str, int, str]]: The formatted event codes data as a list of tuples.
-            Each tuple contains four elements (_id as int, event_code as str, event_code_type as int, event_iso3 as str).
+            Each tuple contains four elements (_id as int, event_code as str, event_code_type as int, event_iso3 as
+            str).
 
     """
     code_list = []
@@ -530,7 +541,8 @@ def extract_source_data(
     Extracts source data from a list of tuples.
 
     Args:
-        data (List[Tuple[str, str, str]]): A list of tuples containing source data. Each tuple should have three elements:
+        data (List[Tuple[str, str, str]]): A list of tuples containing source data. Each tuple should have three
+        elements:
             - str: The ID of the source data. If the ID is None, it will be skipped.
             - str: The source value.
             - str: The source type.
@@ -565,7 +577,8 @@ def extract_source_data_as_string(
     Extracts source data and returns it as a formatted string.
 
     Parameters:
-    - data (List[Tuple[str, str]]): A list of tuples containing source data. Each tuple should have two elements, representing the field name and its value.
+    - data (List[Tuple[str, str]]): A list of tuples containing source data. Each tuple should have two elements,
+    representing the field name and its value.
 
     Returns:
     - str: A formatted string representing the source data.
@@ -598,13 +611,15 @@ class ExtractPublisherData(typing.TypedDict):
     - publishers_type: A list of strings representing the types of the publishers.
 
     Example usage:
-    data = ExtractPublisherData(ids=[1, 2, 3], publishers=["Publisher A", "Publisher B", "Publisher C"], publishers_type=["Type A", "Type B", "Type C"])
+    data = ExtractPublisherData(ids=[1, 2, 3], publishers=["Publisher A", "Publisher B", "Publisher C"],
+    publishers_type=["Type A", "Type B", "Type C"])
 
     data.ids # [1, 2, 3]
     data.publishers # ["Publisher A", "Publisher B", "Publisher C"]
     data.publishers_type # ["Type A", "Type B", "Type C"]
 
-    Please note that this class is a data structure and does not contain any methods or functionality other than storing and accessing the data.
+    Please note that this class is a data structure and does not contain any methods or functionality other than storing
+    and accessing the data.
     """
     ids: typing.List[int]
     publishers: typing.List[str]
@@ -618,10 +633,13 @@ def extract_publisher_data(
     Extracts data from a list of tuples and returns a dictionary with extracted data.
 
     Parameters:
-    - data (List[Tuple[str, str, str]]): A list of tuples containing data to be extracted. Each tuple must have three elements, where the first element is an ID, the second element is the publisher, and the third element is the publisher type.
+    - data (List[Tuple[str, str, str]]): A list of tuples containing data to be extracted. Each tuple must have three
+    elements, where the first element is an ID, the second element is the publisher, and the third element is the
+    publisher type.
 
     Returns:
-    - ExtractPublisherData: A dictionary containing the extracted data. The dictionary has three keys: 'ids', 'publishers', and 'publishers_type'. Each key corresponds to a list of the extracted data.
+    - ExtractPublisherData: A dictionary containing the extracted data. The dictionary has three keys: 'ids',
+    'publishers', and 'publishers_type'. Each key corresponds to a list of the extracted data.
 
     Example:
 

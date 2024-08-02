@@ -20,7 +20,8 @@ class Crisis(MetaInformationAbstractModel, models.Model):
     Attributes:
     - ND_FIGURES_ANNOTATE (str): constant. Disaggregation variable definition for total flow ND figures.
     - IDP_FIGURES_ANNOTATE (str): constant. Disaggregation variable definition for total stock IDP figures.
-    - IDP_FIGURES_REFERENCE_DATE_ANNOTATE (str): constant. Disaggregation variable definition for reference date of IDP figures.
+    - IDP_FIGURES_REFERENCE_DATE_ANNOTATE (str): constant. Disaggregation variable definition for reference date of IDP
+    figures.
 
     Inner Enum:
     - CRISIS_TYPE (enum.Enum): Enum with values: CONFLICT (0), DISASTER (1), OTHER (2). Inner labels are defined.
@@ -31,9 +32,11 @@ class Crisis(MetaInformationAbstractModel, models.Model):
     - crisis_narrative (models.TextField): Field for crisis narrative/summary.
     - countries (models.ManyToManyField): Field for countries related to the crisis.
     - start_date (models.DateField): Field for start date of the crisis. Can be blank and null.
-    - start_date_accuracy (enum.EnumField): Field for accuracy of the start date. EnumField of DATE_ACCURACY. Default: DATE_ACCURACY.DAY. Can be blank and null.
+    - start_date_accuracy (enum.EnumField): Field for accuracy of the start date. EnumField of DATE_ACCURACY. Default:
+    DATE_ACCURACY.DAY. Can be blank and null.
     - end_date (models.DateField): Field for end date of the crisis. Can be blank and null.
-    - end_date_accuracy (enum.EnumField): Field for accuracy of the end date. EnumField of DATE_ACCURACY. Default: DATE_ACCURACY.DAY. Can be blank and null.
+    - end_date_accuracy (enum.EnumField): Field for accuracy of the end date. EnumField of DATE_ACCURACY. Default:
+    DATE_ACCURACY.DAY. Can be blank and null.
 
     Methods:
     - _total_figure_disaggregation_subquery (classmethod): Returns a subquery for total figure disaggregation.

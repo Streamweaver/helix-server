@@ -38,7 +38,8 @@ def get_name_choices(enum_class) -> typing.List[typing.Tuple[str, str]]:
     ```
 
     Notes:
-    - The method returns the name choices from the enum class as tuples, where the first element of each tuple is the name of the enum item in uppercase, and the second element is the corresponding label.
+    - The method returns the name choices from the enum class as tuples, where the first element of each tuple is the
+    name of the enum item in uppercase, and the second element is the corresponding label.
     - The method also includes lowercase versions of the name choices in the returned list.
     """
     return [
@@ -116,7 +117,8 @@ class ConflictFilter(ReleaseMetadataFilter):
 class DisasterFilter(ReleaseMetadataFilter):
     """
 
-    This class is a subclass of ReleaseMetadataFilter and is used for filtering disaster data based on various parameters.
+    This class is a subclass of ReleaseMetadataFilter and is used for filtering disaster data based on various
+    parameters.
 
     Attributes:
         - hazard_types: IDListFilter object that filters disaster data based on hazard types.
@@ -133,7 +135,8 @@ class DisasterFilter(ReleaseMetadataFilter):
         - filter_countries_iso3(queryset, name, value): Filters the queryset based on the countries' ISO3 codes.
 
     Properties:
-        - qs: Overrides the parent class's qs property and returns the filtered queryset with new_displacement greater than 0.
+        - qs: Overrides the parent class's qs property and returns the filtered queryset with new_displacement greater
+        than 0.
 
     """
     hazard_types = IDListFilter(method='filter_hazard_types')
@@ -175,7 +178,8 @@ class ConflictStatisticsFilter(ReleaseMetadataFilter):
 
     Subclass of: ReleaseMetadataFilter
 
-    This class is used to filter conflict statistics based on various criteria such as countries, start year, end year, and country ISO3 code.
+    This class is used to filter conflict statistics based on various criteria such as countries, start year, end year,
+    and country ISO3 code.
 
     Attributes:
         countries (StringListFilter): A filter for selecting conflicts based on countries.
@@ -185,8 +189,10 @@ class ConflictStatisticsFilter(ReleaseMetadataFilter):
 
     Methods:
         filter_countries(queryset, name, value): Filters the queryset based on the specified countries.
-        filter_start_year(queryset, name, value): Filters the queryset to select conflicts that occurred on or after the specified start year.
-        filter_end_year(queryset, name, value): Filters the queryset to select conflicts that occurred on or before the specified end year.
+        filter_start_year(queryset, name, value): Filters the queryset to select conflicts that occurred on or after the
+        specified start year.
+        filter_end_year(queryset, name, value): Filters the queryset to select conflicts that occurred on or before the
+        specified end year.
         filter_countries_iso3(queryset, name, value): Filters the queryset based on the specified country ISO3 codes.
 
     """
@@ -284,11 +290,15 @@ class PublicFigureAnalysisFilter(ReleaseMetadataFilter):
     """
     Class: PublicFigureAnalysisFilter
 
-    This class is an implementation of ReleaseMetadataFilter used for filtering PublicFigureAnalysis model instances based on certain criteria.
+    This class is an implementation of ReleaseMetadataFilter used for filtering PublicFigureAnalysis model instances
+    based on certain criteria.
 
     Attributes:
-        - model: The model attribute specifies the model class that the filter is intended for, which is PublicFigureAnalysis in this case.
-        - fields: The fields attribute is a dictionary that defines the available filter options for the PublicFigureAnalysis model. The key represents the field name, and the value is a list of available filter options for that field.
+        - model: The model attribute specifies the model class that the filter is intended for, which is
+        PublicFigureAnalysis in this case.
+        - fields: The fields attribute is a dictionary that defines the available filter options for the
+        PublicFigureAnalysis model. The key represents the field name, and the value is a list of available filter
+        options for that field.
 
     """
     class Meta:
@@ -309,10 +319,13 @@ class DisplacementDataFilter(ReleaseMetadataFilter):
     Filters the DisplacementData model based on various parameters such as start year, end year, countries, and cause.
 
     Attributes:
-    - start_year: A django_filters.NumberFilter instance that filters the queryset based on the start year of the displacement data.
-    - end_year: A django_filters.NumberFilter instance that filters the queryset based on the end year of the displacement data.
+    - start_year: A django_filters.NumberFilter instance that filters the queryset based on the start year of the
+    displacement data.
+    - end_year: A django_filters.NumberFilter instance that filters the queryset based on the end year of the
+    displacement data.
     - countries_iso3: A StringListFilter instance that filters the queryset based on the ISO3 country codes.
-    - cause: A django_filters.ChoiceFilter instance that filters the queryset based on the cause of the displacement. Can be 'conflict' or 'disaster'.
+    - cause: A django_filters.ChoiceFilter instance that filters the queryset based on the cause of the displacement.
+    Can be 'conflict' or 'disaster'.
 
     Methods:
     - filter_start_year(queryset, name, value): Filters the queryset based on the start year.

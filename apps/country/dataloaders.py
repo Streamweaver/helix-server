@@ -103,7 +103,8 @@ class MonitoringSubRegionCountryLoader(DataLoader):
                 - keys (list): A list of monitoring sub-region keys (strings) for which the countries need to be loaded.
 
             Returns:
-                - Promise: A Promise that resolves to a list of lists. Each inner list corresponds to a monitoring sub-region key and contains the associated Country objects.
+                - Promise: A Promise that resolves to a list of lists. Each inner list corresponds to a monitoring
+                sub-region key and contains the associated Country objects.
 
     Usage Example:
         # Create an instance of MonitoringSubRegionCountryLoader

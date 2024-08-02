@@ -38,7 +38,8 @@ class CreateExtraction(graphene.Mutation):
 
         - ok: Boolean value indicating the success or failure of the mutation.
 
-        - result: Object of type ExtractionQueryObjectType. Contains the created extraction object if the mutation was successful.
+        - result: Object of type ExtractionQueryObjectType. Contains the created extraction object if the mutation was
+        successful.
 
     Methods:
         - mutate(root, info, data): Static method used to perform the mutation.
@@ -64,7 +65,8 @@ class CreateExtraction(graphene.Mutation):
 class UpdateExtraction(graphene.Mutation):
     """
 
-    The `UpdateExtraction` class is a mutation in the Graphene library for updating an instance of the `ExtractionQuery` model. It takes a `data` argument of type `UpdateExtractInputType` which is required.
+    The `UpdateExtraction` class is a mutation in the Graphene library for updating an instance of the `ExtractionQuery`
+    model. It takes a `data` argument of type `UpdateExtractInputType` which is required.
 
     Attributes:
     - `errors`: A list of `CustomErrorType` objects representing any errors that occurred during the mutation.
@@ -77,13 +79,18 @@ class UpdateExtraction(graphene.Mutation):
         - `info`: An execution information object containing information about the execution.
         - `data`: The input data for the mutation.
 
-    The `mutate` method first tries to retrieve an instance of the `ExtractionQuery` model using the provided `id` and the currently authenticated user. If the instance does not exist, it returns an error object indicating that the extraction query does not exist.
+    The `mutate` method first tries to retrieve an instance of the `ExtractionQuery` model using the provided `id` and
+    the currently authenticated user. If the instance does not exist, it returns an error object indicating that the
+    extraction query does not exist.
 
-    Next, it creates a serializer object of type `ExtractionQuerySerializer` with the instance and the input data. The serializer is initialized with a context object containing the request from the execution information.
+    Next, it creates a serializer object of type `ExtractionQuerySerializer` with the instance and the input data. The
+    serializer is initialized with a context object containing the request from the execution information.
 
-    If the serializer is not valid, meaning it failed to validate the input data, it returns an error object containing the validation errors.
+    If the serializer is not valid, meaning it failed to validate the input data, it returns an error object containing
+    the validation errors.
 
-    If the serializer is valid, it saves the instance using the serializer and returns a response object with the updated instance and no errors.
+    If the serializer is valid, it saves the instance using the serializer and returns a response object with the
+    updated instance and no errors.
 
     """
     class Arguments:
@@ -125,10 +132,13 @@ class DeleteExtraction(graphene.Mutation):
 
     Methods:
         - mutate(root, info, id): This static method is called to perform the mutation operation. It receives the root
-                                  object, the info object, and the id argument as parameters. It attempts to retrieve the
+                                  object, the info object, and the id argument as parameters. It attempts to retrieve
+                                  the
                                   ExtractionQuery object specified by the id and created by the user making the request.
-                                  If the object does not exist, it returns an error with a corresponding message. Otherwise,
-                                  it deletes the object and returns a DeleteExtraction instance with the result field set
+                                  If the object does not exist, it returns an error with a corresponding message.
+                                  Otherwise,
+                                  it deletes the object and returns a DeleteExtraction instance with the result field
+                                  set
                                   to the deleted instance and the ok field set to True.
 
     Note: This class does not rely on any external libraries other than Graphene.

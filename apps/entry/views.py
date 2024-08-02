@@ -25,7 +25,8 @@ from utils.db import Array
 def get_idu_data(filters=None):
     """
 
-    This method `get_idu_data` takes an optional parameter `filters` and returns a queryset of Figure objects with annotated values.
+    This method `get_idu_data` takes an optional parameter `filters` and returns a queryset of Figure objects with
+    annotated values.
 
     Parameters:
     - `filters` (optional): A dictionary of filters to apply to the queryset. Default value is None.
@@ -367,7 +368,8 @@ class FigureViewSet(viewsets.ReadOnlyModelViewSet):
 
     Attributes:
         serializer_class (class): The serializer class to use for Figure objects.
-        permission_classes (list): The list of permission classes to use for authentication and authorization of Figure objects.
+        permission_classes (list): The list of permission classes to use for authentication and authorization of Figure
+        objects.
 
     Methods:
         get_queryset(): Retrieves the queryset for Figure objects.
@@ -433,7 +435,8 @@ class IdusFlatCachedView(ExternalEndpointBaseCachedViewMixin, APIView):
     """
     Class: IdusFlatCachedView
 
-    This class is a subclass of ExternalEndpointBaseCachedViewMixin and APIView. It represents a view for the Idus flat cached API endpoint.
+    This class is a subclass of ExternalEndpointBaseCachedViewMixin and APIView. It represents a view for the Idus flat
+    cached API endpoint.
 
     Attributes:
         ENDPOINT_TYPE (str): Specifies the type of the external API as IDUS.
@@ -446,10 +449,12 @@ class IdusAllFlatCachedView(ExternalEndpointBaseCachedViewMixin, APIView):
     """
     Class IdusAllFlatCachedView
 
-    This class is a subclass of ExternalEndpointBaseCachedViewMixin and APIView. It represents a cached view for the Idus All Flat endpoint.
+    This class is a subclass of ExternalEndpointBaseCachedViewMixin and APIView. It represents a cached view for the
+    Idus All Flat endpoint.
 
     Attributes:
-    - ENDPOINT_TYPE (ExternalApiDump.ExternalApiType): Constant attribute that represents the type of the endpoint, which is ExternalApiDump.ExternalApiType.IDUS_ALL.
+    - ENDPOINT_TYPE (ExternalApiDump.ExternalApiType): Constant attribute that represents the type of the endpoint,
+    which is ExternalApiDump.ExternalApiType.IDUS_ALL.
 
     """
     ENDPOINT_TYPE = ExternalApiDump.ExternalApiType.IDUS_ALL

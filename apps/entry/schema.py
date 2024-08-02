@@ -156,11 +156,13 @@ class OSMNameType(DjangoObjectType):
 
         - accuracy (Field): A graphene Field representing the accuracy of the OSMName.
 
-        - accuracy_display (EnumDescription): An EnumDescription object that provides a source for displaying the accuracy enum value.
+        - accuracy_display (EnumDescription): An EnumDescription object that provides a source for displaying the
+        accuracy enum value.
 
         - identifier (Field): A graphene Field representing the identifier of the OSMName.
 
-        - identifier_display (EnumDescription): An EnumDescription object that provides a source for displaying the identifier enum value.
+        - identifier_display (EnumDescription): An EnumDescription object that provides a source for displaying the
+        identifier enum value.
 
     """
     class Meta:
@@ -368,7 +370,8 @@ class FigureListType(CustomDjangoListObjectType):
 
     FigureListType - Custom Django List Object Type for Figure Model
 
-    This class extends the CustomDjangoListObjectType class and is used to represent a list of Figure objects in the Django application.
+    This class extends the CustomDjangoListObjectType class and is used to represent a list of Figure objects in the
+    Django application.
 
     Attributes:
         model (Figure): The model class representing the Figure object in the Django application.
@@ -400,7 +403,8 @@ class TotalFigureFilterInputType(graphene.InputObjectType):
 class EntryType(DjangoObjectType):
     """
 
-    This class represents an EntryType, which is a subclass of DjangoObjectType. It is used to define the fields and behaviors of an Entry object in the system.
+    This class represents an EntryType, which is a subclass of DjangoObjectType. It is used to define the fields and
+    behaviors of an Entry object in the system.
 
     Attributes:
         - created_by (graphene.Field): A field representing the creator of the entry.
@@ -410,11 +414,15 @@ class EntryType(DjangoObjectType):
         - preview (graphene.Field): A field representing the preview of the entry.
 
     Methods:
-        - resolve_figures: A method used to resolve the figures field. It retrieves the figures related to the entry and selects the related fields using a filter and select_related and prefetch_related methods.
-        - resolve_document: A method used to resolve the document field. It uses a DataLoader to load the document associated with the entry.
-        - resolve_preview: A method used to resolve the preview field. It uses a DataLoader to load the preview associated with the entry.
+        - resolve_figures: A method used to resolve the figures field. It retrieves the figures related to the entry and
+        selects the related fields using a filter and select_related and prefetch_related methods.
+        - resolve_document: A method used to resolve the document field. It uses a DataLoader to load the document
+        associated with the entry.
+        - resolve_preview: A method used to resolve the preview field. It uses a DataLoader to load the preview
+        associated with the entry.
 
-    Note: The exclude_fields attribute in the Meta class excludes certain fields from the Entry model when creating the EntryType. These fields are 'reviewers', 'review_status', 'review_comments', and 'reviewing'.
+    Note: The exclude_fields attribute in the Meta class excludes certain fields from the Entry model when creating the
+    EntryType. These fields are 'reviewers', 'review_status', 'review_comments', and 'reviewing'.
 
     """
     class Meta:
@@ -539,10 +547,14 @@ class VisualizationFigureType(ObjectType):
     Description: This class represents a type of visualization figure.
 
     Attributes:
-    - idps_conflict_figures: A list of non-null VisualizationValueType objects representing figures related to IDPs and conflicts.
-    - idps_disaster_figures: A list of non-null VisualizationValueType objects representing figures related to IDPs and disasters.
-    - nds_conflict_figures: A list of non-null VisualizationValueType objects representing figures related to NDS and conflicts.
-    - nds_disaster_figures: A list of non-null VisualizationValueType objects representing figures related to NDS and disasters.
+    - idps_conflict_figures: A list of non-null VisualizationValueType objects representing figures related to IDPs and
+    conflicts.
+    - idps_disaster_figures: A list of non-null VisualizationValueType objects representing figures related to IDPs and
+    disasters.
+    - nds_conflict_figures: A list of non-null VisualizationValueType objects representing figures related to NDS and
+    conflicts.
+    - nds_disaster_figures: A list of non-null VisualizationValueType objects representing figures related to NDS and
+    disasters.
 
     """
     idps_conflict_figures = graphene.List(graphene.NonNull(VisualizationValueType))
@@ -585,7 +597,8 @@ class Query:
     - figure_aggregations (graphene.Field): A field to retrieve different types of aggregated figures based on filters.
 
     Methods:
-    - resolve_figure_aggregations: A static method that resolves the figure_aggregations field by filtering and aggregating figure data.
+    - resolve_figure_aggregations: A static method that resolves the figure_aggregations field by filtering and
+    aggregating figure data.
 
     """
     figure_tag = DjangoObjectField(FigureTagType)

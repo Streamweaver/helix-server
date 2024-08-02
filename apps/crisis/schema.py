@@ -50,7 +50,8 @@ class CrisisType(DjangoObjectType):
         crisis_type_display (EnumDescription): A description of the crisis type.
         events (DjangoPaginatedListObjectField): A field representing the events related to the crisis.
         total_stock_idp_figures (graphene.Field): A field representing the total stock IDP figures for the crisis.
-        stock_idp_figures_max_end_date (graphene.Field): A field representing the maximum end date of the stock IDP figures for the crisis.
+        stock_idp_figures_max_end_date (graphene.Field): A field representing the maximum end date of the stock IDP
+        figures for the crisis.
         total_flow_nd_figures (graphene.Field): A field representing the total flow ND figures for the crisis.
         start_date_accuracy (graphene.Field): A field representing the accuracy of the start date for the crisis.
         start_date_accuracy_display (EnumDescription): A description of the accuracy of the start date.
@@ -61,7 +62,8 @@ class CrisisType(DjangoObjectType):
 
     Methods:
         resolve_total_stock_idp_figures(root, info, **kwargs): Returns the total stock IDP figures for the crisis.
-        resolve_stock_idp_figures_max_end_date(root, info, **kwargs): Returns the maximum end date of the stock IDP figures for the crisis.
+        resolve_stock_idp_figures_max_end_date(root, info, **kwargs): Returns the maximum end date of the stock IDP
+        figures for the crisis.
         resolve_total_flow_nd_figures(root, info, **kwargs): Returns the total flow ND figures for the crisis.
         resolve_event_count(root, info, **kwargs): Returns the number of events related to the crisis.
         resolve_review_count(root, info, **kwargs): Returns the number of reviews for the crisis.
@@ -132,7 +134,8 @@ class CrisisType(DjangoObjectType):
 class CrisisListType(CustomDjangoListObjectType):
     """
 
-    CrisisListType class is a subclass of CustomDjangoListObjectType. It represents a GraphQL list type for Crisis objects.
+    CrisisListType class is a subclass of CustomDjangoListObjectType. It represents a GraphQL list type for Crisis
+    objects.
 
     Attributes:
         Meta: A nested class that holds metadata of CrisisListType class.

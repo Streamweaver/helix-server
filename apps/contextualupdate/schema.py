@@ -37,7 +37,8 @@ class ContextualUpdateListType(CustomDjangoListObjectType):
     """
     A custom list type for ContextualUpdate objects in Django.
 
-    This class extends the CustomDjangoListObjectType and provides a list type for ContextualUpdate model objects. It also specifies the ContextualUpdate model and the ContextualUpdateFilter as the filterset.
+    This class extends the CustomDjangoListObjectType and provides a list type for ContextualUpdate model objects. It
+    also specifies the ContextualUpdate model and the ContextualUpdateFilter as the filterset.
 
     Attributes:
         model (type): The ContextualUpdate model.

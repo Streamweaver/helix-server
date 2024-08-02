@@ -19,9 +19,12 @@ def permission_checker(perms: List[str]) -> Callable[..., Callable]:
     :return: Callable function
     :rtype: Callable[..., Callable]
 
-    This method is a decorator that checks if the current user has the required permissions before executing the wrapped function. It takes a list of permissions as input and returns a function decorator.
+    This method is a decorator that checks if the current user has the required permissions before executing the wrapped
+    function. It takes a list of permissions as input and returns a function decorator.
 
-    The decorator function takes the wrapped function as input and returns a new function that checks if the user has the required permissions. If the user does not have the required permissions, a `PermissionDenied` exception is raised. Otherwise, the wrapped function is executed with the provided arguments and keyword arguments.
+    The decorator function takes the wrapped function as input and returns a new function that checks if the user has
+    the required permissions. If the user does not have the required permissions, a `PermissionDenied` exception is
+    raised. Otherwise, the wrapped function is executed with the provided arguments and keyword arguments.
 
     Example usage:
 
@@ -32,9 +35,12 @@ def permission_checker(perms: List[str]) -> Callable[..., Callable]:
         pass
     ```
 
-    In this example, the `my_function` is decorated with the `permission_checker` decorator, which requires the user to have both "permission1" and "permission2" permissions. If the user has the required permissions, the function will be executed as usual. If not, a `PermissionDenied` exception will be raised.
+    In this example, the `my_function` is decorated with the `permission_checker` decorator, which requires the user to
+    have both "permission1" and "permission2" permissions. If the user has the required permissions, the function will
+    be executed as usual. If not, a `PermissionDenied` exception will be raised.
 
-    Note: The `PermissionDenied` exception is assumed to be imported from the appropriate module, and the `PERMISSION_DENIED_MESSAGE` constant is assumed to be defined elsewhere in the code.
+    Note: The `PermissionDenied` exception is assumed to be imported from the appropriate module, and the
+    `PERMISSION_DENIED_MESSAGE` constant is assumed to be defined elsewhere in the code.
 
     """
     def wrapped(func):
@@ -98,7 +104,8 @@ def cache_me(timeout=None):
     Cache the function's return value for a specified amount of time.
 
     Parameters:
-    - timeout (float, optional): The time in seconds for which the value should be cached. If not specified, the value will be cached indefinitely.
+    - timeout (float, optional): The time in seconds for which the value should be cached. If not specified, the value
+    will be cached indefinitely.
 
     Returns:
     - function: A wrapper function that caches the return value of the decorated function.

@@ -141,7 +141,8 @@ def generate_report_snapshot(generation_id):
 @celery_app.task(time_limit=REPORT_TIMEOUT)
 def trigger_report_generation(generation_id):
     """
-    Triggers the generation of a report by calling the `generate_report_excel` and `generate_report_snapshot` functions. This function is a Celery task, meaning it can be executed asynchronously.
+    Triggers the generation of a report by calling the `generate_report_excel` and `generate_report_snapshot` functions.
+    This function is a Celery task, meaning it can be executed asynchronously.
 
     Parameters:
     - generation_id: An integer representing the ID of the report generation.

@@ -6,7 +6,8 @@ from apps.review.models import UnifiedReviewComment
 class UnifiedReviewCommentFilter(df.FilterSet):
     """
 
-    The `UnifiedReviewCommentFilter` class is a subclass of `df.FilterSet` and is used for filtering instances of the `UnifiedReviewComment` model.
+    The `UnifiedReviewCommentFilter` class is a subclass of `df.FilterSet` and is used for filtering instances of the
+    `UnifiedReviewComment` model.
 
     Attributes:
         events (IDListFilter): A filter for filtering by event IDs.

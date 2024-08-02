@@ -71,25 +71,31 @@ class ContactFilter(django_filters.FilterSet):
 class CommunicationFilter(django_filters.FilterSet):
     """
 
-    The CommunicationFilter class is a subclass of the django_filters.FilterSet class and is used to filter instances of the Communication model.
+    The CommunicationFilter class is a subclass of the django_filters.FilterSet class and is used to filter instances of
+    the Communication model.
 
     Attributes:
-        - id: A CharFilter that filters the 'id' field of the Communication model based on an exact case-insensitive match.
-        - subject_contains: A CharFilter that filters the 'subject' field of the Communication model based on a case-insensitive substring match, using the 'unaccent__icontains' lookup expression.
+        - id: A CharFilter that filters the 'id' field of the Communication model based on an exact case-insensitive
+        match.
+        - subject_contains: A CharFilter that filters the 'subject' field of the Communication model based on a
+        case-insensitive substring match, using the 'unaccent__icontains' lookup expression.
 
     Meta:
         - model: The model to filter, which is set to the Communication model.
         - fields: The fields to include in the filter, which are 'contact' and 'country'.
 
     Methods:
-        - qs: A property method that overrides the default queryset method of the FilterSet class. It filters the queryset based on the user's highest role. If the user's highest role is set to 'GUEST', it returns an empty queryset. Otherwise, it returns the distinct queryset obtained from the superclass method.
+        - qs: A property method that overrides the default queryset method of the FilterSet class. It filters the
+        queryset based on the user's highest role. If the user's highest role is set to 'GUEST', it returns an empty
+        queryset. Otherwise, it returns the distinct queryset obtained from the superclass method.
 
     Example usage:
 
     filter = CommunicationFilter(request.GET, queryset=Communication.objects.all())
     filtered_queryset = filter.qs
 
-    Note: This code/documentation assumes the existence of a Communication model and a USER_ROLE enum with the 'GUEST' value.
+    Note: This code/documentation assumes the existence of a Communication model and a USER_ROLE enum with the 'GUEST'
+    value.
     """
     id = django_filters.CharFilter(field_name='id', lookup_expr='iexact')
     subject_contains = django_filters.CharFilter(field_name='subject', lookup_expr='unaccent__icontains')

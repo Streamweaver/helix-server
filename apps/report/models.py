@@ -452,7 +452,8 @@ class ReportApproval(MetaInformationArchiveAbstractModel, models.Model):
         - is_approved (BooleanField): Indicates whether the report is approved or not.
 
     Meta:
-        - unique_together (tuple): Specifies that the combination of 'generation' and 'created_by' fields should be unique.
+        - unique_together (tuple): Specifies that the combination of 'generation' and 'created_by' fields should be
+        unique.
 
     Methods:
         - __str__(): Returns a string representation of the ReportApproval instance.

@@ -17,7 +17,8 @@ class DebugToolbarMiddleware(BaseMiddleware):
     """
     Middleware class for integrating the Debug Toolbar into Django applications.
 
-    This class is responsible for intercepting incoming requests and generating the necessary debugging information and toolbar. It inherits from the `BaseMiddleware` class and overrides the `__call__` method.
+    This class is responsible for intercepting incoming requests and generating the necessary debugging information and
+    toolbar. It inherits from the `BaseMiddleware` class and overrides the `__call__` method.
 
     Example usage:
         middleware = DebugToolbarMiddleware(get_response)
@@ -27,7 +28,8 @@ class DebugToolbarMiddleware(BaseMiddleware):
         None
 
     Methods:
-        - __call__(self, request): Handles the incoming request and generates the necessary debugging information and toolbar. Returns the response.
+        - __call__(self, request): Handles the incoming request and generates the necessary debugging information and
+        toolbar. Returns the response.
 
     """
     # https://github.com/flavors/django-graphiql-debug-toolbar/issues/9

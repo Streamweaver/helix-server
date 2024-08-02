@@ -264,7 +264,8 @@ class CountrySummaryFilter(django_filters.FilterSet):
     """
     FilterSet class for filtering summary objects by country.
 
-    Filters the summary objects based on the selected country using the 'lte' and 'gte' operators on the 'created_at' field.
+    Filters the summary objects based on the selected country using the 'lte' and 'gte' operators on the 'created_at'
+    field.
 
     Attributes:
         model (django.db.models.Model): The model class to which the filterset will be applied
@@ -281,14 +282,16 @@ class CountrySummaryFilter(django_filters.FilterSet):
 class ContextualAnalysisFilter(django_filters.FilterSet):
     """
 
-    The `ContextualAnalysisFilter` class is a filter set class that is used for filtering data from the `ContextualAnalysis` model.
+    The `ContextualAnalysisFilter` class is a filter set class that is used for filtering data from the
+    `ContextualAnalysis` model.
 
     Attributes:
         model (django.db.models.Model): The `ContextualAnalysis` model that will be filtered.
 
     Fields:
         The following fields are used for filtering the `ContextualAnalysis` data:
-            - 'created_at': ['lte', 'gte'] (Filter by the 'created_at' attribute using the 'less than or equal to' and 'greater than or equal to' conditions)
+            - 'created_at': ['lte', 'gte'] (Filter by the 'created_at' attribute using the 'less than or equal to' and
+            'greater than or equal to' conditions)
 
     Example usage:
 

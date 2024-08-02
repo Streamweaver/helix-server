@@ -31,11 +31,16 @@ class ExtractionQueryObjectType(DjangoObjectType):
 
     Attributes:
         entries (DjangoPaginatedListObjectField): A field representing paginated list of EntryListType objects.
-        filter_figure_roles (List[RoleGrapheneEnum]): A list of RoleGrapheneEnum objects representing filter options for figure roles.
-        filter_figure_crisis_types (List[CrisisTypeGrapheneEnum]): A list of CrisisTypeGrapheneEnum objects representing filter options for figure crisis types.
-        filter_figure_categories (List[FigureCategoryTypeEnum]): A list of FigureCategoryTypeEnum objects representing filter options for figure categories.
-        filter_figure_terms (List[FigureTermsEnum]): A list of FigureTermsEnum objects representing filter options for figure terms.
-        filter_figure_review_status (List[FigureReviewStatusEnum]): A list of FigureReviewStatusEnum objects representing filter options for figure review status.
+        filter_figure_roles (List[RoleGrapheneEnum]): A list of RoleGrapheneEnum objects representing filter options for
+        figure roles.
+        filter_figure_crisis_types (List[CrisisTypeGrapheneEnum]): A list of CrisisTypeGrapheneEnum objects representing
+        filter options for figure crisis types.
+        filter_figure_categories (List[FigureCategoryTypeEnum]): A list of FigureCategoryTypeEnum objects representing
+        filter options for figure categories.
+        filter_figure_terms (List[FigureTermsEnum]): A list of FigureTermsEnum objects representing filter options for
+        figure terms.
+        filter_figure_review_status (List[FigureReviewStatusEnum]): A list of FigureReviewStatusEnum objects
+        representing filter options for figure review status.
 
     """
     class Meta:
@@ -85,7 +90,8 @@ class Query:
 
     Attributes:
         extraction_query (DjangoObjectField): A field representing a single extraction query.
-        extraction_query_list (DjangoPaginatedListObjectField): A field representing a paginated list of extraction queries.
+        extraction_query_list (DjangoPaginatedListObjectField): A field representing a paginated list of extraction
+        queries.
 
     """
     extraction_query = DjangoObjectField(ExtractionQueryObjectType)

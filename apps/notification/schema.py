@@ -33,7 +33,8 @@ class GenericNotificationType(DjangoObjectType):
         type_display: A EnumDescription field representing the display value of the notification type.
 
     Methods:
-        get_custom_queryset(queryset, info): A static method that returns a modified queryset based on the provided info.
+        get_custom_queryset(queryset, info): A static method that returns a modified queryset based on the provided
+        info.
 
     """
     class Meta:
@@ -96,7 +97,8 @@ class Query(object):
             - info: The GraphQLResolveInfo object.
             - **kwargs: Additional keyword arguments.
         - Returns:
-            - If the user is authenticated, it returns the result of the `notification_qs(info)` function, which represents the query to fetch the notification.
+            - If the user is authenticated, it returns the result of the `notification_qs(info)` function, which
+            represents the query to fetch the notification.
             - Otherwise, it returns an empty list.
     """
     notification = DjangoObjectField(GenericNotificationType)

@@ -165,7 +165,8 @@ class ExportParkedItem(ExportBaseMutation):
     """
     Class representing an export of parked items.
 
-    This class is a subclass of ExportBaseMutation and provides additional functionality specific to exporting parked items.
+    This class is a subclass of ExportBaseMutation and provides additional functionality specific to exporting parked
+    items.
 
     Attributes:
         DOWNLOAD_TYPE (str): The type of download, which is set to "PARKING_LOT" for parked items.

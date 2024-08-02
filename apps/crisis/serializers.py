@@ -18,13 +18,20 @@ class CrisisSerializer(serializers.ModelSerializer, MetaInformationSerializerMix
     Serializes Crisis model instances and validates the data.
 
     Methods:
-    - validate_dates: Validates the start_date and end_date fields to make sure the start date is smaller than the end date. Returns a dictionary of any validation errors.
-    - validate_event_dates: Validates the start_date and end_date fields by comparing them with the dates of the related events. Returns a dictionary of any validation errors.
-    - validate_event_countries: Validates the countries field by comparing it with the countries of the related events. Returns a dictionary of any validation errors.
-    - validate_event_types: Validates the crisis_type field by comparing it with the event_type of the related events. Returns a dictionary of any validation errors.
-    - validate_empty_countries: Validates the countries field to make sure it is not empty if there are no existing countries for the crisis. Returns a dictionary of any validation errors.
-    - validate: Validates the overall data by calling the above validation methods. Raises a serializers.ValidationError if there are any validation errors.
-    - create: Creates a new Crisis object using the validated data. Sets the created_by field to the current user and assigns the related countries if provided.
+    - validate_dates: Validates the start_date and end_date fields to make sure the start date is smaller than the end
+    date. Returns a dictionary of any validation errors.
+    - validate_event_dates: Validates the start_date and end_date fields by comparing them with the dates of the related
+    events. Returns a dictionary of any validation errors.
+    - validate_event_countries: Validates the countries field by comparing it with the countries of the related events.
+    Returns a dictionary of any validation errors.
+    - validate_event_types: Validates the crisis_type field by comparing it with the event_type of the related events.
+    Returns a dictionary of any validation errors.
+    - validate_empty_countries: Validates the countries field to make sure it is not empty if there are no existing
+    countries for the crisis. Returns a dictionary of any validation errors.
+    - validate: Validates the overall data by calling the above validation methods. Raises a serializers.ValidationError
+    if there are any validation errors.
+    - create: Creates a new Crisis object using the validated data. Sets the created_by field to the current user and
+    assigns the related countries if provided.
     - update: Not implemented. Raises a NotImplementedError.
 
     Note:

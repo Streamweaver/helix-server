@@ -69,7 +69,8 @@ class PortfolioListType(CustomDjangoListObjectType):
     """
     This class represents a list type for portfolios.
 
-    It is a subclass of CustomDjangoListObjectType, which is a custom list object type used in Django. It provides functionality for querying and filtering portfolios.
+    It is a subclass of CustomDjangoListObjectType, which is a custom list object type used in Django. It provides
+    functionality for querying and filtering portfolios.
 
     Attributes:
         model (Model): The model class representing the Portfolio.
@@ -106,7 +107,8 @@ class UserType(DjangoObjectType):
     This class extends the DjangoObjectType and provides a GraphQL representation of the User model.
 
     Attributes:
-        created_entry (DjangoPaginatedListObjectField): A field representing the paginated list of entries created by the user.
+        created_entry (DjangoPaginatedListObjectField): A field representing the paginated list of entries created by
+        the user.
         full_name (Field): A field representing the full name of the user.
         email (graphene.String): A field representing the email of the user.
         portfolios (graphene.List): A list of portfolios associated with the user.
@@ -193,7 +195,8 @@ class UserListType(CustomDjangoListObjectType):
     Inherits from `CustomDjangoListObjectType` and includes metadata about the User model and filter.
 
     Args:
-        CustomDjangoListObjectType (graphene_django.types.CustomDjangoListObjectType): Base class for defining GraphQL list types for Django models.
+        CustomDjangoListObjectType (graphene_django.types.CustomDjangoListObjectType): Base class for defining GraphQL
+        list types for Django models.
 
     Attributes:
         Meta (class): Inner class to define metadata options.
@@ -209,21 +212,31 @@ class UserListType(CustomDjangoListObjectType):
 
 class Query(object):
     """
-    The Query class represents a collection of GraphQL query fields. It includes fields for retrieving user-related data such as the currently logged-in user, a list of users with pagination support, a list of portfolios with pagination support, and a mapping of roles allowed in each region.
+    The Query class represents a collection of GraphQL query fields. It includes fields for retrieving user-related data
+    such as the currently logged-in user, a list of users with pagination support, a list of portfolios with pagination
+    support, and a mapping of roles allowed in each region.
 
     Attributes:
         me (Field): A field that returns the currently logged-in user (UserType).
         user (DjangoObjectField): A field that returns a user object (UserType) based on a Django model object.
-        users (DjangoPaginatedListObjectField): A field that returns a paginated list of user objects (UserListType) based on a Django model queryset. This field supports pagination with the PageGraphqlPaginationWithoutCount class, using the 'pageSize' query param.
-        portfolios (DjangoPaginatedListObjectField): A field that returns a paginated list of portfolio objects (PortfolioListType) based on a Django model queryset. This field supports pagination with the PageGraphqlPaginationWithoutCount class, using the 'pageSize' query param.
-        role_with_region_allowed_map (Field): A field that returns a generic scalar object representing a mapping of roles allowed in each region.
+        users (DjangoPaginatedListObjectField): A field that returns a paginated list of user objects (UserListType)
+        based on a Django model queryset. This field supports pagination with the PageGraphqlPaginationWithoutCount
+        class, using the 'pageSize' query param.
+        portfolios (DjangoPaginatedListObjectField): A field that returns a paginated list of portfolio objects
+        (PortfolioListType) based on a Django model queryset. This field supports pagination with the
+        PageGraphqlPaginationWithoutCount class, using the 'pageSize' query param.
+        role_with_region_allowed_map (Field): A field that returns a generic scalar object representing a mapping of
+        roles allowed in each region.
 
     Methods:
         resolve_role_with_region_allowed_map(root, info, **kwargs):
-            This static method resolves the role_with_region_allowed_map field by returning the result of calling the Portfolio.get_role_allows_region_map() method.
+            This static method resolves the role_with_region_allowed_map field by returning the result of calling the
+            Portfolio.get_role_allows_region_map() method.
 
         resolve_me(root, info, **kwargs) -> Union[User, None]:
-            This static method resolves the me field by checking if the user is authenticated in the provided GraphQL execution context (info.context). If the user is authenticated, it returns the currently logged-in user (User object). If the user is not authenticated, it returns None.
+            This static method resolves the me field by checking if the user is authenticated in the provided GraphQL
+            execution context (info.context). If the user is authenticated, it returns the currently logged-in user
+            (User object). If the user is not authenticated, it returns None.
 
     """
     me = Field(UserType)

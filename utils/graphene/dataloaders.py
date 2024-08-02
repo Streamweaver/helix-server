@@ -49,7 +49,8 @@ def get_related_name(model1, model2):
 class DataLoaderException(Exception):
     """
 
-    The DataLoaderException class is a custom exception class that is used to raise exceptions related to data loading operations.
+    The DataLoaderException class is a custom exception class that is used to raise exceptions related to data loading
+    operations.
 
     Attributes:
         message (str): The error message associated with the exception.
@@ -158,7 +159,8 @@ class OneToManyLoader(DataLoader):
     - request: The current request object (defaults to None).
 
     Methods:
-    - load(key, parent, child, related_name=None, reverse_related_name=None, accessor=None, pagination=None, filterset_class=None, filter_kwargs=None, request=None, **kwargs):
+    - load(key, parent, child, related_name=None, reverse_related_name=None, accessor=None, pagination=None,
+    filterset_class=None, filter_kwargs=None, request=None, **kwargs):
       Loads the related objects for the given key and returns the result.
 
     - batch_load_fn(keys):

@@ -43,7 +43,8 @@ from apps.common.enums import QA_RULE_TYPE
 class EventFilter(NameFilterMixin,
                   django_filters.FilterSet):
     """
-    EventFilter class is used to filter event objects based on various criteria. It is a subclass of NameFilterMixin and django_filters.FilterSet.
+    EventFilter class is used to filter event objects based on various criteria. It is a subclass of NameFilterMixin and
+    django_filters.FilterSet.
 
     Attributes:
         - name: CharFilter to filter events by name
@@ -68,21 +69,28 @@ class EventFilter(NameFilterMixin,
 
     Methods:
         - noop: Method used as a filter method for aggregate_figures filter, no operation is performed
-        - filter_by_figures: Method used as a filter method for filter_figures filter, filters events based on figure filters
+        - filter_by_figures: Method used as a filter method for filter_figures filter, filters events based on figure
+        filters
         - filter_countries: Method used as a filter method for countries filter, filters events by countries
-        - filter_disaster_sub_types: Method used as a filter method for disaster_sub_types filter, filters events by disaster sub types
-        - filter_violence_types: Method used as a filter method for violence_types filter, filters events by violence types
-        - filter_violence_sub_types: Method used as a filter method for violence_sub_types filter, filters events by violence sub types
+        - filter_disaster_sub_types: Method used as a filter method for disaster_sub_types filter, filters events by
+        disaster sub types
+        - filter_violence_types: Method used as a filter method for violence_types filter, filters events by violence
+        types
+        - filter_violence_sub_types: Method used as a filter method for violence_sub_types filter, filters events by
+        violence sub types
         - filter_crises: Method used as a filter method for crisis_by_ids filter, filters events by crisis IDs
         - filter_event_types: Method used as a filter method for event_types filter, filters events by event types
         - filter_review_status: Method used as a filter method for review_status filter, filters events by review status
         - filter_name: Method used as a filter method for name filter, filters events by name
-        - filter_osv_sub_types: Method used as a filter method for osv_sub_type_by_ids filter, filters events by OSV sub types
+        - filter_osv_sub_types: Method used as a filter method for osv_sub_type_by_ids filter, filters events by OSV sub
+        types
         - filter_qa_rule: Method used as a filter method for qa_rule filter, filters events by QA rule
-        - filter_context_of_violences: Method used as a filter method for context_of_violences filter, filters events by context of violence IDs
+        - filter_context_of_violences: Method used as a filter method for context_of_violences filter, filters events by
+        context of violence IDs
         - filter_assigners: Method used as a filter method for assigners filter, filters events by assigners IDs
         - filter_assignees: Method used as a filter method for assignees filter, filters events by assignees IDs
-        - filter_created_by: Method used as a filter method for created_by_ids filter, filters events by created by user IDs
+        - filter_created_by: Method used as a filter method for created_by_ids filter, filters events by created by user
+        IDs
     """
     name = django_filters.CharFilter(method='filter_name')
     crisis_by_ids = IDListFilter(method='filter_crises')
@@ -342,17 +350,20 @@ class DisasterTypeFilter(django_filters.FilterSet):
     """
     Class: DisasterTypeFilter
 
-    This class inherits from the django_filters.FilterSet class and is used to filter instances of the DisasterType model based on a specific criteria.
+    This class inherits from the django_filters.FilterSet class and is used to filter instances of the DisasterType
+    model based on a specific criteria.
 
     Parameters:
     - model: The model class that the filter is associated with. In this case, it is the DisasterType model.
-    - fields: A dictionary that specifies the fields that will be used for filtering. In this case, the 'name' field is used with the 'unaccent__icontains' lookup to perform a case-insensitive containment match on the unaccented name.
+    - fields: A dictionary that specifies the fields that will be used for filtering. In this case, the 'name' field is
+    used with the 'unaccent__icontains' lookup to perform a case-insensitive containment match on the unaccented name.
 
     Example usage:
 
         filter = DisasterTypeFilter(data={'name': 'earthquake'})
         queryset = filter.qs
-        # queryset now contains instances of the DisasterType model that have a name containing the word 'earthquake' (case-insensitive)
+        # queryset now contains instances of the DisasterType model that have a name containing the word 'earthquake'
+        (case-insensitive)
 
     Note:
     This class requires the django_filters package to be installed. You can install it using pip:
@@ -416,19 +427,23 @@ class DisasterSubCategoryFilter(django_filters.FilterSet):
 
 class OsvSubTypeFilter(django_filters.FilterSet):
     """
-    The OsvSubTypeFilter class is a FilterSet subclass for filtering OsvSubType instances based on their name attribute. It is designed to be used with Django's filtering functionality.
+    The OsvSubTypeFilter class is a FilterSet subclass for filtering OsvSubType instances based on their name attribute.
+    It is designed to be used with Django's filtering functionality.
 
     Attributes:
         model (Model): The model class to be filtered.
 
     Fields:
-        name (list): Specifies the filter condition for the 'name' attribute. The 'icontains' lookup type is used to perform a case-insensitive containment match.
+        name (list): Specifies the filter condition for the 'name' attribute. The 'icontains' lookup type is used to
+        perform a case-insensitive containment match.
 
     Example usage:
         filter_set = OsvSubTypeFilter(data=request.GET, queryset=OsvSubType.objects.all())
         filtered_queryset = filter_set.qs
 
-        This code creates an instance of OsvSubTypeFilter with request.GET as the filter data and all OsvSubType instances as the initial queryset. It then applies the filtering based on the provided data and returns the filtered queryset.
+        This code creates an instance of OsvSubTypeFilter with request.GET as the filter data and all OsvSubType
+        instances as the initial queryset. It then applies the filtering based on the provided data and returns the
+        filtered queryset.
 
     """
     class Meta:
@@ -442,13 +457,15 @@ class OtherSubTypeFilter(django_filters.FilterSet):
     """
     Filter class for OtherSubType model.
 
-    This class is a subclass of `django_filters.FilterSet` and provides filtering options for the `OtherSubType` model based on the `name` field.
+    This class is a subclass of `django_filters.FilterSet` and provides filtering options for the `OtherSubType` model
+    based on the `name` field.
 
     Attributes:
         model (Model): The model class for which the filter is defined.
 
     Fields:
-        - name (list[str]): Filter options for the `name` field. The filter is case-insensitive and performs a partial match.
+        - name (list[str]): Filter options for the `name` field. The filter is case-insensitive and performs a partial
+        match.
 
     Example usage:
         filter_class = OtherSubTypeFilter
@@ -505,7 +522,8 @@ class ViolenceFilter(django_filters.FilterSet):
 
 class ViolenceSubTypeFilter(django_filters.FilterSet):
     """
-    This class is a FilterSet for the ViolenceSubType model. It is used to filter querysets based on the 'id' field of the ViolenceSubType model.
+    This class is a FilterSet for the ViolenceSubType model. It is used to filter querysets based on the 'id' field of
+    the ViolenceSubType model.
 
     Attributes:
         model (class): The model that the FilterSet is being applied to.

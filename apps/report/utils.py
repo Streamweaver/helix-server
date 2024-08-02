@@ -307,15 +307,21 @@ def report_stat_flow_region(report):
     :param report: The report object
     :return: A dictionary containing headers, data, and formulae
 
-    The `report_stat_flow_region` method calculates and returns statistical data for a given flow region based on the provided report. The method takes a single parameter `report`, which is the report object.
+    The `report_stat_flow_region` method calculates and returns statistical data for a given flow region based on the
+    provided report. The method takes a single parameter `report`, which is the report object.
 
-    The method starts by defining a dictionary `headers` that maps column names to their corresponding labels. The column names are 'id', 'name', 'Conflict ND {report.name}', 'Disaster ND {report.name}', and 'Total ND {report.name}'. These labels are used to display the column headers in the output.
+    The method starts by defining a dictionary `headers` that maps column names to their corresponding labels. The
+    column names are 'id', 'name', 'Conflict ND {report.name}', 'Disaster ND {report.name}', and 'Total ND
+    {report.name}'. These labels are used to display the column headers in the output.
 
     Next, the method defines an empty dictionary `formulae` that will hold the calculated formulas.
 
-    The method then retrieves data from the `CountryRegion` model using a filter to get the relevant regions based on the report's country regions. The retrieved data is annotated with the total figure disaggregation subquery for the report, ignoring dates.
+    The method then retrieves data from the `CountryRegion` model using a filter to get the relevant regions based on
+    the report's country regions. The retrieved data is annotated with the total figure disaggregation subquery for the
+    report, ignoring dates.
 
-    After that, the method calculates the total value by summing the 'Conflict ND' and 'Disaster ND' values for each region using the `Coalesce` and `F` functions. The result is annotated as 'total' for each row.
+    After that, the method calculates the total value by summing the 'Conflict ND' and 'Disaster ND' values for each
+    region using the `Coalesce` and `F` functions. The result is annotated as 'total' for each row.
 
     Finally, the method returns a dictionary containing the headers, the retrieved data, and the formulae.
 
@@ -370,7 +376,8 @@ def report_stat_conflict_country(report, include_history):
     Returns:
     A dictionary containing the following keys:
     - headers: An ordered dictionary of the headers and their corresponding labels.
-    - data: The aggregated data for each country, including population, figures for new displacement (flow) and IDPs (stock).
+    - data: The aggregated data for each country, including population, figures for new displacement (flow) and IDPs
+    (stock).
     - formulae: A dictionary of formulae for calculations based on the aggregated data.
     - aggregation: None (not used in the current implementation).
     """
@@ -506,11 +513,15 @@ def report_stat_conflict_country(report, include_history):
 def report_stat_conflict_region(report, include_history):
     """
 
-    This method generates a report on statistical conflict regions based on the given report and include_history parameter. It returns a dictionary with the following keys:
+    This method generates a report on statistical conflict regions based on the given report and include_history
+    parameter. It returns a dictionary with the following keys:
 
-    - headers: an OrderedDict containing the column headers for the report. The keys represent the column names and the values represent the column labels.
-    - data: a queryset that contains the data for the report. It includes the following fields: region, region_population, name, flow_total, stock_total.
-    - formulae: an OrderedDict containing the formulas to calculate additional statistics for each region. The keys represent the statistic names and the values represent the formula templates.
+    - headers: an OrderedDict containing the column headers for the report. The keys represent the column names and the
+    values represent the column labels.
+    - data: a queryset that contains the data for the report. It includes the following fields: region,
+    region_population, name, flow_total, stock_total.
+    - formulae: an OrderedDict containing the formulas to calculate additional statistics for each region. The keys
+    represent the statistic names and the values represent the formula templates.
     - aggregation: currently set to None.
 
     Parameters:

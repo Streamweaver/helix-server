@@ -13,7 +13,8 @@ class ExcelExportFilter(django_filters.FilterSet):
     """
     FilterSet for exporting data to Excel.
 
-    This class extends the `django_filters.FilterSet` class and provides additional filtering options for exporting data to Excel.
+    This class extends the `django_filters.FilterSet` class and provides additional filtering options for exporting data
+    to Excel.
 
     Attributes:
         status_list (StringListFilter): Filter for status list.
@@ -102,7 +103,8 @@ class ClientFilter(django_filters.FilterSet):
 class ClientTrackInfoFilter(django_filters.FilterSet):
     """
 
-    ClientTrackInfoFilter is a class that extends django_filters.FilterSet. It provides filtering options for the fields api_type, client_codes, start_track_date, and end_track_date.
+    ClientTrackInfoFilter is a class that extends django_filters.FilterSet. It provides filtering options for the fields
+    api_type, client_codes, start_track_date, and end_track_date.
 
     Attributes:
       - api_type: A filter for the api_type field.
@@ -113,12 +115,14 @@ class ClientTrackInfoFilter(django_filters.FilterSet):
     Methods:
       - filter_api_type(qs, name, value): A method that filters the queryset based on the api_type field.
       - filter_client_codes(qs, name, value): A method that filters the queryset based on the client_codes field.
-      - filter_start_track_date(qs, name, value): A method that filters the queryset based on the start_track_date field.
+      - filter_start_track_date(qs, name, value): A method that filters the queryset based on the start_track_date
+      field.
       - filter_end_track_date(qs, name, value): A method that filters the queryset based on the end_track_date field.
       - qs: A property that returns the filtered queryset based on the user role.
 
     Usage:
-      - Create an instance of ClientTrackInfoFilter and pass it to a FilterSet or a Django view for filtering the queryset.
+      - Create an instance of ClientTrackInfoFilter and pass it to a FilterSet or a Django view for filtering the
+      queryset.
 
     Example:
       filter = ClientTrackInfoFilter(data=request.GET, queryset=ClientTrackInfo.objects.all())
@@ -168,13 +172,17 @@ class BulkApiOperationFilter(django_filters.FilterSet):
     This class is a subclass of django_filters.FilterSet and is used to filter instances of the BulkApiOperation model.
 
     Attributes:
-        action_list: A MultipleInputFilter instance that filters the BulkApiOperation instances based on the action field.
-        status_list: A MultipleInputFilter instance that filters the BulkApiOperation instances based on the status field.
+        action_list: A MultipleInputFilter instance that filters the BulkApiOperation instances based on the action
+        field.
+        status_list: A MultipleInputFilter instance that filters the BulkApiOperation instances based on the status
+        field.
 
     Methods:
         qs:
-            This method is a property decorator that returns the filtered queryset of BulkApiOperation instances based on the provided filters.
-            It filters the queryset based on the created_by field, considering only the bulk operations created by the current user.
+            This method is a property decorator that returns the filtered queryset of BulkApiOperation instances based
+            on the provided filters.
+            It filters the queryset based on the created_by field, considering only the bulk operations created by the
+            current user.
             It also defers the loading of the success_list and failure_list fields to improve performance.
 
     """

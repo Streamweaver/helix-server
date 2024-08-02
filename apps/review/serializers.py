@@ -19,7 +19,8 @@ class UnifiedReviewCommentSerializer(MetaInformationSerializerMixin, serializers
 
     Attributes:
     - model: The model that the serializer is based on (UnifiedReviewComment)
-    - fields: The fields that should be serialized (event, geo_location, figure, field, comment_type, geo_location, comment)
+    - fields: The fields that should be serialized (event, geo_location, figure, field, comment_type, geo_location,
+    comment)
 
     Methods:
     1. validate_comment(comment: str) -> str:

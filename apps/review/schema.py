@@ -40,7 +40,8 @@ class UnifiedReviewCommentType(DjangoObjectType):
 
 class UnifiedReviewCommentListType(CustomDjangoListObjectType):
     """
-    This class defines a custom Django list object type for UnifiedReviewComment model. It inherits from CustomDjangoListObjectType.
+    This class defines a custom Django list object type for UnifiedReviewComment model. It inherits from
+    CustomDjangoListObjectType.
 
     Attributes:
         Meta:
@@ -62,7 +63,8 @@ class Query(object):
 
     Attributes:
         review_comment (DjangoObjectField): A field that represents a review comment of type UnifiedReviewCommentType.
-        review_comments (DjangoPaginatedListObjectField): A field that represents a paginated list of review comments of type UnifiedReviewCommentListType.
+        review_comments (DjangoPaginatedListObjectField): A field that represents a paginated list of review comments of
+        type UnifiedReviewCommentListType.
             It uses PageGraphqlPaginationWithoutCount for pagination with a custom page size query parameter 'pageSize'.
 
     """

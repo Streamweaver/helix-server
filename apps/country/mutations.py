@@ -74,23 +74,29 @@ class CreateSummary(graphene.Mutation):
 class CreateContextualAnalysis(graphene.Mutation):
     """
 
-    The `CreateContextualAnalysis` class is a GraphQL mutation class that allows users to create a contextual analysis. It extends the `graphene.Mutation` class and provides a set of arguments, return values, and a mutation method.
+    The `CreateContextualAnalysis` class is a GraphQL mutation class that allows users to create a contextual analysis.
+    It extends the `graphene.Mutation` class and provides a set of arguments, return values, and a mutation method.
 
     Arguments:
-    - `data` - Required input field of type `ContextualAnalysisCreateInputType`. This argument represents the data needed to create a contextual analysis.
+    - `data` - Required input field of type `ContextualAnalysisCreateInputType`. This argument represents the data
+    needed to create a contextual analysis.
 
     Attributes:
-    - `errors` - A list of non-null `CustomErrorType` objects. This attribute contains a list of any errors that occurred during the mutation process.
+    - `errors` - A list of non-null `CustomErrorType` objects. This attribute contains a list of any errors that
+    occurred during the mutation process.
     - `ok` - A boolean value indicating the success or failure of the mutation.
-    - `result` - A field of type `ContextualAnalysisType`. This attribute contains the created contextual analysis object if the mutation was successful.
+    - `result` - A field of type `ContextualAnalysisType`. This attribute contains the created contextual analysis
+    object if the mutation was successful.
 
     Methods:
-    - `mutate(root, info, data)` - The mutation method that is called when the mutation is executed. It takes three parameters:
+    - `mutate(root, info, data)` - The mutation method that is called when the mutation is executed. It takes three
+    parameters:
       - `root` - The root object of the schema.
       - `info` - An object containing information about the execution state of the query.
       - `data` - The input data required to create the contextual analysis.
 
-      This method performs various operations to create the contextual analysis, such as validating the input data, saving the serializer instance, and returning the appropriate response.
+      This method performs various operations to create the contextual analysis, such as validating the input data,
+      saving the serializer instance, and returning the appropriate response.
 
     Example usage:
     ```python

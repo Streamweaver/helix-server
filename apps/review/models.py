@@ -9,18 +9,26 @@ class UnifiedReviewComment(MetaInformationArchiveAbstractModel, models.Model):
 
     Class: UnifiedReviewComment
 
-    This class represents a review comment for an event, geo location, or figure in the system. It extends the MetaInformationArchiveAbstractModel and models.Model classes.
+    This class represents a review comment for an event, geo location, or figure in the system. It extends the
+    MetaInformationArchiveAbstractModel and models.Model classes.
 
     Attributes:
-    - event (ForeignKey): A foreign key to the Event model representing the event related to the review comment. It is nullable and blankable.
-    - geo_location (ForeignKey): A foreign key to the OSMname model representing the geo location related to the review comment. It is nullable and blankable.
-    - figure (ForeignKey): A foreign key to the Figure model representing the figure related to the review comment. It is nullable and blankable.
+    - event (ForeignKey): A foreign key to the Event model representing the event related to the review comment. It is
+    nullable and blankable.
+    - geo_location (ForeignKey): A foreign key to the OSMname model representing the geo location related to the review
+    comment. It is nullable and blankable.
+    - figure (ForeignKey): A foreign key to the Figure model representing the figure related to the review comment. It
+    is nullable and blankable.
     - field (EnumField): An enum field representing the type of review field. It is nullable and blankable.
-    - comment_type (EnumField): An enum field representing the type of review comment. Default value is REVIEW_COMMENT_TYPE.GREY.
-    - geo_location (ForeignKey): A foreign key to the OSMName model representing the geolocation/OSM related to the review comment. It is nullable and blankable.
+    - comment_type (EnumField): An enum field representing the type of review comment. Default value is
+    REVIEW_COMMENT_TYPE.GREY.
+    - geo_location (ForeignKey): A foreign key to the OSMName model representing the geolocation/OSM related to the
+    review comment. It is nullable and blankable.
     - comment (TextField): A text field representing the comment for the review.
-    - is_edited (BooleanField): A boolean field indicating if the review comment has been edited. Default value is False.
-    - is_deleted (BooleanField): A boolean field indicating if the review comment has been deleted. Default value is False.
+    - is_edited (BooleanField): A boolean field indicating if the review comment has been edited. Default value is
+    False.
+    - is_deleted (BooleanField): A boolean field indicating if the review comment has been deleted. Default value is
+    False.
 
     """
     class REVIEW_COMMENT_TYPE(enum.Enum):
@@ -117,7 +125,8 @@ class Review(MetaInformationArchiveAbstractModel, models.Model):
 
     Attributes:
         UNIQUE_TOGETHER_FIELDS (set): A set of fields that must be unique together in a review entry.
-        UNIQUE_TOGETHER_WITHOUT_ENTRY_FIELDS (set): A set of fields that must be unique together in a review entry, excluding the 'entry' field.
+        UNIQUE_TOGETHER_WITHOUT_ENTRY_FIELDS (set): A set of fields that must be unique together in a review entry,
+        excluding the 'entry' field.
 
     Nested Classes:
         ENTRY_REVIEW_STATUS: An enumeration class representing the review status of an entry.

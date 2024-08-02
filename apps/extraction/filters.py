@@ -37,7 +37,8 @@ class EntryExtractionFilterSet(df.FilterSet):
         filter_entry_article_title: A CharFilter object used for filtering entries based on article titles.
         filter_figure_created_by: An IDListFilter object used for filtering entries based on creator IDs.
         filter_figure_regions: An IDListFilter object used for filtering entries based on region IDs.
-        filter_figure_geographical_groups: An IDListFilter object used for filtering entries based on geographical group IDs.
+        filter_figure_geographical_groups: An IDListFilter object used for filtering entries based on geographical group
+        IDs.
         filter_figure_countries: An IDListFilter object used for filtering entries based on country IDs.
         filter_figure_category_types: A StringListFilter object used for filtering entries based on category types.
         filter_figure_categories: A StringListFilter object used for filtering entries based on category names.
@@ -345,7 +346,8 @@ class BaseFigureExtractionFilterSet(df.FilterSet):
 
     BaseFigureExtractionFilterSet
 
-    This class extends the df.FilterSet class and provides a set of filters for extracting figures. These filters are used to query the Figure model.
+    This class extends the df.FilterSet class and provides a set of filters for extracting figures. These filters are
+    used to query the Figure model.
 
     Attributes:
     filter_figure_regions: Filter for filtering figures based on geographical regions (IDListFilter)
@@ -656,14 +658,22 @@ class FigureExtractionFilterSet(BaseFigureExtractionFilterSet):
     This class is a subclass of BaseFigureExtractionFilterSet. It represents a filter set for extracting figures.
 
     Attributes:
-    - filter_figure_start_after (df.DateFilter): A DateFilter object representing the filter for figures starting after a specific date.
-    - filter_figure_end_before (df.DateFilter): A DateFilter object representing the filter for figures ending before a specific date.
+    - filter_figure_start_after (df.DateFilter): A DateFilter object representing the filter for figures starting after
+    a specific date.
+    - filter_figure_end_before (df.DateFilter): A DateFilter object representing the filter for figures ending before a
+    specific date.
 
     Methods:
-    - noop(self, qs, *args): This method takes a queryset (qs) and additional arguments (*args) and returns the same queryset without any modifications.
+    - noop(self, qs, *args): This method takes a queryset (qs) and additional arguments (*args) and returns the same
+    queryset without any modifications.
 
     Properties:
-    - qs: This property returns the combined queryset of filtered figures for both stock and flow. It first calls the qs property of the superclass, then annotates the queryset with stock and flow dates and geolocations. It also annotates the queryset with sources reliability. Finally, it applies the filters for figure start date and figure end date to the queryset using the Figure.filtered_nd_figures_for_listing and Figure.filtered_idp_figures_for_listing methods. The result is the combined queryset of filtered figures for both stock and flow.
+    - qs: This property returns the combined queryset of filtered figures for both stock and flow. It first calls the qs
+    property of the superclass, then annotates the queryset with stock and flow dates and geolocations. It also
+    annotates the queryset with sources reliability. Finally, it applies the filters for figure start date and figure
+    end date to the queryset using the Figure.filtered_nd_figures_for_listing and
+    Figure.filtered_idp_figures_for_listing methods. The result is the combined queryset of filtered figures for both
+    stock and flow.
 
     """
     filter_figure_start_after = df.DateFilter(method='noop')
@@ -755,7 +765,8 @@ class FigureExtractionBulkOperationFilterSet(ReportFigureExtractionFilterSet):
       Returns:
         - QuerySet: The filtered queryset with only the figures whose IDs are included in the value list.
 
-    - filter_exclude_ids(qs, _, value): This method applies the filter to exclude figures with specified IDs from the queryset.
+    - filter_exclude_ids(qs, _, value): This method applies the filter to exclude figures with specified IDs from the
+    queryset.
       Parameters:
         - qs (QuerySet): The original queryset to be filtered.
         - _ (str): Unused parameter (django-filter convention).

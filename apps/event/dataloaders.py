@@ -16,7 +16,8 @@ def batch_load_fn_by_category(keys, category):
 
     Parameters:
     - keys (list): A list of keys representing the event IDs.
-    - category (str): The category for the figures. Should be one of the categories defined in Figure.FIGURE_CATEGORY_TYPES.
+    - category (str): The category for the figures. Should be one of the categories defined in
+    Figure.FIGURE_CATEGORY_TYPES.
 
     Returns:
     - Promise: A Promise object resolved with a list of total figures corresponding to the keys in the input list.
@@ -82,8 +83,10 @@ class MaxStockIDPFigureEndDateByEventLoader(DataLoader):
 
     Methods:
     - batch_load_fn(keys: List[str]) -> Promise[List[Optional[datetime]]]:
-        - This method takes in a list of event IDs and returns a Promise that resolves to a list of maximum stock IDP figure end dates corresponding to the given event IDs.
-        - It retrieves the events from the database using the given event IDs and annotates each event with the total figure disaggregation subquery.
+        - This method takes in a list of event IDs and returns a Promise that resolves to a list of maximum stock IDP
+        figure end dates corresponding to the given event IDs.
+        - It retrieves the events from the database using the given event IDs and annotates each event with the total
+        figure disaggregation subquery.
         - It then extracts the maximum stock IDP figure end date for each event and stores it in a dictionary.
         - Finally, it returns a list of maximum stock IDP figure end dates in the same order as the given event IDs.
 
@@ -114,13 +117,15 @@ class EventEntryCountLoader(DataLoader):
     """
     Class: EventEntryCountLoader
 
-    A class that extends the DataLoader class and provides a method for loading the entry count for a given list of event IDs.
+    A class that extends the DataLoader class and provides a method for loading the entry count for a given list of
+    event IDs.
 
     Attributes:
     - None
 
     Methods:
-    - batch_load_fn(keys): Returns a promise that resolves to a list of entry counts corresponding to the provided event IDs.
+    - batch_load_fn(keys): Returns a promise that resolves to a list of entry counts corresponding to the provided event
+    IDs.
 
         Parameters:
         - keys (list): A list of event IDs for which the entry count needs to be loaded.
@@ -188,11 +193,13 @@ class EventFigureTypologyLoader(DataLoader):
     """
     Class: EventFigureTypologyLoader
 
-    EventFigureTypologyLoader is a class that inherits from the DataLoader class. It provides a method, batch_load_fn, for batch loading event typologies for a given list of event IDs.
+    EventFigureTypologyLoader is a class that inherits from the DataLoader class. It provides a method, batch_load_fn,
+    for batch loading event typologies for a given list of event IDs.
 
     Methods:
     - batch_load_fn(keys: list) -> Promise:
-        This method takes a list of event IDs as input and returns a Promise object that resolves to a list of event typologies corresponding to the given event IDs.
+        This method takes a list of event IDs as input and returns a Promise object that resolves to a list of event
+        typologies corresponding to the given event IDs.
 
         Parameters:
         - keys: list - A list of event IDs.
@@ -299,7 +306,8 @@ class EventCrisisLoader(DataLoader):
                 keys (list): A list of event IDs.
 
             Returns:
-                Promise[List[Optional[Crisis]]]: A Promise resolving to a list of crisis objects associated with the given event IDs.
+                Promise[List[Optional[Crisis]]]: A Promise resolving to a list of crisis objects associated with the
+                given event IDs.
     """
     def batch_load_fn(self, keys: list):
         qs = Event.objects.filter(id__in=keys).select_related('crisis').only('id', 'crisis')

@@ -30,22 +30,31 @@ from django.db.models.fields import BooleanField, CharField, DateField, TextFiel
 def check_is_pfa_visible_in_gidd(report):
     """
 
-    This method, check_is_pfa_visible_in_gidd, is used to check if a report meets certain criteria that determine its visibility in the GIDD (Global Internal Displacement Database) interface.
+    This method, check_is_pfa_visible_in_gidd, is used to check if a report meets certain criteria that determine its
+    visibility in the GIDD (Global Internal Displacement Database) interface.
 
     Parameters:
     - report: A Report object that represents the report to be checked.
 
     Returns:
-    - errors: A list containing any error messages encountered during the checking process. If the list is empty, it means the report is visible in GIDD.
+    - errors: A list containing any error messages encountered during the checking process. If the list is empty, it
+    means the report is visible in GIDD.
 
     The method performs the following checks:
-    1. If the report parameter is not provided, it appends the error message 'Report does not exist.' to the errors list.
-    2. It checks if the report has start and end dates specified. If not, it appends the error message 'Start date and end date are required.' to the errors list.
-    3. If the start and end dates are specified, it checks if the report spans for the full year. If not, it appends the error message 'The report should span for the full year.' to the errors list.
-    4. It checks if the report is marked as public. If not, it appends the error message 'Report should be public.' to the errors list.
-    5. It checks if the report has exactly one country specified. If not, it appends the error message 'Report should have exactly one country.' to the errors list.
-    6. It checks if the report has either the conflict or disaster crisis type specified. If not, it appends the error message 'Report should have conflict or disaster crisis type.' to the errors list.
-    7. It checks if the report has either the IDPs or Internal Displacements category specified. If not, it appends the error message 'Report should have IDPs or Internal Displacements category.' to the errors list.
+    1. If the report parameter is not provided, it appends the error message 'Report does not exist.' to the errors
+    list.
+    2. It checks if the report has start and end dates specified. If not, it appends the error message 'Start date and
+    end date are required.' to the errors list.
+    3. If the start and end dates are specified, it checks if the report spans for the full year. If not, it appends the
+    error message 'The report should span for the full year.' to the errors list.
+    4. It checks if the report is marked as public. If not, it appends the error message 'Report should be public.' to
+    the errors list.
+    5. It checks if the report has exactly one country specified. If not, it appends the error message 'Report should
+    have exactly one country.' to the errors list.
+    6. It checks if the report has either the conflict or disaster crisis type specified. If not, it appends the error
+    message 'Report should have conflict or disaster crisis type.' to the errors list.
+    7. It checks if the report has either the IDPs or Internal Displacements category specified. If not, it appends the
+    error message 'Report should have IDPs or Internal Displacements category.' to the errors list.
 
     Example usage:
 
@@ -260,11 +269,13 @@ class ReportCommentSerializer(MetaInformationSerializerMixin,
 class ReportSignoffSerializer(serializers.Serializer):
     """Serializer for signing off a report.
 
-    This serializer is used to validate the data for signing off a report and perform the necessary actions for saving the sign off status.
+    This serializer is used to validate the data for signing off a report and perform the necessary actions for saving
+    the sign off status.
 
     Attributes:
         report (serializers.IntegerField): The ID of the report to sign off.
-        include_history (serializers.BooleanField): Optional field indicating whether to include the sign off history in the report.
+        include_history (serializers.BooleanField): Optional field indicating whether to include the sign off history in
+        the report.
 
     Methods:
         validate_report(report): Validates the report ID and checks if there is anything to sign off.
@@ -299,20 +310,24 @@ class ReportGenerationSerializer(MetaInformationSerializerMixin,
     The `ReportGenerationSerializer` class is responsible for serializing and deserializing `ReportGeneration` objects.
 
     Parameters:
-    - `MetaInformationSerializerMixin`: A mixin class that provides additional serialization and deserialization functionality.
+    - `MetaInformationSerializerMixin`: A mixin class that provides additional serialization and deserialization
+    functionality.
     - `serializers.ModelSerializer`: A base class for creating serializer classes.
 
     Attributes:
-    - `Meta`: A nested class that contains metadata for the serializer, including the `model` and `fields` to be serialized.
+    - `Meta`: A nested class that contains metadata for the serializer, including the `model` and `fields` to be
+    serialized.
 
     Methods:
-    - `validate_report(report)`: A method used for validating the `report` field of a serialized `ReportGeneration` object.
+    - `validate_report(report)`: A method used for validating the `report` field of a serialized `ReportGeneration`
+    object.
 
     Returns:
     - `report`: The validated `report` field.
 
     Exceptions:
-    - `serializers.ValidationError`: Raised if the maximum page size for report generation has been reached or if there is an existing unsigned report.
+    - `serializers.ValidationError`: Raised if the maximum page size for report generation has been reached or if there
+    is an existing unsigned report.
 
     """
     class Meta:

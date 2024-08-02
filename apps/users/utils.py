@@ -37,7 +37,8 @@ def get_user_from_activation_token(uid, token) -> Union[User, None]:
     - token (str): The activation token.
 
     Returns:
-    - User or None: If the user is found and the token is valid, the corresponding User object is returned. If not found or the token is not valid, None is returned.
+    - User or None: If the user is found and the token is valid, the corresponding User object is returned. If not found
+    or the token is not valid, None is returned.
 
     """
     try:

@@ -24,7 +24,8 @@ class User(AbstractUser):
 
     Attributes:
         email (EmailField): The email address of the user. It is unique and serves as the username for authentication.
-        username (CharField): The username of the user. It must be unique and should contain only letters, digits, and characters @/./+/-/_.
+        username (CharField): The username of the user. It must be unique and should contain only letters, digits, and
+        characters @/./+/-/_.
         full_name (CharField): The full name of the user. It is auto-generated.
         USERNAME_FIELD (str): The field to use as the username for authentication. In this case, it is 'email'.
         REQUIRED_FIELDS (list[str]): The required fields in addition to the username for creating a user.
@@ -32,7 +33,8 @@ class User(AbstractUser):
     Methods:
         can_update_user(cls, user_id: int, authenticated_user: User) -> bool:
             Checks if the authenticated user can update the user with the given user_id.
-            Returns True if the authenticated user has the 'users.change_user' permission or if the user_id matches the authenticated user's primary key.
+            Returns True if the authenticated user has the 'users.change_user' permission or if the user_id matches the
+            authenticated user's primary key.
             Returns False otherwise.
 
         get_excel_sheets_data(cls, user_id, filters):
@@ -41,7 +43,8 @@ class User(AbstractUser):
                 user_id (int): The ID of the user requesting the data.
                 filters (dict): A dictionary of filters to apply to the user queryset.
             Returns:
-                dict: A dictionary containing headers, data, formulae, and a transformer function for Excel sheet generation.
+                dict: A dictionary containing headers, data, formulae, and a transformer function for Excel sheet
+                generation.
 
         _reset_login_cache(email: str):
             Resets the login cache for the user with the given email.
@@ -249,20 +252,24 @@ class Portfolio(models.Model):
     Attributes:
         user (ForeignKey): The user associated with the portfolio.
         role (EnumField): The role of the user in the portfolio.
-        monitoring_sub_region (ForeignKey, optional): The monitoring sub-region associated with the portfolio. Only applicable for regional coordinators. Defaults to None.
-        country (OneToOneField, optional): The country associated with the portfolio. Only applicable for monitoring experts. Defaults to None.
+        monitoring_sub_region (ForeignKey, optional): The monitoring sub-region associated with the portfolio. Only
+        applicable for regional coordinators. Defaults to None.
+        country (OneToOneField, optional): The country associated with the portfolio. Only applicable for monitoring
+        experts. Defaults to None.
 
     Methods:
         user_can_alter(user: User) -> bool: Check if the given user has permission to alter the portfolio.
         get_role_allows_region_map() -> dict: Get a mapping of roles and their permissions for regions and countries.
         get_coordinators() -> QuerySet: Get all the portfolios of regional coordinators.
-        get_coordinator(ms_region: int) -> Optional[Portfolio]: Get the portfolio of the regional coordinator for the given monitoring sub-region.
+        get_coordinator(ms_region: int) -> Optional[Portfolio]: Get the portfolio of the regional coordinator for the
+        given monitoring sub-region.
         get_highest_role(user: User) -> USER_ROLE: Get the highest role of the user based on their portfolios.
         permissions -> list[dict]: The list of permissions associated with the portfolio.
         save(*args, **kwargs): Save the portfolio.
 
     Meta:
-        constraints -> List[UniqueConstraint]: The constraints for the portfolio class, defining uniqueness rules based on role and associations with monitoring sub-regions and countries.
+        constraints -> List[UniqueConstraint]: The constraints for the portfolio class, defining uniqueness rules based
+        on role and associations with monitoring sub-regions and countries.
 
     """
     user = models.ForeignKey(

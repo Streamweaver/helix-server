@@ -43,10 +43,12 @@ class TotalIDPFigureByCrisisLoader(DataLoader):
     """
     Class TotalIDPFigureByCrisisLoader
 
-    This class is a DataLoader that is used to load total figures of IDP (Internally Displaced Persons) by crisis. It inherits from the DataLoader class.
+    This class is a DataLoader that is used to load total figures of IDP (Internally Displaced Persons) by crisis. It
+    inherits from the DataLoader class.
 
     Methods:
-    - batch_load_fn(keys): This method takes a list of keys and returns the batch load function for loading total IDP figures by crisis.
+    - batch_load_fn(keys): This method takes a list of keys and returns the batch load function for loading total IDP
+    figures by crisis.
 
     """
     def batch_load_fn(self, keys):
@@ -60,14 +62,17 @@ class TotalNDFigureByCrisisLoader(DataLoader):
     """
     Class TotalNDFigureByCrisisLoader
 
-    This class extends the DataLoader class and provides a batch_load_fn method specific to loading total figures for new displacement crises.
+    This class extends the DataLoader class and provides a batch_load_fn method specific to loading total figures for
+    new displacement crises.
 
     Attributes:
         None
 
     Methods:
         - batch_load_fn(keys):
-            This method retrieves data for the given keys, where each key represents a particular crisis. It calls the batch_load_fn_by_category function from Figure module to load figures specifically related to new displacement crises. The loaded figures are then returned.
+            This method retrieves data for the given keys, where each key represents a particular crisis. It calls the
+            batch_load_fn_by_category function from Figure module to load figures specifically related to new
+            displacement crises. The loaded figures are then returned.
 
     """
     def batch_load_fn(self, keys):
@@ -84,7 +89,11 @@ class MaxStockIDPFigureEndDateByCrisisLoader(DataLoader):
     This class is a DataLoader class that loads the maximum stock IDP figure end date by crisis.
 
     Methods:
-    - batch_load_fn(keys): This method takes a list of keys and returns a Promise that resolves to a list of maximum stock IDP figure end dates for the given keys. It retrieves the data from the Crisis model by filtering with the keys and annotates each crisis object with the total figure disaggregation subquery. It then creates a dictionary, batch_load, where the key is the crisis id and the value is the IDP figures reference date. Finally, it returns a list of IDP figure end dates corresponding to the given keys.
+    - batch_load_fn(keys): This method takes a list of keys and returns a Promise that resolves to a list of maximum
+    stock IDP figure end dates for the given keys. It retrieves the data from the Crisis model by filtering with the
+    keys and annotates each crisis object with the total figure disaggregation subquery. It then creates a dictionary,
+    batch_load, where the key is the crisis id and the value is the IDP figures reference date. Finally, it returns a
+    list of IDP figure end dates corresponding to the given keys.
 
     Note: This class inherits from the DataLoader class and overrides the batch_load_fn method.
     """
@@ -147,10 +156,13 @@ class CrisisReviewCountLoader(DataLoader):
     """
     Class: CrisisReviewCountLoader
 
-    The CrisisReviewCountLoader class is a DataLoader subclass that is responsible for loading crisis review count data for a given list of keys.
+    The CrisisReviewCountLoader class is a DataLoader subclass that is responsible for loading crisis review count data
+    for a given list of keys.
 
     Methods:
-    - batch_load_fn(keys: list): This method loads the crisis review count data for the specified list of keys. It uses the Crisis model to query the database and fetch the required data. The method returns a Promise object that resolves to a list of batch-loaded data.
+    - batch_load_fn(keys: list): This method loads the crisis review count data for the specified list of keys. It uses
+    the Crisis model to query the database and fetch the required data. The method returns a Promise object that
+    resolves to a list of batch-loaded data.
 
     Attributes:
 

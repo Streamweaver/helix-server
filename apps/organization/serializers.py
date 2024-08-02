@@ -7,13 +7,16 @@ from apps.contrib.serializers import UpdateSerializerMixin, IntegerIDField, Meta
 class OrganizationKindSerializer(serializers.ModelSerializer, MetaInformationSerializerMixin):
     """
 
-    The OrganizationKindSerializer class is responsible for serializing and deserializing instances of the OrganizationKind model. It is a subclass of the ModelSerializer class provided by the Django REST Framework.
+    The OrganizationKindSerializer class is responsible for serializing and deserializing instances of the
+    OrganizationKind model. It is a subclass of the ModelSerializer class provided by the Django REST Framework.
 
-    This serializer class includes the MetaInformationSerializerMixin, which provides additional meta information related to the serializer.
+    This serializer class includes the MetaInformationSerializerMixin, which provides additional meta information
+    related to the serializer.
 
     Usage:
     ------
-    To use the OrganizationKindSerializer, you need to import it into your project and create an instance of it in your view or serializer.
+    To use the OrganizationKindSerializer, you need to import it into your project and create an instance of it in your
+    view or serializer.
 
     Example usage:
 
@@ -30,7 +33,8 @@ class OrganizationKindSerializer(serializers.ModelSerializer, MetaInformationSer
 
     Serializer Fields:
     -----------------
-    The OrganizationKindSerializer class automatically generates fields based on the model fields defined in the OrganizationKind model. It includes the following fields:
+    The OrganizationKindSerializer class automatically generates fields based on the model fields defined in the
+    OrganizationKind model. It includes the following fields:
 
     - id: The unique identifier of the OrganizationKind.
     - name: The name of the OrganizationKind.
@@ -38,13 +42,17 @@ class OrganizationKindSerializer(serializers.ModelSerializer, MetaInformationSer
 
     Meta Class:
     -----------
-    The Meta class within the OrganizationKindSerializer defines the model and fields to be used by the serializer. In this case, the model is set to OrganizationKind, and the fields are set to '__all__', which means all fields defined in the model will be included in the serialized output.
+    The Meta class within the OrganizationKindSerializer defines the model and fields to be used by the serializer. In
+    this case, the model is set to OrganizationKind, and the fields are set to '__all__', which means all fields defined
+    in the model will be included in the serialized output.
 
     Additional Methods:
     -------------------
-    You can include additional methods or customizations within the OrganizationKindSerializer class as needed for your project.
+    You can include additional methods or customizations within the OrganizationKindSerializer class as needed for your
+    project.
 
-    Please refer to the Django REST Framework documentation for more information on serializers: https://www.django-rest-framework.org/api-guide/serializers/
+    Please refer to the Django REST Framework documentation for more information on serializers:
+    https://www.django-rest-framework.org/api-guide/serializers/
 
     """
     class Meta:
@@ -71,7 +79,8 @@ class OrganizationSerializer(serializers.ModelSerializer, MetaInformationSeriali
 
     Attributes:
         model (Model): The Organization model to be serialized/deserialized.
-        fields (List[str]): The fields to include in the serialized representation. If set to '__all__', all fields will be included.
+        fields (List[str]): The fields to include in the serialized representation. If set to '__all__', all fields will
+        be included.
         extra_kwargs (Dict[str, Dict[str, Any]]): Extra keyword arguments for specific fields.
 
     Methods:

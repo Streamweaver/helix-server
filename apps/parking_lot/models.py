@@ -11,23 +11,28 @@ User = get_user_model()
 
 class ParkedItem(MetaInformationAbstractModel):
     """
-    ParkedItem is a class that represents a parked item in a parking lot. It is a subclass of MetaInformationAbstractModel.
+    ParkedItem is a class that represents a parked item in a parking lot. It is a subclass of
+    MetaInformationAbstractModel.
 
     Attributes:
-    - country: A ForeignKey field that refers to the Country model. It represents the country in which the parked item is located.
+    - country: A ForeignKey field that refers to the Country model. It represents the country in which the parked item
+    is located.
     - title: A TextField that represents the title of the parked item.
     - url: A URLField that represents the URL of the parked item.
     - assigned_to: A ForeignKey field that refers to the User model. It represents the user assigned to the parked item.
-    - status: An enum.EnumField field that represents the status of the parked item. It is a member of the PARKING_LOT_STATUS enum.
+    - status: An enum.EnumField field that represents the status of the parked item. It is a member of the
+    PARKING_LOT_STATUS enum.
     - comments: A TextField that represents the comments for the parked item.
-    - source: An enum.EnumField field that represents the source of the parked item. It is a member of the PARKING_LOT_SOURCE enum.
+    - source: An enum.EnumField field that represents the source of the parked item. It is a member of the
+    PARKING_LOT_SOURCE enum.
     - source_uuid: A CharField that represents the UUID of the source.
     - meta_data: A JSONField that stores additional metadata for the parked item.
 
     Methods:
     - __str__: Returns a string representation of the parked item.
     - get_excel_sheets_data: Retrieves data for generating Excel sheets based on the provided filters and user ID.
-    - get_parking_lot_excel_sheets_data: Retrieves data for generating Excel sheets based on the provided parking lot queryset.
+    - get_parking_lot_excel_sheets_data: Retrieves data for generating Excel sheets based on the provided parking lot
+    queryset.
 
     """
     class PARKING_LOT_STATUS(enum.Enum):

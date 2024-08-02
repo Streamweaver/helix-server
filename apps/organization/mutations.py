@@ -73,15 +73,23 @@ class UpdateOrganizationKind(graphene.Mutation):
     UpdateOrganizationKind class is a mutation class that is used to update an instance of OrganizationKind.
 
     Arguments:
-        - data (OrganizationKindUpdateInputType): The data to be updated for the OrganizationKind instance. This argument is required.
+        - data (OrganizationKindUpdateInputType): The data to be updated for the OrganizationKind instance. This
+        argument is required.
 
     Attributes:
-        - errors (List[CustomErrorType]): A list of custom error objects. Each error object contains the field name and corresponding error messages.
+        - errors (List[CustomErrorType]): A list of custom error objects. Each error object contains the field name and
+        corresponding error messages.
         - ok (Boolean): Indicates whether the mutation was successful or not.
         - result (OrganizationKindObjectType): The updated OrganizationKind instance.
 
     Methods:
-        - mutate(root, info, data): This method is called to perform the mutation operation. It receives the root and info objects as parameters, which provide information about the GraphQL execution context. The 'data' parameter contains the input data for the mutation. It first tries to retrieve the OrganizationKind instance with the provided ID from the database. If it doesn't exist, it returns an error indicating that the OrganizationKind type does not exist. Then, it creates a serializer instance with the retrieved instance and the update data. If the mutation data is not valid, it returns an error with the validation errors. Otherwise, it saves the updated instance and returns it along with the 'ok' flag indicating a successful mutation.
+        - mutate(root, info, data): This method is called to perform the mutation operation. It receives the root and
+        info objects as parameters, which provide information about the GraphQL execution context. The 'data' parameter
+        contains the input data for the mutation. It first tries to retrieve the OrganizationKind instance with the
+        provided ID from the database. If it doesn't exist, it returns an error indicating that the OrganizationKind
+        type does not exist. Then, it creates a serializer instance with the retrieved instance and the update data. If
+        the mutation data is not valid, it returns an error with the validation errors. Otherwise, it saves the updated
+        instance and returns it along with the 'ok' flag indicating a successful mutation.
 
     Note: This class requires the permission 'organization.change_organizationkind' to be used."""
     class Arguments:
@@ -109,15 +117,18 @@ class UpdateOrganizationKind(graphene.Mutation):
 
 class DeleteOrganizationKind(graphene.Mutation):
     """
-    The `DeleteOrganizationKind` class is a mutation class in a GraphQL schema. It is used to delete an instance of the `OrganizationKind` model.
+    The `DeleteOrganizationKind` class is a mutation class in a GraphQL schema. It is used to delete an instance of the
+    `OrganizationKind` model.
 
     Args:
         id (graphene.ID): The ID of the `OrganizationKind` instance to be deleted. (required)
 
     Attributes:
-        errors (graphene.List): A list of `CustomErrorType` objects representing any errors that occurred during the mutation.
+        errors (graphene.List): A list of `CustomErrorType` objects representing any errors that occurred during the
+        mutation.
         ok (graphene.Boolean): A boolean indicating whether the mutation was successful or not.
-        result (graphene.Field): A field of type `OrganizationKindObjectType` representing the deleted `OrganizationKind` instance, if successful.
+        result (graphene.Field): A field of type `OrganizationKindObjectType` representing the deleted
+        `OrganizationKind` instance, if successful.
 
     Methods:
         mutate(root, info, id):
@@ -179,7 +190,8 @@ class CreateOrganization(graphene.Mutation):
     - result (OrganizationType): The created organization.
 
     Methods:
-    - mutate(root, info, data) -> CreateOrganization: A static method that performs the mutation and returns a CreateOrganization instance.
+    - mutate(root, info, data) -> CreateOrganization: A static method that performs the mutation and returns a
+    CreateOrganization instance.
 
     """
     class Arguments:
@@ -210,15 +222,22 @@ class UpdateOrganization(graphene.Mutation):
         - `result`: An instance of `OrganizationType` representing the updated organization.
 
     Methods:
-        - `mutate(root, info, data)`: This static method is the main method of the class and is responsible for performing the mutation logic. It takes three parameters:
+        - `mutate(root, info, data)`: This static method is the main method of the class and is responsible for
+        performing the mutation logic. It takes three parameters:
             - `root`: The root value.
             - `info`: An object containing information about the execution and the GraphQL schema.
             - `data`: An instance of `OrganizationUpdateInputType` representing the data to update the organization.
 
         Returns:
-            - If the organization with the given ID does not exist, returns an instance of `UpdateOrganization` with the `errors` attribute set to a list containing a dictionary with the `field` set to `'nonFieldErrors'` and the `messages` set to `'Organization does not exist.'`.
-            - If there are any errors during the mutation, returns an instance of `UpdateOrganization` with the `errors` attribute set to a list of `CustomErrorType` objects representing the errors, the `ok` attribute set to `False`, and the `result` attribute set to `None`.
-            - If the mutation is successful, returns an instance of `UpdateOrganization` with the `result` attribute set to an instance of `OrganizationType` representing the updated organization, the `errors` attribute set to `None`, and the `ok` attribute set to `True`.
+            - If the organization with the given ID does not exist, returns an instance of `UpdateOrganization` with the
+            `errors` attribute set to a list containing a dictionary with the `field` set to `'nonFieldErrors'` and the
+            `messages` set to `'Organization does not exist.'`.
+            - If there are any errors during the mutation, returns an instance of `UpdateOrganization` with the `errors`
+            attribute set to a list of `CustomErrorType` objects representing the errors, the `ok` attribute set to
+            `False`, and the `result` attribute set to `None`.
+            - If the mutation is successful, returns an instance of `UpdateOrganization` with the `result` attribute set
+            to an instance of `OrganizationType` representing the updated organization, the `errors` attribute set to
+            `None`, and the `ok` attribute set to `True`.
     """
     class Arguments:
         data = OrganizationUpdateInputType(required=True)
@@ -254,7 +273,8 @@ class DeleteOrganization(graphene.Mutation):
         id (graphene.ID): The ID of the organization to be deleted. This argument is required.
 
     Attributes:
-        errors (graphene.List[graphene.NonNull[CustomErrorType]]): A list of errors that occurred during the mutation process.
+        errors (graphene.List[graphene.NonNull[CustomErrorType]]): A list of errors that occurred during the mutation
+        process.
         ok (graphene.Boolean): Indicates whether the mutation was successful or not.
         result (graphene.Field[OrganizationType]): The deleted organization object.
 
@@ -271,7 +291,8 @@ class DeleteOrganization(graphene.Mutation):
                 DeleteOrganization: The mutated DeleteOrganization object.
 
     Usage:
-        To delete an organization, create a DeleteOrganization object and call the mutate method with the appropriate arguments.
+        To delete an organization, create a DeleteOrganization object and call the mutate method with the appropriate
+        arguments.
 
     Example:
         delete_org = DeleteOrganization()

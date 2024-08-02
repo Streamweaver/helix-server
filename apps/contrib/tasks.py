@@ -38,7 +38,8 @@ def get_excel_sheet_content(headers, data, **kwargs):
     Get the content of an Excel sheet.
 
     Parameters:
-    - headers (dict): A dictionary where the keys represent the column names and the values represent the column headers.
+    - headers (dict): A dictionary where the keys represent the column names and the values represent the column
+    headers.
     - data (iterator): An iterator that contains the data for the sheet.
     - **kwargs (optional): Additional keyword arguments.
 
@@ -131,13 +132,20 @@ def generate_excel_file(download_id, user_id, model_instance_id=None):
     Returns:
     None
 
-    This method generates an Excel file for download based on the provided parameters. It updates the status of the ExcelDownload object accordingly.
+    This method generates an Excel file for download based on the provided parameters. It updates the status of the
+    ExcelDownload object accordingly.
 
-    The Excel file is generated based on the type of download specified in the ExcelDownload object. If the download type is INDIVIDUAL_REPORT and a model_instance_id is provided, it generates the Excel file for the specified report using the report_get_excel_sheets_data and report_generate_excel_file functions from the 'apps.report' module. Otherwise, it calls the get_model_sheet_data_getter method of the ExcelDownload object to get the sheet data getter function and generates the Excel file using the get_excel_sheet_content function.
+    The Excel file is generated based on the type of download specified in the ExcelDownload object. If the download
+    type is INDIVIDUAL_REPORT and a model_instance_id is provided, it generates the Excel file for the specified report
+    using the report_get_excel_sheets_data and report_generate_excel_file functions from the 'apps.report' module.
+    Otherwise, it calls the get_model_sheet_data_getter method of the ExcelDownload object to get the sheet data getter
+    function and generates the Excel file using the get_excel_sheet_content function.
 
-    If an exception occurs during the generation process, the method catches the exception and updates the status of the ExcelDownload object as FAILED.
+    If an exception occurs during the generation process, the method catches the exception and updates the status of the
+    ExcelDownload object as FAILED.
 
-    Note: This method is a Celery task and has a time limit set using the settings.EXCEL_EXPORT_PROGRESS_STATE_TIMEOUT value.
+    Note: This method is a Celery task and has a time limit set using the settings.EXCEL_EXPORT_PROGRESS_STATE_TIMEOUT
+    value.
 
     """
     from apps.contrib.models import ExcelDownload
@@ -204,7 +212,8 @@ def kill_all_old_excel_exports():
 @celery_app.task
 def kill_all_long_running_previews():
     """
-    Kills all long running previews by updating the status of the SourcePreview objects to 'KILLED'. The method is a Celery task and is decorated with '@celery_app.task'.
+    Kills all long running previews by updating the status of the SourcePreview objects to 'KILLED'. The method is a
+    Celery task and is decorated with '@celery_app.task'.
 
     Parameters:
         None
@@ -230,7 +239,8 @@ def kill_all_long_running_previews():
 def kill_all_long_running_report_generations():
     """
 
-    This method kills all long-running report generations which have been in progress for more than twice the REPORT_TIMEOUT value.
+    This method kills all long-running report generations which have been in progress for more than twice the
+    REPORT_TIMEOUT value.
 
     @return: None
 
@@ -391,7 +401,8 @@ def save_and_delete_tracked_data_from_redis_to_db():
 
     Save and Delete Tracked Data from Redis to Database
 
-    This method retrieves tracked data from Redis cache, updates the corresponding records in the database, and deletes the Redis keys.
+    This method retrieves tracked data from Redis cache, updates the corresponding records in the database, and deletes
+    the Redis keys.
 
     """
     from apps.contrib.models import ClientTrackInfo

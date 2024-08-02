@@ -23,7 +23,8 @@ class UserFilter(django_filters.FilterSet):
     - role_in: Filter users by role. Accepts a list of roles.
     - role_not_in: Filter users by excluding roles. Accepts a list of roles.
     - monitoring_sub_region_in: Filter users by monitoring sub region. Accepts a list of monitoring sub region ids.
-    - monitoring_sub_region_not_in: Filter users by excluding monitoring sub region. Accepts a list of monitoring sub region ids.
+    - monitoring_sub_region_not_in: Filter users by excluding monitoring sub region. Accepts a list of monitoring sub
+    region ids.
     - full_name: Filter users by full name. Accepts a string value.
     - include_inactive: Filter users by including or excluding inactive users. Accepts a boolean value.
     - id: Filter users by id. Accepts an exact id value.
@@ -106,13 +107,15 @@ class UserFilter(django_filters.FilterSet):
 
 class PortfolioFilter(django_filters.FilterSet):
     """
-    The PortfolioFilter class is a subclass of django_filters.FilterSet and is used to filter instances of the Portfolio model. It provides the role_in filter, which allows filtering by the role field using a list of values.
+    The PortfolioFilter class is a subclass of django_filters.FilterSet and is used to filter instances of the Portfolio
+    model. It provides the role_in filter, which allows filtering by the role field using a list of values.
 
     Attributes:
         - role_in (StringListFilter): A filter for the role field using a list of values.
 
     Methods:
-        - filter_role_in(queryset, name, value): This method is used to filter the queryset based on the role field. It takes three parameters:
+        - filter_role_in(queryset, name, value): This method is used to filter the queryset based on the role field. It
+        takes three parameters:
             - queryset (QuerySet): The initial queryset to be filtered.
             - name (str): The name of the field being filtered.
             - value (list): The list of role values to filter on.
@@ -123,7 +126,8 @@ class PortfolioFilter(django_filters.FilterSet):
         filter = PortfolioFilter(data=request.GET, queryset=Portfolio.objects.all())
         filtered_queryset = filter.qs
 
-        Note that to use the filter_role_in method, you need to specify it in the method attribute of the role_in filter when defining the PortfolioFilter class.
+        Note that to use the filter_role_in method, you need to specify it in the method attribute of the role_in filter
+        when defining the PortfolioFilter class.
     """
     role_in = StringListFilter(method='filter_role_in')
 
@@ -145,7 +149,8 @@ class ReviewerUserFilter(UserFilter):
     """
     A class representing a reviewer user filter.
 
-    This class extends the UserFilter class and provides a filtered queryset of users who have the 'add_review' permission.
+    This class extends the UserFilter class and provides a filtered queryset of users who have the 'add_review'
+    permission.
 
     Attributes:
         qs (django.db.models.query.QuerySet): The filtered queryset of users.

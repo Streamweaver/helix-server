@@ -82,15 +82,18 @@ class DisaggregatedStratumSerializer(serializers.Serializer):
     Class Name: DisaggregatedStratumSerializer
 
     Class Description:
-    This class is a serializer for the DisaggregatedStratum model. It is responsible for validating and serializing the data for a DisaggregatedStratum object.
+    This class is a serializer for the DisaggregatedStratum model. It is responsible for validating and serializing the
+    data for a DisaggregatedStratum object.
 
     Attributes:
     - uuid: A UUIDField that represents the UUID of the DisaggregatedStratum object. It is required.
     - date: A DateField that represents the date of the DisaggregatedStratum object. It is required.
-    - value: An IntegerField that represents the value of the DisaggregatedStratum object. It is required and must be greater than or equal to 0.
+    - value: An IntegerField that represents the value of the DisaggregatedStratum object. It is required and must be
+    greater than or equal to 0.
 
     Methods:
-    - validate: A method that validates the attributes of the serializer. It converts the 'uuid' and 'date' attributes to strings before returning the validated attributes.
+    - validate: A method that validates the attributes of the serializer. It converts the 'uuid' and 'date' attributes
+    to strings before returning the validated attributes.
 
     """
     uuid = serializers.UUIDField(required=True)
@@ -548,16 +551,31 @@ class FigureSerializer(
 
     Attributes:
     - `id`: An `IntegerField` representing the ID of the figure (optional).
-    - `disaggregation_age`: A `DisaggregatedAgeSerializer` that serializes and deserializes instances of the `DisaggregatedAge` model (many, optional, not nullable).
-    - `geo_locations`: An `OSMNameSerializer` that serializes and deserializes instances of the `OSMName` model (many, optional, not nullable).
-    - `Meta`: A nested class that contains metadata for the serializer, including the `model` (set to `Figure`), `fields` (a list of field names to include in serialization), and `extra_kwargs` (extra options for specific fields).
+    - `disaggregation_age`: A `DisaggregatedAgeSerializer` that serializes and deserializes instances of the
+    `DisaggregatedAge` model (many, optional, not nullable).
+    - `geo_locations`: An `OSMNameSerializer` that serializes and deserializes instances of the `OSMName` model (many,
+    optional, not nullable).
+    - `Meta`: A nested class that contains metadata for the serializer, including the `model` (set to `Figure`),
+    `fields` (a list of field names to include in serialization), and `extra_kwargs` (extra options for specific
+    fields).
 
     Methods:
-    - `create(self, validated_data: dict) -> Figure`: Creates a new `Figure` instance with the provided validated data. This method adds the currently authenticated user as the `created_by` field and handles related models such as `geo_locations`, `tags`, `context_of_violence`, `disaggregation_age`, and `sources`. It also sends notifications and updates the `BulkUpdateFigureManager`.
-    - `_update_locations(self, instance, attr: str, data: list)`: Private method that updates the `geo_locations` field of the given `instance` with the provided `data`. It handles creating, updating, and deleting related `OSMName` instances.
-    - `_update_disaggregation_age(self, instance, attr: str, data: list)`: Private method that updates the `disaggregation_age` field of the given `instance` with the provided `data`. It handles creating, updating, and deleting related `DisaggregatedAge` instances.
-    - `_send_event_change_notification(self, figure, existing_event, new_event)`: Private method that sends notifications when the `event` field of the given `figure` is changed.
-    - `update(self, instance: Figure, validated_data)`: Updates an existing `Figure` instance with the provided validated data. This method handles updates to the `geo_locations`, `disaggregation_age`, `tags`, `context_of_violence`, and `sources` fields. It also sends notifications, updates the `BulkUpdateFigureManager`, and updates the `Figure` status.
+    - `create(self, validated_data: dict) -> Figure`: Creates a new `Figure` instance with the provided validated data.
+    This method adds the currently authenticated user as the `created_by` field and handles related models such as
+    `geo_locations`, `tags`, `context_of_violence`, `disaggregation_age`, and `sources`. It also sends notifications and
+    updates the `BulkUpdateFigureManager`.
+    - `_update_locations(self, instance, attr: str, data: list)`: Private method that updates the `geo_locations` field
+    of the given `instance` with the provided `data`. It handles creating, updating, and deleting related `OSMName`
+    instances.
+    - `_update_disaggregation_age(self, instance, attr: str, data: list)`: Private method that updates the
+    `disaggregation_age` field of the given `instance` with the provided `data`. It handles creating, updating, and
+    deleting related `DisaggregatedAge` instances.
+    - `_send_event_change_notification(self, figure, existing_event, new_event)`: Private method that sends
+    notifications when the `event` field of the given `figure` is changed.
+    - `update(self, instance: Figure, validated_data)`: Updates an existing `Figure` instance with the provided
+    validated data. This method handles updates to the `geo_locations`, `disaggregation_age`, `tags`,
+    `context_of_violence`, and `sources` fields. It also sends notifications, updates the `BulkUpdateFigureManager`, and
+    updates the `Figure` status.
 
     Note: This documentation does not include example code."""
     id = IntegerIDField(required=False)
@@ -841,14 +859,16 @@ class FigureTagCreateSerializer(MetaInformationSerializerMixin,
     """
     Serializer for creating a FigureTag instance.
 
-    This serializer extends MetaInformationSerializerMixin and ModelSerializer to provide a way to serialize and validate FigureTag data when creating a new instance.
+    This serializer extends MetaInformationSerializerMixin and ModelSerializer to provide a way to serialize and
+    validate FigureTag data when creating a new instance.
 
     Attributes:
         Meta (class): Inner class that defines the metadata options for the serializer.
 
         model (class): Specifies the model class that the serializer is based on, which in this case is FigureTag.
 
-        fields (str or tuple): Specifies the fields to include in the serialized output. Using '__all__' includes all fields.
+        fields (str or tuple): Specifies the fields to include in the serialized output. Using '__all__' includes all
+        fields.
 
     """
     class Meta:
@@ -885,7 +905,8 @@ class FigureReadOnlySerializer(serializers.ModelSerializer):
         displacement_type (serializers.CharField): Serializes the 'figure_cause' field of the Figure model.
         qualifier (serializers.CharField): Serializes the 'quantifier_label' field of the Figure model.
         figure (serializers.IntegerField): Serializes the 'total_figures' field of the Figure model as an integer.
-        displacement_start_date (serializers.CharField): Serializes the 'displacement_start_date' field of the Figure model.
+        displacement_start_date (serializers.CharField): Serializes the 'displacement_start_date' field of the Figure
+        model.
         displacement_end_date (serializers.CharField): Serializes the 'displacement_end_date' field of the Figure model.
         displacement_date (serializers.CharField): Serializes the 'displacement_date' field of the Figure model.
         event_name (serializers.CharField): Serializes the 'event_name' field of the Figure model.
@@ -907,7 +928,8 @@ class FigureReadOnlySerializer(serializers.ModelSerializer):
         locations_coordinates (serializers.CharField): Serializes the 'locations_coordinates' field of the Figure model.
         locations_accuracy (serializers.CharField): Serializes the 'locations_accuracy' field of the Figure model.
         locations_type (serializers.CharField): Serializes the 'locations_type' field of the Figure model.
-        displacement_occurred (serializers.CharField): Serializes the 'displacement_occurred_transformed' field of the Figure model.
+        displacement_occurred (serializers.CharField): Serializes the 'displacement_occurred_transformed' field of the
+        Figure model.
 
         Meta (class): Meta class for configuring the serializer.
 

@@ -17,7 +17,8 @@ class OrganizationCountriesLoader(DataLoader):
         Parameters:
             - keys: A list of organization keys for which countries need to be loaded.
         Returns:
-            - A Promise that resolves to a list of countries associated with the given organization keys. The order of the
+            - A Promise that resolves to a list of countries associated with the given organization keys. The order of
+            the
               countries in the list corresponds to the order of the organization keys provided.
 
     Example usage:
@@ -53,7 +54,8 @@ class OrganizationOrganizationKindLoader(DataLoader):
             - keys (list): A list of organization IDs.
 
         Returns:
-            - Promise: A promise that resolves to a list of organization kinds corresponding to the given organization IDs.
+            - Promise: A promise that resolves to a list of organization kinds corresponding to the given organization
+            IDs.
 
     """
     def batch_load_fn(self, keys: list):

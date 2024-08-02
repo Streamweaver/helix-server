@@ -108,7 +108,8 @@ class GiddTimeSeriesStatisticsByCountryType(graphene.ObjectType):
     - year: An integer representing the year of the statistics. It is a required attribute.
     - total: An integer representing the total number of statistics. It is an optional attribute.
     - total_rounded: An integer representing the rounded total number of statistics. It is an optional attribute.
-    - country: A GiddDisasterCountryType object representing the country associated with the statistics. It is a required attribute.
+    - country: A GiddDisasterCountryType object representing the country associated with the statistics. It is a
+    required attribute.
     """
     year = graphene.Int(required=True)
     total = graphene.Int()
@@ -150,10 +151,14 @@ class GiddConflictStatisticsType(graphene.ObjectType):
     - total_displacements_rounded (int): The rounded total number of displacements.
     - total_displacement_countries (int): The total number of countries with displacement.
     - internal_displacement_countries (int): The total number of countries with internal displacement.
-    - new_displacement_timeseries_by_year (List[GiddTimeSeriesStatisticsByYearType]): A list of GiddTimeSeriesStatisticsByYearType objects representing the new displacement statistics by year.
-    - new_displacement_timeseries_by_country (List[GiddTimeSeriesStatisticsByCountryType]): A list of GiddTimeSeriesStatisticsByCountryType objects representing the new displacement statistics by country.
-    - total_displacement_timeseries_by_year (List[GiddTimeSeriesStatisticsByYearType]): A list of GiddTimeSeriesStatisticsByYearType objects representing the total displacement statistics by year.
-    - total_displacement_timeseries_by_country (List[GiddTimeSeriesStatisticsByCountryType]): A list of GiddTimeSeriesStatisticsByCountryType objects representing the total displacement statistics by country.
+    - new_displacement_timeseries_by_year (List[GiddTimeSeriesStatisticsByYearType]): A list of
+    GiddTimeSeriesStatisticsByYearType objects representing the new displacement statistics by year.
+    - new_displacement_timeseries_by_country (List[GiddTimeSeriesStatisticsByCountryType]): A list of
+    GiddTimeSeriesStatisticsByCountryType objects representing the new displacement statistics by country.
+    - total_displacement_timeseries_by_year (List[GiddTimeSeriesStatisticsByYearType]): A list of
+    GiddTimeSeriesStatisticsByYearType objects representing the total displacement statistics by year.
+    - total_displacement_timeseries_by_country (List[GiddTimeSeriesStatisticsByCountryType]): A list of
+    GiddTimeSeriesStatisticsByCountryType objects representing the total displacement statistics by country.
 
     """
     new_displacements = graphene.Int()
@@ -441,7 +446,8 @@ class GiddPublicFigureAnalysisType(DjangoObjectType):
         figure_cause (graphene.Field): A field representing the CrisisTypeGrapheneEnum.
         figure_cause_display (EnumDescription): An EnumDescription object representing the display of figure_cause.
         figure_category (graphene.Field): A field representing the FigureCategoryTypeEnum.
-        figure_category_display (EnumDescription): An EnumDescription object representing the display of figure_category.
+        figure_category_display (EnumDescription): An EnumDescription object representing the display of
+        figure_category.
 
     """
     class Meta:
@@ -516,7 +522,8 @@ class GiddPublicCountryType(graphene.ObjectType):
     Attributes:
     - id (str): The ID of the country.
     - iso3 (str): The ISO3 code of the country.
-    - idmc_short_name (str): The short name of the country in the International Displacement Monitoring Centre (IDMC) system.
+    - idmc_short_name (str): The short name of the country in the International Displacement Monitoring Centre (IDMC)
+    system.
     - region (GiddPublicCountryRegionType): The region that the country belongs to.
 
     """
@@ -642,7 +649,8 @@ class GiddEventType(graphene.ObjectType):
         glide_numbers (List[str]): The list of glide numbers associated with the event.
         event_codes (List[str]): The list of event codes associated with the event.
         event_codes_type (List[str]): The list of event code types associated with the event.
-        affected_countries (List[GiddEventAffectedCountryType]): The list of affected countries associated with the event.
+        affected_countries (List[GiddEventAffectedCountryType]): The list of affected countries associated with the
+        event.
         hazard_types (List[GiddHazardType]): The list of hazard types associated with the event.
 
     Note:
@@ -684,30 +692,46 @@ class Query(graphene.ObjectType):
     """
     Class Query
 
-    This class represents a GraphQL query object that defines various fields that can be queried. Each field corresponds to a specific data query or operation.
+    This class represents a GraphQL query object that defines various fields that can be queried. Each field corresponds
+    to a specific data query or operation.
 
     Fields:
-    - gidd_public_conflicts: A DjangoPaginatedListObjectField representing a paginated list of GiddConflictListType objects. Requires the 'client_id' parameter.
-    - gidd_public_disasters: A DjangoPaginatedListObjectField representing a paginated list of GiddDisasterListType objects. Requires the 'client_id' parameter.
-    - gidd_public_conflict_statistics: A graphene.Field representing GiddConflictStatisticsType object. Requires the 'client_id' parameter and additional filtering parameters.
-    - gidd_public_disaster_statistics: A graphene.Field representing GiddDisasterStatisticsType object. Requires the 'client_id' parameter and additional filtering parameters.
+    - gidd_public_conflicts: A DjangoPaginatedListObjectField representing a paginated list of GiddConflictListType
+    objects. Requires the 'client_id' parameter.
+    - gidd_public_disasters: A DjangoPaginatedListObjectField representing a paginated list of GiddDisasterListType
+    objects. Requires the 'client_id' parameter.
+    - gidd_public_conflict_statistics: A graphene.Field representing GiddConflictStatisticsType object. Requires the
+    'client_id' parameter and additional filtering parameters.
+    - gidd_public_disaster_statistics: A graphene.Field representing GiddDisasterStatisticsType object. Requires the
+    'client_id' parameter and additional filtering parameters.
     - gidd_log: A DjangoObjectField representing a GiddStatusLogType object.
     - gidd_logs: A DjangoPaginatedListObjectField representing a paginated list of GiddStatusLogListType objects.
-    - gidd_public_release_meta_data: A graphene.Field representing a GiddReleaseMetadataType object. Requires the 'client_id' parameter.
+    - gidd_public_release_meta_data: A graphene.Field representing a GiddReleaseMetadataType object. Requires the
+    'client_id' parameter.
     - gidd_release_meta_data: A graphene.Field representing a GiddReleaseMetadataType object.
     - gidd_public_countries: A graphene.List of GiddPublicCountryType objects. Requires the 'client_id' parameter.
     - gidd_public_hazard_types: A graphene.List of GiddHazardType objects. Requires the 'client_id' parameter.
-    - gidd_public_figure_analysis_list: A DjangoPaginatedListObjectField representing a paginated list of GiddPublicFigureAnalysisListType objects. Requires the 'client_id' parameter.
-    - gidd_public_displacements: A DjangoPaginatedListObjectField representing a paginated list of GiddDisplacementDataListType objects. Requires the 'client_id' parameter.
-    - gidd_public_year: A graphene.Field representing a GiddYearType object. Requires the 'release_environment' and 'client_id' parameters.
-    - gidd_public_event: A graphene.Field representing a GiddEventType object. Requires the 'event_id', 'client_id' parameters, and additional filtering parameters.
-    - gidd_public_combined_statistics: A graphene.Field representing a GiddCombinedStatisticsType object. Requires the 'client_id' parameter and additional filtering parameters.
+    - gidd_public_figure_analysis_list: A DjangoPaginatedListObjectField representing a paginated list of
+    GiddPublicFigureAnalysisListType objects. Requires the 'client_id' parameter.
+    - gidd_public_displacements: A DjangoPaginatedListObjectField representing a paginated list of
+    GiddDisplacementDataListType objects. Requires the 'client_id' parameter.
+    - gidd_public_year: A graphene.Field representing a GiddYearType object. Requires the 'release_environment' and
+    'client_id' parameters.
+    - gidd_public_event: A graphene.Field representing a GiddEventType object. Requires the 'event_id', 'client_id'
+    parameters, and additional filtering parameters.
+    - gidd_public_combined_statistics: A graphene.Field representing a GiddCombinedStatisticsType object. Requires the
+    'client_id' parameter and additional filtering parameters.
 
     Methods:
-    - resolve_gidd_public_release_meta_data: Resolves the 'gidd_public_release_meta_data' field by retrieving the last ReleaseMetadata object from the database. Requires the 'client_id' parameter.
-    - resolve_gidd_release_meta_data: Resolves the 'gidd_release_meta_data' field by retrieving the last ReleaseMetadata object from the database.
-    - resolve_gidd_public_countries: Resolves the 'gidd_public_countries' field by retrieving a list of GiddPublicCountryType objects from the database. Requires the 'client_id' parameter.
-    - resolve_gidd_public_conflict_statistics: Resolves the 'gidd_public_conflict_statistics' field by performing various queries and aggregations on the ConflictStatistics model. Requires the 'client_id' parameter and additional filtering parameters.
+    - resolve_gidd_public_release_meta_data: Resolves the 'gidd_public_release_meta_data' field by retrieving the last
+    ReleaseMetadata object from the database. Requires the 'client_id' parameter.
+    - resolve_gidd_release_meta_data: Resolves the 'gidd_release_meta_data' field by retrieving the last ReleaseMetadata
+    object from the database.
+    - resolve_gidd_public_countries: Resolves the 'gidd_public_countries' field by retrieving a list of
+    GiddPublicCountryType objects from the database. Requires the 'client_id' parameter.
+    - resolve_gidd_public_conflict_statistics: Resolves the 'gidd_public_conflict_statistics' field by performing
+    various queries and aggregations on the ConflictStatistics model. Requires the 'client_id' parameter and additional
+    filtering parameters.
     - ... (continues for each method)
 
     Note: More detailed documentation can be found in the source code for each method.

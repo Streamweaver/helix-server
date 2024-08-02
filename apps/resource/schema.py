@@ -17,7 +17,8 @@ class ResourceType(DjangoObjectType):
         N/A
 
     Usage:
-        To use this class, simply subclass it and specify the Django model representing the resource type in the `Meta` class.
+        To use this class, simply subclass it and specify the Django model representing the resource type in the `Meta`
+        class.
 
     Example:
         class CustomResourceType(ResourceType):
@@ -52,7 +53,8 @@ class Query:
 
     Class Query
 
-    This class represents the GraphQL query type in the application. It defines the fields and their corresponding resolvers for retrieving resources and resource groups.
+    This class represents the GraphQL query type in the application. It defines the fields and their corresponding
+    resolvers for retrieving resources and resource groups.
 
     Attributes:
     - resource: A DjangoObjectField representing a single resource.
@@ -61,8 +63,10 @@ class Query:
     - resource_group_list: A List of ResourceGroupType representing a list of resource groups.
 
     Methods:
-    - resolve_resource_list: A resolver method that retrieves a list of resources based on the currently authenticated user.
-    - resolve_resource_group_list: A resolver method that retrieves a list of resource groups based on the currently authenticated user.
+    - resolve_resource_list: A resolver method that retrieves a list of resources based on the currently authenticated
+    user.
+    - resolve_resource_group_list: A resolver method that retrieves a list of resource groups based on the currently
+    authenticated user.
 
     """
     resource = DjangoObjectField(ResourceType)

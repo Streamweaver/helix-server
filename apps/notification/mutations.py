@@ -7,14 +7,17 @@ from apps.notification.schema import GenericNotificationType
 
 class ToggleNotificationRead(graphene.Mutation):
     """
-    ToggleNotificationRead class is a mutation class that is responsible for toggling the read status of a notification. It takes the notification ID as an argument and returns the updated notification object along with an 'ok' flag and any errors that may occur.
+    ToggleNotificationRead class is a mutation class that is responsible for toggling the read status of a notification.
+    It takes the notification ID as an argument and returns the updated notification object along with an 'ok' flag and
+    any errors that may occur.
 
     Args:
         id (graphene.ID): The ID of the notification that needs to be toggled.
 
     Returns:
         - ok (graphene.Boolean): A boolean flag indicating whether the mutation was successful or not.
-        - errors (List[graphene.NonNull(CustomErrorType)]): A list of custom error objects (CustomErrorType) that may occur during the mutation process.
+        - errors (List[graphene.NonNull(CustomErrorType)]): A list of custom error objects (CustomErrorType) that may
+        occur during the mutation process.
         - result (graphene.Field(GenericNotificationType)): The updated notification object.
 
     """
@@ -52,7 +55,8 @@ class Mutation(object):
     This class represents a mutation for toggling the read status of a notification.
 
     Attributes:
-        toggle_notification_read (ToggleNotificationRead.Field): A field representing the toggle_notification_read mutation.
+        toggle_notification_read (ToggleNotificationRead.Field): A field representing the toggle_notification_read
+        mutation.
 
     """
     toggle_notification_read = ToggleNotificationRead.Field()

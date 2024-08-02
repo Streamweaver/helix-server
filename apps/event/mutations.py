@@ -51,7 +51,8 @@ class CreateActor(graphene.Mutation):
 
     Methods:
         mutate(root, info, data):
-            This method is responsible for executing the mutation. It takes three parameters: `root`, `info`, and `data`.
+            This method is responsible for executing the mutation. It takes three parameters: `root`, `info`, and
+            `data`.
             - `root`: The root value of the GraphQL query, unused in this context.
             - `info`: The GraphQLResolveInfo object that contains information about the execution state.
             - `data`: The input data for creating the actor instance.
@@ -92,7 +93,8 @@ class UpdateActor(graphene.Mutation):
     - result: A field of type ActorType that represents the updated actor object.
 
     Methods:
-    - mutate: A static method decorated with the permission_checker decorator that performs the mutation operation. It takes three parameters:
+    - mutate: A static method decorated with the permission_checker decorator that performs the mutation operation. It
+    takes three parameters:
 
       - root: The root object for the query or mutation.
 
@@ -100,9 +102,11 @@ class UpdateActor(graphene.Mutation):
 
       - data: The input data for the mutation.
 
-      The method first attempts to retrieve the actor object with the given ID from the database. If the actor does not exist, it returns an UpdateActor object with an error indicating that the actor does not exist.
+      The method first attempts to retrieve the actor object with the given ID from the database. If the actor does not
+      exist, it returns an UpdateActor object with an error indicating that the actor does not exist.
 
-      It then creates an instance of the ActorSerializer with the retrieved actor object and the input data. The serializer is initialized with the context containing the request object from the info context.
+      It then creates an instance of the ActorSerializer with the retrieved actor object and the input data. The
+      serializer is initialized with the context containing the request object from the info context.
 
       If any validation errors occur during"""
     class Arguments:
@@ -142,7 +146,10 @@ class DeleteActor(graphene.Mutation):
         - result: Field of type ActorType, represents the deleted Actor object.
 
     Methods:
-        - mutate: Static method decorator that performs the deletion of the Actor object. It verifies the permission 'event.delete_actor', retrieves the Actor instance based on the provided id, and deletes it. If the Actor does not exist, it returns a DeleteActor object with an error message. Otherwise, it returns a DeleteActor object with the deleted Actor instance, no errors, and ok set to True.
+        - mutate: Static method decorator that performs the deletion of the Actor object. It verifies the permission
+        'event.delete_actor', retrieves the Actor instance based on the provided id, and deletes it. If the Actor does
+        not exist, it returns a DeleteActor object with an error message. Otherwise, it returns a DeleteActor object
+        with the deleted Actor instance, no errors, and ok set to True.
 
     Usage example:
 
@@ -230,20 +237,24 @@ class CreateEvent(graphene.Mutation):
 
 class UpdateEvent(graphene.Mutation):
     """
-    The UpdateEvent class is a subclass of graphene.Mutation. It represents a GraphQL mutation that is used to update an event.
+    The UpdateEvent class is a subclass of graphene.Mutation. It represents a GraphQL mutation that is used to update an
+    event.
 
     Attributes:
-        Arguments (class attribute): Defines the arguments required for the mutation. It includes a single argument 'data',
+        Arguments (class attribute): Defines the arguments required for the mutation. It includes a single argument
+        'data',
                                     which is of type EventUpdateInputType and is required.
 
-        errors (class attribute): A List of CustomErrorType objects. It represents any errors that occur during the mutation.
+        errors (class attribute): A List of CustomErrorType objects. It represents any errors that occur during the
+        mutation.
 
         ok (class attribute): A Boolean value indicating the success or failure of the mutation.
 
         result (class attribute): A Field of type EventType. It represents the updated event.
 
     Methods:
-        mutate(root, info, data): A static method that performs the mutation. It takes three arguments - root, info, and data.
+        mutate(root, info, data): A static method that performs the mutation. It takes three arguments - root, info, and
+        data.
 
             Parameters:
                 root: The root value provided by the GraphQL resolver.
@@ -253,7 +264,8 @@ class UpdateEvent(graphene.Mutation):
                 data: The input data for the mutation, of type EventUpdateInputType.
 
             Returns:
-                If the event with the specified ID does not exist, it returns an instance of UpdateEvent with errors set to a list containing a single error dictionary with the fields 'field' set to"""
+                If the event with the specified ID does not exist, it returns an instance of UpdateEvent with errors set
+                to a list containing a single error dictionary with the fields 'field' set to"""
     class Arguments:
         data = EventUpdateInputType(required=True)
 
@@ -285,21 +297,25 @@ class UpdateEvent(graphene.Mutation):
 class DeleteEvent(graphene.Mutation):
     """
 
-    The DeleteEvent class is a mutation class in Graphene that is used to delete an event. It accepts an ID as a required argument, which specifies the ID of the event to be deleted.
+    The DeleteEvent class is a mutation class in Graphene that is used to delete an event. It accepts an ID as a
+    required argument, which specifies the ID of the event to be deleted.
 
     Attributes:
-        - errors (List[CustomErrorType]): A list of CustomErrorType objects that represent any errors that occurred during the mutation.
+        - errors (List[CustomErrorType]): A list of CustomErrorType objects that represent any errors that occurred
+        during the mutation.
         - ok (Boolean): A boolean value indicating whether the mutation was successful.
         - result (EventType): An object of the EventType class representing the deleted event.
 
     Methods:
-        - mutate(root, info, id): This method is a static method that performs the actual deletion of the event. It takes three arguments:
+        - mutate(root, info, id): This method is a static method that performs the actual deletion of the event. It
+        takes three arguments:
             - root: The root object that contains the query or mutation.
             - info: The GraphQL ResolveInfo object containing information about the execution state.
             - id: The ID of the event to be deleted.
 
             The method performs the following steps:
-            1. Tries to retrieve an instance of the Event model with the given ID. If it does not exist, it returns a DeleteEvent object with an error indicating that the event does not exist.
+            1. Tries to retrieve an instance of the Event model with the given ID. If it does not exist, it returns a
+            DeleteEvent object with an error indicating that the event does not exist.
             2. Deletes the instance from the database.
             3. Sets the ID of the deleted instance"""
     class Arguments:
@@ -346,7 +362,8 @@ class ExportActors(ExportBaseMutation):
     Class: ExportActors
 
     Description:
-    This class is a subclass of ExportBaseMutation and is used to export actor data. It provides a method to download actor data in Excel format.
+    This class is a subclass of ExportBaseMutation and is used to export actor data. It provides a method to download
+    actor data in Excel format.
 
     Attributes:
     - DOWNLOAD_TYPE (str): Specifies the type of download as 'ACTOR'.
@@ -438,8 +455,10 @@ class CreateContextOfViolence(graphene.Mutation):
                 - info: The GraphQL ResolveInfo object.
                 - data: The input data for creating the context of violence.
             - Returns:
-                - If there are any errors in the input data, it returns an instance of CreateContextOfViolence with errors and ok set to False.
-                - Otherwise, it saves the context of violence using the input data and returns an instance of CreateContextOfViolence with the created instance, errors set to None, and ok set to True.
+                - If there are any errors in the input data, it returns an instance of CreateContextOfViolence with
+                errors and ok set to False.
+                - Otherwise, it saves the context of violence using the input data and returns an instance of
+                CreateContextOfViolence with the created instance, errors set to None, and ok set to True.
 
     Note: In order to use this class, the user must have the 'event.add_contextofviolence' permission"""
     class Arguments:
@@ -462,7 +481,8 @@ class CreateContextOfViolence(graphene.Mutation):
 class UpdateContextOfViolence(graphene.Mutation):
     """
 
-    UpdateContextOfViolence class is a mutation class used to update the context of violence. It receives a ContextOfViolenceUpdateInputType as an argument and returns a result of type ContextOfViolenceType.
+    UpdateContextOfViolence class is a mutation class used to update the context of violence. It receives a
+    ContextOfViolenceUpdateInputType as an argument and returns a result of type ContextOfViolenceType.
 
     Attributes:
     - errors: A list of CustomErrorType objects to store any errors that occur during the mutation.
@@ -470,7 +490,8 @@ class UpdateContextOfViolence(graphene.Mutation):
     - result: A field of type ContextOfViolenceType to store the updated context of violence.
 
     Methods:
-    - mutate: A static method decorated with @permission_checker that performs the mutation. It takes root, info, and data as arguments.
+    - mutate: A static method decorated with @permission_checker that performs the mutation. It takes root, info, and
+    data as arguments.
       - root: The root value passed by the GraphQL server.
       - info: An object containing information about the execution of the query/mutation.
       - data: The input data for updating the context of violence.
@@ -504,7 +525,8 @@ class UpdateContextOfViolence(graphene.Mutation):
 
 class DeleteContextOfViolence(graphene.Mutation):
     """
-    The `DeleteContextOfViolence` class is a mutation class that is responsible for deleting a context of violence object.
+    The `DeleteContextOfViolence` class is a mutation class that is responsible for deleting a context of violence
+    object.
 
     Args:
         id: The ID of the context of violence object that needs to be deleted. (required)
@@ -631,7 +653,8 @@ class SetAssigneeToEvent(graphene.Mutation):
 
 class SetSelfAssigneeToEvent(graphene.Mutation):
     """
-    The `SetSelfAssigneeToEvent` class is a mutation that allows the current user to assign themselves as the assignee of a specified event.
+    The `SetSelfAssigneeToEvent` class is a mutation that allows the current user to assign themselves as the assignee
+    of a specified event.
 
     Parameters:
     - `event_id` (required): The ID of the event to be assigned.
@@ -797,7 +820,8 @@ class ClearSelfAssigneFromEvent(graphene.Mutation):
         Arguments:
             event_id (graphene.ID): The ID of the event to clear self assignee from.
 
-        errors (graphene.List[graphene.NonNull(CustomErrorType)]): A list of custom error messages returned by the mutation.
+        errors (graphene.List[graphene.NonNull(CustomErrorType)]): A list of custom error messages returned by the
+        mutation.
 
         ok (graphene.Boolean): A boolean indicating if the mutation was successful.
 
@@ -916,7 +940,8 @@ class SignOffEvent(graphene.Mutation):
 
 class ExportContextOfViolences(ExportBaseMutation):
     """
-    ExportContextOfViolences class is a subclass of ExportBaseMutation class. It represents a mutation for exporting the context of violences data.
+    ExportContextOfViolences class is a subclass of ExportBaseMutation class. It represents a mutation for exporting the
+    context of violences data.
 
     Attributes:
         DOWNLOAD_TYPE (str): The download type for context of violences export.
@@ -943,7 +968,8 @@ class Mutation(object):
 
     Class: Mutation
 
-    This class represents a collection of fields that define the mutations available in a system. Each mutation corresponds to a specific action that can be performed on the system's data.
+    This class represents a collection of fields that define the mutations available in a system. Each mutation
+    corresponds to a specific action that can be performed on the system's data.
 
     Attributes:
     - create_event: A field representing the mutation to create an event.

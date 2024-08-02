@@ -38,7 +38,8 @@ RegisterInputType = generate_input_type_for_serializer(
 class Register(graphene.Mutation):
     """
 
-    The Register class is a mutation class that is used to register a user in a GraphQL API. It takes in a RegisterInputType object as an argument, which contains the data required to register a user.
+    The Register class is a mutation class that is used to register a user in a GraphQL API. It takes in a
+    RegisterInputType object as an argument, which contains the data required to register a user.
 
     Attributes:
     - data (RegisterInputType): The input data required for user registration.
@@ -48,7 +49,10 @@ class Register(graphene.Mutation):
     - captcha_required (bool): Indicates whether captcha is required or not.
 
     Methods:
-    - mutate: This static method is responsible for registering the user using the provided data. It takes in the root, info, and data arguments. The root argument is the root value that was passed at the beginning of the execution, the info argument contains information about the execution context, and the data argument is the RegisterInputType object containing the user registration data. The method returns a Register object.
+    - mutate: This static method is responsible for registering the user using the provided data. It takes in the root,
+    info, and data arguments. The root argument is the root value that was passed at the beginning of the execution, the
+    info argument contains information about the execution context, and the data argument is the RegisterInputType
+    object containing the user registration data. The method returns a Register object.
 
     """
     class Arguments:
@@ -161,13 +165,15 @@ ActivateInputType = generate_input_type_for_serializer(
 
 class Activate(graphene.Mutation):
     """
-    The Activate class is a Mutation class defined in the Graphene library. It represents a mutation operation that activates a certain data input.
+    The Activate class is a Mutation class defined in the Graphene library. It represents a mutation operation that
+    activates a certain data input.
 
     Attributes:
         - Arguments:
             - data: An instance of ActivateInputType, which is a required argument for the mutation.
 
-        - errors: A list of CustomErrorType objects. Each CustomErrorType object represents an error that occurred during the activation mutation.
+        - errors: A list of CustomErrorType objects. Each CustomErrorType object represents an error that occurred
+        during the activation mutation.
 
         - ok: A boolean value indicating the success state of the activation mutation.
 
@@ -250,21 +256,27 @@ class ChangeUserPassword(graphene.Mutation):
     - data: This is a required argument of type UserPasswordInputType. It contains the new password data for the user.
 
     Attributes:
-    - errors: A list of CustomErrorType objects. If there are any errors during the mutation process, they will be stored in this list.
+    - errors: A list of CustomErrorType objects. If there are any errors during the mutation process, they will be
+    stored in this list.
     - ok: A boolean value indicating the success or failure of the mutation.
     - result: A field of type UserType. It represents the updated user object after the password change.
 
     Methods:
-    - mutate(root, info, data): This is a static method decorated with the @is_authenticated() decorator. It is the main method of the mutation class and is responsible for performing the password change. It takes three arguments:
+    - mutate(root, info, data): This is a static method decorated with the @is_authenticated() decorator. It is the main
+    method of the mutation class and is responsible for performing the password change. It takes three arguments:
       - root: The root object, which is not used in this method.
       - info: The GraphQL Resolve Info object, which contains information about the executing query and schema.
       - data: The new password data provided by the user.
 
       Inside the method:
-      - A UserPasswordSerializer instance is created with the current user as the instance, the provided password data, and the request context.
-      - If there are any validation errors, the method "mutation_is_not_valid" is called, and the errors are assigned to the "errors" attribute.
-      - If there are no errors, the serializer saves the changes and the updated user object is assigned to the "result" attribute.
-      - Finally, an instance of the ChangeUserPassword class is returned with the appropriate values for the "errors", "ok", and "result" attributes.
+      - A UserPasswordSerializer instance is created with the current user as the instance, the provided password data,
+      and the request context.
+      - If there are any validation errors, the method "mutation_is_not_valid" is called, and the errors are assigned to
+      the "errors" attribute.
+      - If there are no errors, the serializer saves the changes and the updated user object is assigned to the "result"
+      attribute.
+      - Finally, an instance of the ChangeUserPassword class is returned with the appropriate values for the "errors",
+      "ok", and "result" attributes.
 
     Example usage:
 
@@ -314,7 +326,8 @@ UserUpdateInputType = generate_input_type_for_serializer(
 
 class UpdateUser(graphene.Mutation):
     """
-    The `UpdateUser` class is a mutation class in a GraphQL schema. This class is responsible for updating a user record in the database.
+    The `UpdateUser` class is a mutation class in a GraphQL schema. This class is responsible for updating a user record
+    in the database.
 
     Attributes:
         - `errors`: A list of custom error types, representing any errors encountered during the mutation process.
@@ -325,15 +338,20 @@ class UpdateUser(graphene.Mutation):
         - `data` (Required): An instance of `UserUpdateInputType`, containing the updated data for the user.
 
     Methods:
-        - `mutate(root, info, data)`: A static method decorated with `is_authenticated()` decorator. It is responsible for performing the mutation operation. It takes the following parameters:
+        - `mutate(root, info, data)`: A static method decorated with `is_authenticated()` decorator. It is responsible
+        for performing the mutation operation. It takes the following parameters:
             - `root`: The root instance of the mutation class.
-            - `info`: An instance of `ResolveInfo` class which provides information about the execution state of the GraphQL query.
+            - `info`: An instance of `ResolveInfo` class which provides information about the execution state of the
+            GraphQL query.
             - `data`: The updated data for the user.
 
     Returns:
-        - If the user record with the provided ID is not found in the database, returns an instance of `UpdateUser` class with the `errors` attribute populated with a custom error dict indicating the user was not found.
-        - If the mutation operation is not valid (e.g., invalid input data), returns an instance of `UpdateUser` class with the `errors` attribute populated with custom error types and `ok` set to `False`.
-        - If the mutation operation is successful, returns an instance of `UpdateUser` class with the `result` attribute set to the updated user record, `errors` set to `None`, and `ok` set to `True`.
+        - If the user record with the provided ID is not found in the database, returns an instance of `UpdateUser`
+        class with the `errors` attribute populated with a custom error dict indicating the user was not found.
+        - If the mutation operation is not valid (e.g., invalid input data), returns an instance of `UpdateUser` class
+        with the `errors` attribute populated with custom error types and `ok` set to `False`.
+        - If the mutation operation is successful, returns an instance of `UpdateUser` class with the `result` attribute
+        set to the updated user record, `errors` set to `None`, and `ok` set to `True`.
     """
     class Arguments:
         data = UserUpdateInputType(required=True)
@@ -374,14 +392,16 @@ class GenerateResetPasswordToken(graphene.Mutation):
 
     Class: GenerateResetPasswordToken
 
-    This class is a mutation class for generating a reset password token. It is used in a GraphQL schema and takes an input argument "data" of type GenerateResetPasswordTokenType.
+    This class is a mutation class for generating a reset password token. It is used in a GraphQL schema and takes an
+    input argument "data" of type GenerateResetPasswordTokenType.
 
     Attributes:
     - `errors`: A list of CustomErrorType objects representing any errors that occurred during the mutation.
     - `ok`: A boolean value indicating the success or failure of the mutation.
 
     Methods:
-    - `mutate(root, info, data)`: A static method that is called to perform the mutation operation. It takes three arguments:
+    - `mutate(root, info, data)`: A static method that is called to perform the mutation operation. It takes three
+    arguments:
         - `root`: The root object of the GraphQL query/mutation.
         - `info`: An object containing information about the execution of the GraphQL query/mutation.
         - `data`: The input argument of type GenerateResetPasswordTokenType.
@@ -464,7 +484,8 @@ class CreateMonitoringExpertPortfolio(graphene.Mutation):
     This class represents a GraphQL mutation that creates a monitoring expert portfolio.
 
     Arguments:
-    - data: Required argument of type BulkMonitoringExpertPortfolioInputType. Specifies the input data for creating the portfolio.
+    - data: Required argument of type BulkMonitoringExpertPortfolioInputType. Specifies the input data for creating the
+    portfolio.
 
     Properties:
     - errors: List of CustomErrorType. Contains any errors that occurred during the mutation.
@@ -480,7 +501,8 @@ class CreateMonitoringExpertPortfolio(graphene.Mutation):
     This method executes the following steps:
     1. Create a BulkMonitoringExpertPortfolioSerializer object with the provided data and request context.
     2. Check if there are any validation errors using the mutation_is_not_valid function.
-    3. If there are errors, return an instance of CreateMonitoringExpertPortfolio with the errors and ok properties set accordingly.
+    3. If there are errors, return an instance of CreateMonitoringExpertPortfolio with the errors and ok properties set
+    accordingly.
     4. Save the serializer to persist the portfolio in the database.
     5. Retrieve the monitoring sub-region object based on the 'region' field in the input data.
     6. Return an instance of CreateMonitoringExpertPortfolio with the result, errors, and ok properties set.
@@ -523,7 +545,8 @@ class UpdateRegionalCoordinatorPortfolio(graphene.Mutation):
     A mutation response containing the following attributes:
     - errors: A list of custom error types.
     - ok: A boolean indicating if the mutation was successful.
-    - result: A field representing the updated monitoring sub-region. (Type is 'apps.country.schema.MonitoringSubRegionType')
+    - result: A field representing the updated monitoring sub-region. (Type is
+    'apps.country.schema.MonitoringSubRegionType')
 
     Methods:
     - mutate: The static method that handles the mutation. It receives the root, info, and data parameters, where:
@@ -535,7 +558,8 @@ class UpdateRegionalCoordinatorPortfolio(graphene.Mutation):
     An instance of UpdateRegionalCoordinatorPortfolio containing the mutation response.
 
     Exceptions:
-    - Portfolio.DoesNotExist: If the portfolio does not exist, an error is returned with the field 'nonFieldErrors' and the message 'Portfolio does not exist.'
+    - Portfolio.DoesNotExist: If the portfolio does not exist, an error is returned with the field 'nonFieldErrors' and
+    the message 'Portfolio does not exist.'
 
     Example Usage:
     mutation {
@@ -651,10 +675,12 @@ class DeletePortfolio(graphene.Mutation):
 
 class UpdateAdminPortfolio(graphene.Mutation):
     """
-    The UpdateAdminPortfolio class is a subclass of graphene.Mutation and is used to update the admin portfolio for a user.
+    The UpdateAdminPortfolio class is a subclass of graphene.Mutation and is used to update the admin portfolio for a
+    user.
 
     Arguments:
-        - data: An instance of AdminPortfolioInputType class which represents the data to be updated for the admin portfolio. It is a required argument.
+        - data: An instance of AdminPortfolioInputType class which represents the data to be updated for the admin
+        portfolio. It is a required argument.
 
     Attributes:
         - errors: A list of CustomErrorType objects representing any errors that occurred during the mutation.
@@ -662,10 +688,13 @@ class UpdateAdminPortfolio(graphene.Mutation):
         - result: An instance of UserType representing the updated user with the admin portfolio.
 
     Methods:
-        - mutate: A static method used to perform the mutation. It takes the 'root' argument representing the root object, the 'info' argument representing the resolver information, and the 'data' argument representing the input data for the mutation. It returns an instance of UpdateAdminPortfolio.
+        - mutate: A static method used to perform the mutation. It takes the 'root' argument representing the root
+        object, the 'info' argument representing the resolver information, and the 'data' argument representing the
+        input data for the mutation. It returns an instance of UpdateAdminPortfolio.
 
     Permissions:
-        - The mutate method has a permission_checker decorator with the required permission 'users.change_portfolio'. This ensures that only users with the required permission can perform this mutation.
+        - The mutate method has a permission_checker decorator with the required permission 'users.change_portfolio'.
+        This ensures that only users with the required permission can perform this mutation.
 
     Usage example:
         mutation {
@@ -708,20 +737,24 @@ class UpdateDirectorsOfficePortfolio(graphene.Mutation):
 
     Attributes:
     - Arguments:
-        - data: A required parameter of DirectorsOfficePortfolioInputType, representing the data for updating the portfolio.
+        - data: A required parameter of DirectorsOfficePortfolioInputType, representing the data for updating the
+        portfolio.
     - errors: A List of CustomErrorType objects, representing any errors that occurred during the mutation.
     - ok: A Boolean value indicating the success of the mutation.
     - result: A Field of UserType, representing the updated user.
 
     Methods:
-    - mutate(): A static method with the decorator @permission_checker(['users.change_portfolio']). It is responsible for executing the mutation logic.
+    - mutate(): A static method with the decorator @permission_checker(['users.change_portfolio']). It is responsible
+    for executing the mutation logic.
         - Parameters:
             - root: The root object of the mutation.
             - info: The GraphQL ResolveInfo object, containing information about the execution state.
             - data: The data for updating the portfolio.
         - Returns:
-            - If the mutation is valid, it saves the updated portfolio and returns an instance of UpdateDirectorsOfficePortfolio with the updated user and no errors.
-            - If the mutation is not valid, it returns an instance of UpdateDirectorsOfficePortfolio with the errors and ok set to False.
+            - If the mutation is valid, it saves the updated portfolio and returns an instance of
+            UpdateDirectorsOfficePortfolio with the updated user and no errors.
+            - If the mutation is not valid, it returns an instance of UpdateDirectorsOfficePortfolio with the errors and
+            ok set to False.
     """
     class Arguments:
         data = DirectorsOfficePortfolioInputType(required=True)
@@ -746,28 +779,37 @@ class UpdateDirectorsOfficePortfolio(graphene.Mutation):
 class UpdateReportingTeamPortfolio(graphene.Mutation):
     """
 
-    The `UpdateReportingTeamPortfolio` class is a mutation class that is used to update the reporting team portfolio. It inherits from `graphene.Mutation` and defines the necessary arguments, fields, and methods to perform the mutation.
+    The `UpdateReportingTeamPortfolio` class is a mutation class that is used to update the reporting team portfolio. It
+    inherits from `graphene.Mutation` and defines the necessary arguments, fields, and methods to perform the mutation.
 
     Arguments:
-        - `data` : A required argument of type `ReportingTeamPortfolioInputType` that contains the updated data for the reporting team portfolio.
+        - `data` : A required argument of type `ReportingTeamPortfolioInputType` that contains the updated data for the
+        reporting team portfolio.
 
     Fields:
-        - `errors` : A list of `CustomErrorType` objects. Represents any errors that occurred during the mutation process.
+        - `errors` : A list of `CustomErrorType` objects. Represents any errors that occurred during the mutation
+        process.
         - `ok` : A boolean field indicating whether the mutation was successful or not.
         - `result` : A field of type `UserType` representing the updated user object.
 
     Methods:
-        - `mutate` : A static method decorated with `@staticmethod` that performs the mutation operation. It takes three parameters:
+        - `mutate` : A static method decorated with `@staticmethod` that performs the mutation operation. It takes three
+        parameters:
             - `root` : The root value or object. Ignored in this mutation.
             - `info` : The mutation info object that provides access to various details about the mutation.
             - `data` : The input data containing the updated reporting team portfolio.
 
             Inside the `mutate` method, the following operations are performed:
-            1. A `ReportingTeamPortfolioSerializer` instance is created with the input data and the current request context.
-            2. The validation and serialization of the input data is performed by calling the `is_valid` method on the serializer object.
-            3. If there are any errors, the method returns an instance of `UpdateReportingTeamPortfolio` with the `errors` field populated and `ok` set to `False`.
-            4. If there are no errors, the serializer's `save` method is called to update the user object with the new reporting team portfolio.
-            5. The method returns an instance of `UpdateReportingTeamPortfolio` with the `result` field populated with the updated user object and `ok` set to `True`.
+            1. A `ReportingTeamPortfolioSerializer` instance is created with the input data and the current request
+            context.
+            2. The validation and serialization of the input data is performed by calling the `is_valid` method on the
+            serializer object.
+            3. If there are any errors, the method returns an instance of `UpdateReportingTeamPortfolio` with the
+            `errors` field populated and `ok` set to `False`.
+            4. If there are no errors, the serializer's `save` method is called to update the user object with the new
+            reporting team portfolio.
+            5. The method returns an instance of `UpdateReportingTeamPortfolio` with the `result` field populated with
+            the updated user object and `ok` set to `True`.
 
     Note"""
     class Arguments:
@@ -801,7 +843,8 @@ class ExportUsers(ExportBaseMutation):
         DOWNLOAD_TYPE (str): The download type for the export, set to 'USER' for user data.
 
     Arguments:
-        filters (UserFilterDataInputType): Required argument that specifies the filters to apply to the user data before exporting.
+        filters (UserFilterDataInputType): Required argument that specifies the filters to apply to the user data before
+        exporting.
 
     """
     class Arguments:
@@ -823,8 +866,10 @@ class Mutation(object):
         - change_password (obj): Represents the change user password mutation operation.
         - generate_reset_password_token (obj): Represents the generate reset password token mutation operation.
         - reset_password (obj): Represents the reset password mutation operation.
-        - create_monitoring_expert_portfolio (obj): Represents the create monitoring expert portfolio mutation operation.
-        - update_regional_coordinator_portfolio (obj): Represents the update regional coordinator portfolio mutation operation.
+        - create_monitoring_expert_portfolio (obj): Represents the create monitoring expert portfolio mutation
+        operation.
+        - update_regional_coordinator_portfolio (obj): Represents the update regional coordinator portfolio mutation
+        operation.
         - delete_portfolio (obj): Represents the delete portfolio mutation operation.
         - update_admin_portfolio (obj): Represents the update admin portfolio mutation operation.
         - update_directors_office_portfolio (obj): Represents the update directors office portfolio mutation operation.

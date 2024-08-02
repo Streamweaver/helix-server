@@ -44,7 +44,8 @@ class ReportFilter(df.FilterSet):
 
         - qs: a property that returns the filtered queryset based on the filter options.
 
-    Note: This class does not return a queryset by default if the filter is not applied. To include private reports in the queryset by default, the `is_public` filter option should be set to None in the filter form.
+    Note: This class does not return a queryset by default if the filter is not applied. To include private reports in
+    the queryset by default, the `is_public` filter option should be set to None in the filter form.
 
     """
     filter_figure_countries = IDListFilter(method='filter_countries')
@@ -162,7 +163,8 @@ class DummyFilter(df.FilterSet):
         Inherits from df.FilterSet
 
         Description:
-            This class defines a DummyFilter that can be used to filter data based on the 'id' field using an exact match.
+            This class defines a DummyFilter that can be used to filter data based on the 'id' field using an exact
+            match.
 
         Attributes:
             id (df.CharFilter):
@@ -174,7 +176,8 @@ class DummyFilter(df.FilterSet):
 
 class ReportApprovalFilter(df.FilterSet):
     """
-    The `ReportApprovalFilter` class is a subclass of `FilterSet` that provides filtering capabilities for the `ReportApproval` model. It allows filtering based on the `is_approved` field.
+    The `ReportApprovalFilter` class is a subclass of `FilterSet` that provides filtering capabilities for the
+    `ReportApproval` model. It allows filtering based on the `is_approved` field.
 
     Attributes:
         - model: The model that the filter is applied on.

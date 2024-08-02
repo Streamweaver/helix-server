@@ -41,7 +41,8 @@ def get_client_tracked_cache_keys():
     Retrieves the cache keys for all client tracked information.
 
     Returns:
-        A list of cache keys associated with client tracked information stored in the external API cache. These cache keys follow the 'trackinfo{REDIS_SEPARATOR}*' pattern.
+        A list of cache keys associated with client tracked information stored in the external API cache. These cache
+        keys follow the 'trackinfo{REDIS_SEPARATOR}*' pattern.
 
     """
     return external_api_cache.keys(f'trackinfo{REDIS_SEPARATOR}*')
@@ -108,7 +109,8 @@ def pull_track_data_from_redis(tracking_keys):
     - tracking_keys (list): A list of tracking keys to retrieve data from Redis.
 
     Returns:
-    - tracked_data_from_redis (dict): A dictionary containing the tracked data from Redis. The keys are the tracking keys and the values are dictionaries with the following keys:
+    - tracked_data_from_redis (dict): A dictionary containing the tracked data from Redis. The keys are the tracking
+    keys and the values are dictionaries with the following keys:
         - api_type (str): The API type.
         - client_id (int): The client ID.
         - tracked_date (date): The tracked date.
@@ -116,7 +118,9 @@ def pull_track_data_from_redis(tracking_keys):
 
     Example:
     tracking_keys = ['key1', 'key2']
-    pull_track_data_from_redis(tracking_keys) -> {'key1': {'api_type': 'type1', 'client_id': 1, 'tracked_date': datetime.date(2021, 1, 1), 'requests_per_day': 100}, 'key2': {'api_type': 'type2', 'client_id': 2, 'tracked_date': datetime.date(2021, 2, 2), 'requests_per_day': 200}}
+    pull_track_data_from_redis(tracking_keys) -> {'key1': {'api_type': 'type1', 'client_id': 1, 'tracked_date':
+    datetime.date(2021, 1, 1), 'requests_per_day': 100}, 'key2': {'api_type': 'type2', 'client_id': 2, 'tracked_date':
+    datetime.date(2021, 2, 2), 'requests_per_day': 200}}
     """
     from apps.contrib.models import Client
 

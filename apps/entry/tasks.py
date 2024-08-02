@@ -20,8 +20,10 @@ def __get_pdf_from_html(path, timeout=SELENIUM_TIMEOUT, print_options={}):
 
     Parameters:
         path (str): The URL or local file path of the HTML page to convert to PDF.
-        timeout (int, optional): The maximum time in seconds to wait for the HTML page to load. Default is the value of SELENIUM_TIMEOUT.
-        print_options (dict, optional): Additional options to customize the PDF generation. Default is an empty dictionary.
+        timeout (int, optional): The maximum time in seconds to wait for the HTML page to load. Default is the value of
+        SELENIUM_TIMEOUT.
+        print_options (dict, optional): Additional options to customize the PDF generation. Default is an empty
+        dictionary.
 
     Returns:
         bytes: The PDF document as bytes.

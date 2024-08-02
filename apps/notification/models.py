@@ -23,7 +23,8 @@ class Notification(models.Model):
 
     Methods:
     - __str__(self) -> str: Returns a string representation of the notification.
-    - send_safe_multiple_notifications(cls, recipients, actor, type, figure=None, event=None, entry=None, text=None, review_comment=None): Sends multiple notifications to the specified recipients.
+    - send_safe_multiple_notifications(cls, recipients, actor, type, figure=None, event=None, entry=None, text=None,
+    review_comment=None): Sends multiple notifications to the specified recipients.
 
     """
     class Type(enum.Enum):

@@ -16,11 +16,13 @@ class OrganizationKind(MetaInformationArchiveAbstractModel, models.Model):
     """
     Class: OrganizationKind
 
-    This class represents the model for an organization kind. It inherits from `MetaInformationArchiveAbstractModel` and `models.Model`.
+    This class represents the model for an organization kind. It inherits from `MetaInformationArchiveAbstractModel` and
+    `models.Model`.
 
     Attributes:
     - name: A `CharField` representing the title of the organization kind.
-    - reliability: An `EnumField` representing the reliability of the organization kind. It has the following possible values:
+    - reliability: An `EnumField` representing the reliability of the organization kind. It has the following possible
+    values:
         - LOW: 0
         - MEDIUM: 1
         - HIGH: 2

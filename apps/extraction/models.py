@@ -288,7 +288,8 @@ class ExtractionQuery(MetaInformationAbstractModel, QueryAbstractModel):
     """
     ExtractionQuery
 
-    This class represents a query for extracting meta information. It inherits from MetaInformationAbstractModel and QueryAbstractModel.
+    This class represents a query for extracting meta information. It inherits from MetaInformationAbstractModel and
+    QueryAbstractModel.
 
     Attributes:
         name (django.db.models.CharField): The name of the extraction query.

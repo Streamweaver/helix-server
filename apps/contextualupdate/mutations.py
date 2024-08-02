@@ -105,13 +105,16 @@ class UpdateContextualUpdate(graphene.Mutation):
     This class represents a graphene mutation for updating a ContextualUpdate object.
 
     Attributes:
-    - data: Required argument of type ContextualUpdateUpdateInputType. Represents the updated data for the ContextualUpdate object.
+    - data: Required argument of type ContextualUpdateUpdateInputType. Represents the updated data for the
+    ContextualUpdate object.
     - errors: List of CustomErrorType objects. Contains any errors that occur during the mutation process.
     - ok: Boolean value indicating the success or failure of the mutation.
     - result: Field of type ContextualUpdateType. Represents the updated ContextualUpdate object.
 
     Methods:
-    - mutate(root, info, data): Static method decorated with the @permission_checker decorator. Performs the mutation operation by updating the ContextualUpdate object with the provided data. Returns an instance of UpdateContextualUpdate with the updated object, any errors that occur, and the success status of the mutation.
+    - mutate(root, info, data): Static method decorated with the @permission_checker decorator. Performs the mutation
+    operation by updating the ContextualUpdate object with the provided data. Returns an instance of
+    UpdateContextualUpdate with the updated object, any errors that occur, and the success status of the mutation.
 
     """
     class Arguments:

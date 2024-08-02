@@ -10,10 +10,12 @@ class CreateListMixin():
     """
     Class: CreateListMixin
 
-    This class provides a mixin for Django Rest Framework viewsets that allows the automatic detection of list data in the request payload. When the data is a list, it sets the 'many' argument of the serializer to True.
+    This class provides a mixin for Django Rest Framework viewsets that allows the automatic detection of list data in
+    the request payload. When the data is a list, it sets the 'many' argument of the serializer to True.
 
     Methods:
-    - get_serializer(*args, **kwargs): Returns the serializer instance with the 'many' argument set to True if the data is a list.
+    - get_serializer(*args, **kwargs): Returns the serializer instance with the 'many' argument set to True if the data
+    is a list.
 
     Usage:
 
@@ -24,7 +26,8 @@ class CreateListMixin():
 
     2. Override the get_queryset() method in your viewset to customize the queryset for your view.
 
-    3. Use the 'get_serializer' method to obtain the serializer instance with the 'many' argument set to True if the data is a list.
+    3. Use the 'get_serializer' method to obtain the serializer instance with the 'many' argument set to True if the
+    data is a list.
 
     Example:
 
@@ -54,7 +57,8 @@ class ParkedItemViewSet(CreateListMixin, viewsets.ModelViewSet):
         queryset (QuerySet): The queryset of `ParkedItem` objects to be retrieved or modified.
         serializer_class (Serializer): The serializer class used for serializing and deserializing `ParkedItem` objects.
         permission_classes (list): A list of permission classes that controls access to the view set.
-        pagination_class (NoneType): The pagination class used for paginating the queryset. Set to `None` to disable pagination.
+        pagination_class (NoneType): The pagination class used for paginating the queryset. Set to `None` to disable
+        pagination.
         swagger_schema (NoneType): The schema used for OpenAPI documentation.
 
     """

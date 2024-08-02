@@ -95,7 +95,8 @@ class CountrySubRegionType(DjangoObjectType):
     """
     A GraphQL Object Type representing a country subregion.
 
-    This class is a subclass of `DjangoObjectType`, which is a type defined by the Django Graphene library for working with Django models in GraphQL.
+    This class is a subclass of `DjangoObjectType`, which is a type defined by the Django Graphene library for working
+    with Django models in GraphQL.
 
     Attributes:
         model (django.db.models.Model): The Django model representing the country subregion.
@@ -119,10 +120,12 @@ class CountrySubRegionType(DjangoObjectType):
 
 class CountryRegionType(DjangoObjectType):
     """
-    The `CountryRegionType` class is a DjangoObjectType subclass that represents the GraphQL object type for the `CountryRegion` model.
+    The `CountryRegionType` class is a DjangoObjectType subclass that represents the GraphQL object type for the
+    `CountryRegion` model.
 
     Attributes:
-        Meta (object): A nested class that contains the metadata about the `CountryRegionType` class. It specifies the `CountryRegion` model as the source of data for this GraphQL object type.
+        Meta (object): A nested class that contains the metadata about the `CountryRegionType` class. It specifies the
+        `CountryRegion` model as the source of data for this GraphQL object type.
 
     """
     class Meta:
@@ -199,7 +202,8 @@ class ContextualAnalysisListType(CustomDjangoListObjectType):
     Inherits From: CustomDjangoListObjectType
 
     Description:
-    This class represents a GraphQL list type for ContextualAnalysis objects. It provides the necessary fields and filters to perform contextual analysis queries.
+    This class represents a GraphQL list type for ContextualAnalysis objects. It provides the necessary fields and
+    filters to perform contextual analysis queries.
 
     Attributes:
     - model (class): The Django model associated with the list type.
@@ -260,27 +264,39 @@ class CountryType(DjangoObjectType):
     Fields:
         last_summary (graphene.Field): A field representing the last summary of the country.
         last_contextual_analysis (graphene.Field): A field representing the last contextual analysis of the country.
-        contacts (DjangoPaginatedListObjectField): A field representing a paginated list of contacts related to the country.
-        operating_contacts (DjangoPaginatedListObjectField): A field representing a paginated list of operating contacts related to the country.
-        contextual_analyses (DjangoPaginatedListObjectField): A field representing a paginated list of contextual analyses related to the country.
-        summaries (DjangoPaginatedListObjectField): A field representing a paginated list of summaries related to the country.
+        contacts (DjangoPaginatedListObjectField): A field representing a paginated list of contacts related to the
+        country.
+        operating_contacts (DjangoPaginatedListObjectField): A field representing a paginated list of operating contacts
+        related to the country.
+        contextual_analyses (DjangoPaginatedListObjectField): A field representing a paginated list of contextual
+        analyses related to the country.
+        summaries (DjangoPaginatedListObjectField): A field representing a paginated list of summaries related to the
+        country.
         crises (graphene.Dynamic): A field representing a dynamic paginated list of crises related to the country.
         events (graphene.Dynamic): A field representing a dynamic paginated list of events related to the country.
         entries (graphene.Dynamic): A field representing a dynamic paginated list of entries related to the country.
         figures (graphene.Dynamic): A field representing a dynamic paginated list of figures related to the country.
-        total_flow_conflict (graphene.Int): A field representing the total flow of conflict-related issues in the country.
-        total_flow_disaster (graphene.Int): A field representing the total flow of disaster-related issues in the country.
-        total_stock_conflict (graphene.Int): A field representing the total stock of conflict-related issues in the country.
-        total_stock_disaster (graphene.Int): A field representing the total stock of disaster-related issues in the country.
+        total_flow_conflict (graphene.Int): A field representing the total flow of conflict-related issues in the
+        country.
+        total_flow_disaster (graphene.Int): A field representing the total flow of disaster-related issues in the
+        country.
+        total_stock_conflict (graphene.Int): A field representing the total stock of conflict-related issues in the
+        country.
+        total_stock_disaster (graphene.Int): A field representing the total stock of disaster-related issues in the
+        country.
         geojson_url (graphene.String): A field representing the URL for the geojson of the country.
         regional_coordinator (graphene.Field): A field representing the regional coordinator of the country.
         monitoring_expert (graphene.Field): A field representing the monitoring expert of the country.
 
     Methods:
-        resolve_total_stock_disaster(root, info, **kwargs): A method that resolves the total stock of disaster-related issues in the country.
-        resolve_total_stock_conflict(root, info, **kwargs): A method that resolves the total stock of conflict-related issues in the country.
-        resolve_total_flow_conflict(root, info, **kwargs): A method that resolves the total flow of conflict-related issues in the country.
-        resolve_total_flow_disaster(root, info, **kwargs): A method that resolves the total flow of disaster-related issues in the country.
+        resolve_total_stock_disaster(root, info, **kwargs): A method that resolves the total stock of disaster-related
+        issues in the country.
+        resolve_total_stock_conflict(root, info, **kwargs): A method that resolves the total stock of conflict-related
+        issues in the country.
+        resolve_total_flow_conflict(root, info, **kwargs): A method that resolves the total flow of conflict-related
+        issues in the country.
+        resolve_total_flow_disaster(root, info, **kwargs): A method that resolves the total flow of disaster-related
+        issues in the country.
         resolve_geojson_url(root, info, **kwargs): A method that resolves the URL for the geojson of the country.
     """
     class Meta:
@@ -422,7 +438,8 @@ class CountryHouseholdSizeType(DjangoObjectType):
     class CountryHouseholdSizeType(DjangoObjectType):
         A GraphQL type that represents the household size for a country.
 
-        This class defines a GraphQL type using DjangoObjectType. It represents the household size for a specific country.
+        This class defines a GraphQL type using DjangoObjectType. It represents the household size for a specific
+        country.
 
         Attributes:
             model (Model): The Django model that this GraphQL type references.

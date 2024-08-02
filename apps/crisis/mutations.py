@@ -78,15 +78,20 @@ class CreateCrisis(graphene.Mutation):
 class UpdateCrisis(graphene.Mutation):
     """
 
-    The `UpdateCrisis` class is a subclass of `graphene.Mutation` and is used to update an existing Crisis object. It takes a `data` argument of type `CrisisUpdateInputType`, which is required.
+    The `UpdateCrisis` class is a subclass of `graphene.Mutation` and is used to update an existing Crisis object. It
+    takes a `data` argument of type `CrisisUpdateInputType`, which is required.
 
     Attributes:
-    - `errors`: A list of `CustomErrorType` objects that represent any errors encountered during the update process. It is a non-null list as specified by `graphene.NonNull`.
+    - `errors`: A list of `CustomErrorType` objects that represent any errors encountered during the update process. It
+    is a non-null list as specified by `graphene.NonNull`.
     - `ok`: A boolean value indicating the success or failure of the update operation.
     - `result`: A `CrisisType` object representing the updated Crisis instance.
 
     Methods:
-    - `mutate`: A static method decorated with `@staticmethod` and `@permission_checker(['crisis.change_crisis'])`. It performs the update operation by retrieving the Crisis instance based on the provided data's ID, then using the `CrisisSerializer` to update the instance with the provided data. If any validation errors occur, the `mutation_is_not_valid` function is called to handle the errors.
+    - `mutate`: A static method decorated with `@staticmethod` and `@permission_checker(['crisis.change_crisis'])`. It
+    performs the update operation by retrieving the Crisis instance based on the provided data's ID, then using the
+    `CrisisSerializer` to update the instance with the provided data. If any validation errors occur, the
+    `mutation_is_not_valid` function is called to handle the errors.
 
     """
     class Arguments:

@@ -54,7 +54,8 @@ class CustomDjangoListObjectBase(DjangoListObjectBase):
         count (int): The total count of results.
         page (int): The current page number.
         pageSize (int): The number of results per page.
-        results_field_name (str, optional): The name of the results field in the dictionary representation. Defaults to "results".
+        results_field_name (str, optional): The name of the results field in the dictionary representation. Defaults to
+        "results".
     """
     def __init__(self, results, count, page, pageSize, results_field_name="results"):
         self.results = results
@@ -77,7 +78,8 @@ class CustomDjangoListField(DjangoListField):
 
     CustomDjangoListField
 
-    This class extends the DjangoListField and provides additional functionality for resolving lists in DjangoObjectType.
+    This class extends the DjangoListField and provides additional functionality for resolving lists in
+    DjangoObjectType.
 
     Methods:
     - list_resolver: A static method that resolves the list for a DjangoObjectType. It takes the following parameters:
@@ -87,7 +89,8 @@ class CustomDjangoListField(DjangoListField):
         - info: The GraphQLResolveInfo object.
         - args: Additional arguments passed to the resolver.
 
-    - get_resolver: Overrides the get_resolver method of DjangoListField. It returns a partial function that calls the list_resolver method with the appropriate arguments.
+    - get_resolver: Overrides the get_resolver method of DjangoListField. It returns a partial function that calls the
+    list_resolver method with the appropriate arguments.
 
     """
     @staticmethod
@@ -120,18 +123,21 @@ class CustomPaginatedListObjectField(DjangoFilterPaginateListField):
     """
     CustomPaginatedListObjectField
 
-    A class that extends DjangoFilterPaginateListField and provides additional functionality for paginated lists of objects.
+    A class that extends DjangoFilterPaginateListField and provides additional functionality for paginated lists of
+    objects.
 
     Parameters:
         _type: The GraphQLObjectType to use for the list items.
-        pagination: (optional) The pagination type to use for the list. If not provided, OrderingOnlyArgumentPagination will be used.
+        pagination: (optional) The pagination type to use for the list. If not provided, OrderingOnlyArgumentPagination
+        will be used.
         extra_filter_meta: (optional) Additional meta data for the filterset class.
         filterset_class: (optional) The filterset class to use for filtering the queryset.
         *args: Additional positional arguments to pass to the parent class.
         **kwargs: Additional keyword arguments to pass to the parent class.
 
     Methods:
-        list_resolver: Resolves the list of objects based on the provided filterset class, filtering args, root, info and kwargs.
+        list_resolver: Resolves the list of objects based on the provided filterset class, filtering args, root, info
+        and kwargs.
             Parameters:
                 filterset_class: The filterset class to use for filtering the queryset.
                 filtering_args: The filtering arguments for the filterset class.
@@ -141,7 +147,8 @@ class CustomPaginatedListObjectField(DjangoFilterPaginateListField):
             Returns:
                 A CustomDjangoListObjectBase instance containing the filtered and paginated results.
 
-        get_resolver: Overrides the parent method to return a partial function of the list_resolver with the filterset class and filtering args as arguments.
+        get_resolver: Overrides the parent method to return a partial function of the list_resolver with the filterset
+        class and filtering args as arguments.
 
     Note: This class assumes the use of DjangoFilterPaginateListField and its dependencies.
     """
@@ -225,7 +232,8 @@ class CustomPaginatedListObjectField(DjangoFilterPaginateListField):
 
 class DjangoPaginatedListObjectField(DjangoFilterPaginateListField):
     """
-    DjangoPaginatedListObjectField class is a subclass of DjangoFilterPaginateListField. It is used to create a paginated list of objects with filtering capabilities.
+    DjangoPaginatedListObjectField class is a subclass of DjangoFilterPaginateListField. It is used to create a
+    paginated list of objects with filtering capabilities.
 
     Parameters:
     - _type: The GraphQL object type of the objects in the list.
@@ -242,7 +250,8 @@ class DjangoPaginatedListObjectField(DjangoFilterPaginateListField):
     - reverse_related_name: An optional reverse related name for relationships spanning multiple fields.
 
     Methods:
-    - list_resolver: The resolver function for the list field. It fetches the objects from the queryset and applies filtering and pagination.
+    - list_resolver: The resolver function for the list field. It fetches the objects from the queryset and applies
+    filtering and pagination.
     """
     def __init__(
         self,
@@ -410,7 +419,8 @@ def get_filtering_args_from_non_model_filterset(filterset_class):
     - filterset_class (class): The non-model filterset class from which to extract filtering arguments.
 
     Returns:
-    - args (dict): A dictionary of filtering arguments, where the key is the name of the argument and the value is the corresponding graphene argument type.
+    - args (dict): A dictionary of filtering arguments, where the key is the name of the argument and the value is the
+    corresponding graphene argument type.
 
     """
     from graphene_django.forms.converter import convert_form_field
@@ -616,13 +626,18 @@ def fields_for_serializer(
 
     Parameters:
     - serializer: The serializer object to generate fields from.
-    - only_fields (list): A list of field names to include in the generated fields. If provided, only these fields will be included. Default is an empty list.
-    - exclude_fields (list): A list of field names to exclude from the generated fields. If provided, these fields will be skipped. Default is an empty list.
-    - convert_choices_to_enum (bool): Indicates whether serializer field choices should be converted to enums. Set to True to convert choices to enum values. Default is True.
-    - partial (bool): Indicates whether the serializer is used for partial updates. Set to True if the serializer is used for partial updates. Default is False.
+    - only_fields (list): A list of field names to include in the generated fields. If provided, only these fields will
+    be included. Default is an empty list.
+    - exclude_fields (list): A list of field names to exclude from the generated fields. If provided, these fields will
+    be skipped. Default is an empty list.
+    - convert_choices_to_enum (bool): Indicates whether serializer field choices should be converted to enums. Set to
+    True to convert choices to enum values. Default is True.
+    - partial (bool): Indicates whether the serializer is used for partial updates. Set to True if the serializer is
+    used for partial updates. Default is False.
 
     Returns:
-    - fields (OrderedDict): A dictionary of fields generated from the provided serializer. The keys are field names, and the values are the converted serializer fields.
+    - fields (OrderedDict): A dictionary of fields generated from the provided serializer. The keys are field names, and
+    the values are the converted serializer fields.
 
     Example usage:
         serializer_class = MySerializer

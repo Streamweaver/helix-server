@@ -10,16 +10,24 @@ from apps.contrib.serializers import MetaInformationSerializerMixin
 class ContextualUpdateSerializer(MetaInformationSerializerMixin,
                                  serializers.ModelSerializer):
     """
-    The ContextualUpdateSerializer class is a serializer class used for serializing and deserializing ContextualUpdate objects. It is a subclass of the MetaInformationSerializerMixin and the ModelSerializer classes provided by the Django REST Framework.
+    The ContextualUpdateSerializer class is a serializer class used for serializing and deserializing ContextualUpdate
+    objects. It is a subclass of the MetaInformationSerializerMixin and the ModelSerializer classes provided by the
+    Django REST Framework.
 
     Attributes:
     - model: The model that this serializer class is associated with (ContextualUpdate).
-    - fields: A string or a list/tuple of field names to be included when serializing and deserializing objects. In this case, it includes all fields using the '__all__' shortcut.
+    - fields: A string or a list/tuple of field names to be included when serializing and deserializing objects. In this
+    case, it includes all fields using the '__all__' shortcut.
 
     Methods:
-    - validate_url_document(self, attrs): This method is used to validate the 'url' and 'document' fields in the input data during the deserialization process. If either of these fields is missing, it raises a serializers.ValidationError with appropriate error messages.
+    - validate_url_document(self, attrs): This method is used to validate the 'url' and 'document' fields in the input
+    data during the deserialization process. If either of these fields is missing, it raises a
+    serializers.ValidationError with appropriate error messages.
 
-    - validate(self, attrs) -> dict: This method is called during the validation process and is responsible for performing any additional validation on the input data. It calls the superclass's validate method first and then calls the validate_url_document method to validate the 'url' and 'document' fields. It returns a dictionary of validated data.
+    - validate(self, attrs) -> dict: This method is called during the validation process and is responsible for
+    performing any additional validation on the input data. It calls the superclass's validate method first and then
+    calls the validate_url_document method to validate the 'url' and 'document' fields. It returns a dictionary of
+    validated data.
 
     Example usage:
         serializer = ContextualUpdateSerializer(data=request.data)

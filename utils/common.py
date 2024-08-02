@@ -33,7 +33,10 @@ def convert_date_object_to_string_in_dict(dictionary):
     :returns: The nested dictionary with date objects converted to strings.
     :rtype: dict
 
-    The `convert_date_object_to_string_in_dict` function recursively iterates through the nested dictionary and converts any date objects (instances of `datetime.date` or `datetime.datetime`) to their string representations using the `str()` function. It handles dictionaries within dictionaries and lists of dictionaries, ensuring that all date objects are properly converted.
+    The `convert_date_object_to_string_in_dict` function recursively iterates through the nested dictionary and converts
+    any date objects (instances of `datetime.date` or `datetime.datetime`) to their string representations using the
+    `str()` function. It handles dictionaries within dictionaries and lists of dictionaries, ensuring that all date
+    objects are properly converted.
 
     Example usage:
     ```
@@ -71,7 +74,8 @@ def convert_date_object_to_string_in_dict(dictionary):
 def add_clone_prefix(sentence):
     """
 
-    This method, add_clone_prefix, takes a sentence as input and returns a modified sentence with a prefix added to it. The prefix is determined based on the presence of certain patterns in the input sentence.
+    This method, add_clone_prefix, takes a sentence as input and returns a modified sentence with a prefix added to it.
+    The prefix is determined based on the presence of certain patterns in the input sentence.
 
     :param sentence: The sentence to which the prefix needs to be added.
     :type sentence: str
@@ -206,7 +210,8 @@ def round_and_remove_zero(num):
 
     Round and Remove Zero
 
-    This method rounds the given number and removes trailing zeros. If the number is None or equal to 0, it returns None.
+    This method rounds the given number and removes trailing zeros. If the number is None or equal to 0, it returns
+    None.
 
     Parameters:
     - num: The input number to be rounded and have trailing zeros removed.
@@ -230,7 +235,11 @@ def round_and_remove_zero(num):
 
 def track_gidd(client_id, endpoint_type, viewset: viewsets.GenericViewSet = None):
     """
-    Track_Gidd method tracks the client with the provided client_id. It checks if the client_id is registered in the external API cache. If not registered, it raises a PermissionDenied exception with a message 'Client is not registered.' It then retrieves the client object from the Client model using the client_id. If the client is not active, it raises a PermissionDenied exception with a message 'Client is deactivated.' Finally, it calls the track_client method to track the client with the specified endpoint_type and client_id.
+    Track_Gidd method tracks the client with the provided client_id. It checks if the client_id is registered in the
+    external API cache. If not registered, it raises a PermissionDenied exception with a message 'Client is not
+    registered.' It then retrieves the client object from the Client model using the client_id. If the client is not
+    active, it raises a PermissionDenied exception with a message 'Client is deactivated.' Finally, it calls the
+    track_client method to track the client with the specified endpoint_type and client_id.
 
     Parameters:
     - client_id (string): The unique identifier of the client.
@@ -263,7 +272,8 @@ def track_gidd(client_id, endpoint_type, viewset: viewsets.GenericViewSet = None
 class RuntimeProfile:
     """
 
-    The `RuntimeProfile` class is used to measure the runtime of a function or code block. It can be used as a decorator or as a context manager.
+    The `RuntimeProfile` class is used to measure the runtime of a function or code block. It can be used as a decorator
+    or as a context manager.
 
     Usage:
         1. As a decorator:

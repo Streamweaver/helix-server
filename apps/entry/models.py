@@ -177,10 +177,13 @@ class FigureDisaggregationAbstractModel(models.Model):
     This class is an abstract model that defines the disaggregation information for various categories.
 
     Attributes:
-        - disaggregation_displacement_urban (PositiveIntegerField): Represents the number of individuals displaced in urban areas.
-        - disaggregation_displacement_rural (PositiveIntegerField): Represents the number of individuals displaced in rural areas.
+        - disaggregation_displacement_urban (PositiveIntegerField): Represents the number of individuals displaced in
+        urban areas.
+        - disaggregation_displacement_rural (PositiveIntegerField): Represents the number of individuals displaced in
+        rural areas.
         - disaggregation_location_camp (PositiveIntegerField): Represents the number of individuals located in camps.
-        - disaggregation_location_non_camp (PositiveIntegerField): Represents the number of individuals located in non-camp areas.
+        - disaggregation_location_non_camp (PositiveIntegerField): Represents the number of individuals located in
+        non-camp areas.
         - disaggregation_lgbtiq (PositiveIntegerField): Represents the number of individuals who identify as LGBTIQ+.
         - disaggregation_disability (PositiveIntegerField): Represents the number of individuals with disabilities.
         - disaggregation_indigenous_people (PositiveIntegerField): Represents the number of indigenous people.
@@ -189,10 +192,14 @@ class FigureDisaggregationAbstractModel(models.Model):
         - disaggregation_age (ManyToManyField): Represents the disaggregated age groups.
         - disaggregation_strata_json (ArrayField): Represents the JSON array of stratum disaggregation.
         - disaggregation_conflict (PositiveIntegerField): Represents the number of individuals affected by conflict.
-        - disaggregation_conflict_political (PositiveIntegerField): Represents the number of individuals affected by political violence.
-        - disaggregation_conflict_criminal (PositiveIntegerField): Represents the number of individuals affected by criminal violence.
-        - disaggregation_conflict_communal (PositiveIntegerField): Represents the number of individuals affected by communal violence.
-        - disaggregation_conflict_other (PositiveIntegerField): Represents the number of individuals affected by other conflicts.
+        - disaggregation_conflict_political (PositiveIntegerField): Represents the number of individuals affected by
+        political violence.
+        - disaggregation_conflict_criminal (PositiveIntegerField): Represents the number of individuals affected by
+        criminal violence.
+        - disaggregation_conflict_communal (PositiveIntegerField): Represents the number of individuals affected by
+        communal violence.
+        - disaggregation_conflict_other (PositiveIntegerField): Represents the number of individuals affected by other
+        conflicts.
 
     Meta:
         abstract ("""
@@ -1381,7 +1388,8 @@ class EntryReviewer(MetaInformationAbstractModel, models.Model):
 
     Class: EntryReviewer
 
-    This class represents the relationship between an Entry and a Reviewer. It stores information about the review status of an Entry by a specific Reviewer.
+    This class represents the relationship between an Entry and a Reviewer. It stores information about the review
+    status of an Entry by a specific Reviewer.
 
     Attributes:
     - entry: ForeignKey field representing the related Entry.
@@ -1390,11 +1398,13 @@ class EntryReviewer(MetaInformationAbstractModel, models.Model):
 
     Methods:
     - __str__(self): Returns a string representation of the EntryReviewer object.
-    - assign_creator(cls, entry: 'Entry', user: 'User') -> None: Class method that assigns a creator to the Entry if it doesn't have one already.
+    - assign_creator(cls, entry: 'Entry', user: 'User') -> None: Class method that assigns a creator to the Entry if it
+    doesn't have one already.
     - update_status(self, status: REVIEW_STATUS) -> None: Updates the review status of the EntryReviewer object.
 
     Exceptions:
-    - CannotUpdateStatusException: Custom exception raised when trying to update the status to SIGNED_OFF without the necessary permissions.
+    - CannotUpdateStatusException: Custom exception raised when trying to update the status to SIGNED_OFF without the
+    necessary permissions.
 
     Note:
     - The REVIEW_STATUS enum provides predefined values for the review status.
@@ -1452,7 +1462,8 @@ class Entry(MetaInformationArchiveAbstractModel, models.Model):
         FIGURES_PER_ENTRY (int): The number of figures per entry.
 
     Methods:
-        _total_figure_disaggregation_subquery(cls, figures=None): Returns a subquery that calculates the total figures for the entry.
+        _total_figure_disaggregation_subquery(cls, figures=None): Returns a subquery that calculates the total figures
+        for the entry.
         get_excel_sheets_data(cls, user_id, filters): Returns data for excel sheets.
         is_under_review(self): Returns True if the entry is under review, False otherwise.
         is_reviewed(self): Returns True if the entry has been reviewed, False otherwise.

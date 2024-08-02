@@ -20,9 +20,11 @@ class UserFactory(DjangoModelFactory):
     Attributes:
         model (str): The name of the model to be used for creating User objects.
 
-        email (str): The email address of the User. It is generated using a lambda function that appends a sequence number to the base email 'admin'.
+        email (str): The email address of the User. It is generated using a lambda function that appends a sequence
+        number to the base email 'admin'.
 
-        username (str): The username of the User. It is generated using a lambda function that appends a sequence number to the base username 'username'.
+        username (str): The username of the User. It is generated using a lambda function that appends a sequence number
+        to the base username 'username'.
     """
     class Meta:
         model = 'users.User'
@@ -130,11 +132,13 @@ class SummaryFactory(DjangoModelFactory):
     """
     SummaryFactory class
 
-    This class is a factory for creating instances of the 'country.Summary' model. It extends the DjangoModelFactory class.
+    This class is a factory for creating instances of the 'country.Summary' model. It extends the DjangoModelFactory
+    class.
 
     Attributes:
         summary (str): A string representing a summary. It is generated using the factory.Faker('paragraph') method.
-        country (CountryFactory): An instance of the CountryFactory class, used as a foreign key for the created Summary instance.
+        country (CountryFactory): An instance of the CountryFactory class, used as a foreign key for the created Summary
+        instance.
 
     Example usage:
         factory = SummaryFactory(summary='Lorem ipsum dolor sit amet', country=country_instance)
@@ -154,7 +158,8 @@ class OrganizationKindFactory(DjangoModelFactory):
     """
     A factory class for creating instances of the OrganizationKind model.
 
-    This factory class is used to generate instances of the OrganizationKind model, which represents different kinds of organizations.
+    This factory class is used to generate instances of the OrganizationKind model, which represents different kinds of
+    organizations.
 
     Attributes:
         name (str): The name of the organization kind.
@@ -193,10 +198,12 @@ class ContactFactory(DjangoModelFactory):
     This class is used to create instances of the Contact model using Factory Boy library.
 
     Attributes:
-    - designation: A factory.Iterator object that generates the designation field value from the list of options in the Contact.DESIGNATION.
+    - designation: A factory.Iterator object that generates the designation field value from the list of options in the
+    Contact.DESIGNATION.
     - first_name: A factory.Faker object that generates a random first name.
     - last_name: A factory.Faker object that generates a random last name.
-    - gender: A factory.Iterator object that generates the gender field value from the list of options in the GENDER_TYPE.
+    - gender: A factory.Iterator object that generates the gender field value from the list of options in the
+    GENDER_TYPE.
     - job_title: A factory.Faker object that generates a random job title.
     - organization: A factory.SubFactory object that creates a related OrganizationFactory object.
 
@@ -221,7 +228,8 @@ class CommunicationMediumFactory(DjangoModelFactory):
     A factory class for creating instances of the CommunicationMedium model.
 
     Attributes:
-        Meta: A nested class containing the metadata for the factory. It specifies the model used for creating instances.
+        Meta: A nested class containing the metadata for the factory. It specifies the model used for creating
+        instances.
         name: A string representing the name of the communication medium.
 
     Example usage:
@@ -236,7 +244,8 @@ class CommunicationMediumFactory(DjangoModelFactory):
 
 class CommunicationFactory(DjangoModelFactory):
     """
-    CommunicationFactory class is a factory class used to generate instances of the Communication model in the contact module.
+    CommunicationFactory class is a factory class used to generate instances of the Communication model in the contact
+    module.
 
     Attributes:
         contact (ContactFactory): A factory for generating instances of the Contact model.
@@ -260,7 +269,8 @@ class CommunicationFactory(DjangoModelFactory):
 
 class DisasterCategoryFactory(DjangoModelFactory):
     """
-    The `DisasterCategoryFactory` class is a factory class used to create instances of the `DisasterCategory` model for testing purposes.
+    The `DisasterCategoryFactory` class is a factory class used to create instances of the `DisasterCategory` model for
+    testing purposes.
 
     Usage:
         Use the factory's methods to conveniently create `DisasterCategory` instances for testing.
@@ -357,7 +367,9 @@ class ViolenceSubTypeFactory(DjangoModelFactory):
     """
     Class representing a factory for creating instances of the ViolenceSubType model.
 
-    This factory is a sub-factory of the DjangoModelFactory class and is used to create instances of the ViolenceSubType model. It provides a convenient way to create instances with pre-defined attributes or generate random data for testing or other purposes.
+    This factory is a sub-factory of the DjangoModelFactory class and is used to create instances of the ViolenceSubType
+    model. It provides a convenient way to create instances with pre-defined attributes or generate random data for
+    testing or other purposes.
 
     Attributes:
         violence: A sub-factory of the ViolenceFactory class used to create an instance of the Violence model.
@@ -365,7 +377,8 @@ class ViolenceSubTypeFactory(DjangoModelFactory):
     Methods:
         - create(**kwargs): Creates and saves an instance of the ViolenceSubType model with the given attributes.
         - build(**kwargs): Creates an instance of the ViolenceSubType model but does not save it to the database.
-        - generate(**kwargs): Generates random data for the attributes of the ViolenceSubType model and creates an instance.
+        - generate(**kwargs): Generates random data for the attributes of the ViolenceSubType model and creates an
+        instance.
 
     Example usage:
 
@@ -436,20 +449,29 @@ class EventFactory(DjangoModelFactory):
 
     Attributes:
         crisis (CrisisFactory): A subfactory used to create the crisis attribute of the Event instance.
-        event_type (Iterator): An iterator used to assign a valid crisis type to the event_type attribute of the Event instance.
-        start_date (LazyFunction): A lazy function that returns a date object representing the start date of the event. The default value is January 1, 2010.
-        end_date (LazyFunction): A lazy function that returns a date object representing the end date of the event. The default value is today's date.
+        event_type (Iterator): An iterator used to assign a valid crisis type to the event_type attribute of the Event
+        instance.
+        start_date (LazyFunction): A lazy function that returns a date object representing the start date of the event.
+        The default value is January 1, 2010.
+        end_date (LazyFunction): A lazy function that returns a date object representing the end date of the event. The
+        default value is today's date.
         violence (ViolenceFactory): A subfactory used to create the violence attribute of the Event instance.
-        violence_sub_type (ViolenceSubTypeFactory): A subfactory used to create the violence_sub_type attribute of the Event instance.
+        violence_sub_type (ViolenceSubTypeFactory): A subfactory used to create the violence_sub_type attribute of the
+        Event instance.
         actor (ActorFactory): A subfactory used to create the actor attribute of the Event instance.
-        disaster_category (DisasterCategoryFactory): A subfactory used to create the disaster_category attribute of the Event instance.
-        disaster_sub_category (DisasterSubCategoryFactory): A subfactory used to create the disaster_sub_category attribute of the Event instance.
-        disaster_type (DisasterTypeFactory): A subfactory used to create the disaster_type attribute of the Event instance.
-        disaster_sub_type (DisasterSubTypeFactory): A subfactory used to create the disaster_sub_type attribute of the Event instance.
+        disaster_category (DisasterCategoryFactory): A subfactory used to create the disaster_category attribute of the
+        Event instance.
+        disaster_sub_category (DisasterSubCategoryFactory): A subfactory used to create the disaster_sub_category
+        attribute of the Event instance.
+        disaster_type (DisasterTypeFactory): A subfactory used to create the disaster_type attribute of the Event
+        instance.
+        disaster_sub_type (DisasterSubTypeFactory): A subfactory used to create the disaster_sub_type attribute of the
+        Event instance.
 
     Methods:
         countries(self, create, extracted, **kwargs)
-            This method is a post-generation hook provided by the DjangoModelFactory class. It is used to assign a set of countries to the countries attribute of the Event instance.
+            This method is a post-generation hook provided by the DjangoModelFactory class. It is used to assign a set
+            of countries to the countries attribute of the Event instance.
 
     Parameters:
         create (bool): A flag indicating whether the event instance should be created or not.
@@ -516,7 +538,8 @@ class EntryFactory(DjangoModelFactory):
     Attributes:
         - article_title (str): The title of the article. A sequence is generated using a lambda function.
         - url (str): The URL of the article.
-        - publish_date (datetime): The date when the article was published. A lazy function is used to get the current date.
+        - publish_date (datetime): The date when the article was published. A lazy function is used to get the current
+        date.
 
     """
     class Meta:
@@ -677,7 +700,8 @@ class ReportCommentFactory(DjangoModelFactory):
 
 class OtherSubtypeFactory(DjangoModelFactory):
     """
-    This class represents a factory for creating instances of the 'OtherSubtype' model in the Django application. It is a subclass of 'DjangoModelFactory' and has a Meta class that specifies the model it is associated with.
+    This class represents a factory for creating instances of the 'OtherSubtype' model in the Django application. It is
+    a subclass of 'DjangoModelFactory' and has a Meta class that specifies the model it is associated with.
 
     Usage:
         factory = OtherSubtypeFactory()
@@ -757,7 +781,8 @@ class ExtractionQueryFactory(DjangoModelFactory):
 
     Methods:
     - create(**kwargs): Creates and saves an instance of 'extraction.ExtractionQuery' with the given keyword arguments.
-    - build(**kwargs): Creates an instance of 'extraction.ExtractionQuery' with the given keyword arguments but does not save it.
+    - build(**kwargs): Creates an instance of 'extraction.ExtractionQuery' with the given keyword arguments but does not
+    save it.
 
     Usage:
 

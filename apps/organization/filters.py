@@ -76,7 +76,8 @@ class OrganizationFilter(NameFilterMixin,
 class OrganizationKindFilter(django_filters.FilterSet):
     """A class representing a filter for organization kinds.
 
-    This class inherits from django_filters.FilterSet and provides a custom filter for organization kinds based on their IDs.
+    This class inherits from django_filters.FilterSet and provides a custom filter for organization kinds based on their
+    IDs.
 
     Attributes:
         ids (IDListFilter): A custom filter for filtering organization kinds based on their IDs.

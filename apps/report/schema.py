@@ -63,7 +63,8 @@ class ReportCommentType(DjangoObjectType):
 
 class ReportCommentListType(CustomDjangoListObjectType):
     """
-    This class represents a custom Django list object type for the ReportComment model. It extends the CustomDjangoListObjectType class.
+    This class represents a custom Django list object type for the ReportComment model. It extends the
+    CustomDjangoListObjectType class.
 
     Attributes:
         - model: The model that this list type is based on (ReportComment).
@@ -98,9 +99,11 @@ class ReportApprovalType(DjangoObjectType):
 
 class ReportApprovalListType(CustomDjangoListObjectType):
     """
-    ReportApprovalListType class provides a representation of a list of ReportApproval objects in the Django application.
+    ReportApprovalListType class provides a representation of a list of ReportApproval objects in the Django
+    application.
 
-    It inherits from the CustomDjangoListObjectType class and contains customizations specific to the ReportApproval model.
+    It inherits from the CustomDjangoListObjectType class and contains customizations specific to the ReportApproval
+    model.
 
     Attributes:
         - model (class): The Django model class representing the ReportApproval object.
@@ -116,7 +119,8 @@ class ReportApprovalListType(CustomDjangoListObjectType):
         # Access the filterset_class attribute
         report_approval_list.filterset_class
 
-    Note: Ensure that the CustomDjangoListObjectType class is defined and imported correctly before using ReportApprovalListType.
+    Note: Ensure that the CustomDjangoListObjectType class is defined and imported correctly before using
+    ReportApprovalListType.
     It is recommended to check the CustomDjangoListObjectType class documentation for additional information.
     """
     class Meta:
@@ -127,7 +131,8 @@ class ReportApprovalListType(CustomDjangoListObjectType):
 class ReportGenerationType(DjangoObjectType):
     """
 
-    The ReportGenerationType class is a DjangoObjectType that represents a report generation in the system. It provides a GraphQL interface to retrieve information about a report generation.
+    The ReportGenerationType class is a DjangoObjectType that represents a report generation in the system. It provides
+    a GraphQL interface to retrieve information about a report generation.
 
     Attributes:
         - model: The Django model for the report generation.
@@ -140,8 +145,10 @@ class ReportGenerationType(DjangoObjectType):
         - approvals: A paginated list of ReportApproval objects associated with the report generation.
 
     Methods:
-        - resolve_full_report(root, info, **kwargs): Resolves the full_report field. Returns the absolute URL of the full report if the status of the report generation is COMPLETED, otherwise returns None.
-        - resolve_snapshot(root, info, **kwargs): Resolves the snapshot field. Returns the absolute URL of the snapshot if the status of the report generation is COMPLETED, otherwise returns None.
+        - resolve_full_report(root, info, **kwargs): Resolves the full_report field. Returns the absolute URL of the
+        full report if the status of the report generation is COMPLETED, otherwise returns None.
+        - resolve_snapshot(root, info, **kwargs): Resolves the snapshot field. Returns the absolute URL of the snapshot
+        if the status of the report generation is COMPLETED, otherwise returns None.
 
     Example Usage:
         report_generation = ReportGenerationType()
@@ -174,7 +181,8 @@ class ReportGenerationListType(CustomDjangoListObjectType):
     """
     A class representing a list of report generations.
 
-    This class is a subclass of CustomDjangoListObjectType and is used to define the structure and behavior of a list of report generations.
+    This class is a subclass of CustomDjangoListObjectType and is used to define the structure and behavior of a list of
+    report generations.
 
     Attributes:
         model (Model): The Django model associated with this list type.
@@ -195,12 +203,15 @@ class ReportType(DjangoObjectType):
         comments: A field representing the paginated list of comments associated with the report.
         filter_figure_roles: A list of non-null RoleGrapheneEnum values used for filtering the report by figure roles.
         filter_figure_roles_display: A field representing the display value of filter_figure_roles.
-        filter_figure_crisis_types: A list of non-null CrisisTypeGrapheneEnum values used for filtering the report by figure crisis types.
+        filter_figure_crisis_types: A list of non-null CrisisTypeGrapheneEnum values used for filtering the report by
+        figure crisis types.
         filter_figure_crisis_types_display: A field representing the display value of filter_figure_crisis_types.
-        filter_figure_categories: A list of non-null FigureCategoryTypeEnum values used for filtering the report by figure categories.
+        filter_figure_categories: A list of non-null FigureCategoryTypeEnum values used for filtering the report by
+        figure categories.
         filter_figure_terms: A list of non-null FigureTermsEnum values used for filtering the report by figure terms.
         filter_figure_terms_display: A field representing the display value of filter_figure_terms.
-        filter_figure_review_status: A list of non-null FigureReviewStatusEnum values used for filtering the report by figure review status.
+        filter_figure_review_status: A list of non-null FigureReviewStatusEnum values used for filtering the report by
+        figure review status.
         total_disaggregation: A non-null ReportTotalsType object representing the total disaggregation of the report.
         last_generation: A field representing the last generation of the report.
         generations: A paginated list of report generations associated with the report.
@@ -269,12 +280,14 @@ class Query:
 
         report_comment (DjangoObjectField): The report_comment field represents the report comment type.
 
-        report_comment_list (DjangoPaginatedListObjectField): The report_comment_list field represents the paginated list
+        report_comment_list (DjangoPaginatedListObjectField): The report_comment_list field represents the paginated
+        list
         of report comments.
 
         report_generation (DjangoObjectField): The report_generation field represents the report generation type.
 
-        report_generation_list (DjangoPaginatedListObjectField): The report_generation_list field represents the paginated
+        report_generation_list (DjangoPaginatedListObjectField): The report_generation_list field represents the
+        paginated
         list of report generations.
 
     """

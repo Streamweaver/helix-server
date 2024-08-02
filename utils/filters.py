@@ -70,13 +70,21 @@ def _generate_filter_class(inner_type, filter_type=None, non_null=False):
     Returns:
     - The generated filter class.
 
-    The _generate_filter_class method creates a filter class for the specified inner type. It uses the filter_type parameter to determine the type of filter to be used. If filter_type is not provided, it defaults to django_filters.Filter.
+    The _generate_filter_class method creates a filter class for the specified inner type. It uses the filter_type
+    parameter to determine the type of filter to be used. If filter_type is not provided, it defaults to
+    django_filters.Filter.
 
-    The method creates a form_field for the filter class, which is a type derived from the field_class of the filter type. The form_field is used to define the field class for the filter class. The field class is generated as "{}FormField" where "{}" is the name of the inner_type.
+    The method creates a form_field for the filter class, which is a type derived from the field_class of the filter
+    type. The form_field is used to define the field class for the filter class. The field class is generated as
+    "{}FormField" where "{}" is the name of the inner_type.
 
-    The filter class itself is created using the inner_type, filter_type, and form_field. It extends the filter_type and sets the field_class to the defined form_field. The __doc__ attribute of the filter class is set to a formatted string that describes the purpose of the filter class.
+    The filter class itself is created using the inner_type, filter_type, and form_field. It extends the filter_type and
+    sets the field_class to the defined form_field. The __doc__ attribute of the filter class is set to a formatted
+    string that describes the purpose of the filter class.
 
-    Finally, the form_field is registered in convert_form_field, which is a registration mechanism for converting form fields to graphene types. If non_null is True, the inner_type is wrapped in graphene.NonNull. Otherwise, the inner_type is used as is.
+    Finally, the form_field is registered in convert_form_field, which is a registration mechanism for converting form
+    fields to graphene types. If non_null is True, the inner_type is wrapped in graphene.NonNull. Otherwise, the
+    inner_type is used as is.
 
     Note that the generated filter class is not returned as a string, but as a Python class object.
 
@@ -116,7 +124,8 @@ def _generate_list_filter_class(inner_type, filter_type=None, field_class=None):
 
     :return: The generated list filter class.
 
-    The generated list filter class is a small extension of the raw filter_type that allows expressing graphql List({inner_type}) arguments using FilterSets. The given values are passed directly into queryset filters.
+    The generated list filter class is a small extension of the raw filter_type that allows expressing graphql
+    List({inner_type}) arguments using FilterSets. The given values are passed directly into queryset filters.
     """
 
     _filter_type = filter_type or django_filters.Filter
@@ -165,7 +174,8 @@ def _get_multiple_input_filter(_type, **kwargs):
     Method: _get_multiple_input_filter
 
     Description:
-    This method generates a filter class object for multiple choice filter type. It is a helper method used within the codebase.
+    This method generates a filter class object for multiple choice filter type. It is a helper method used within the
+    codebase.
 
     Parameters:
     - _type: The type of filter.
@@ -195,7 +205,8 @@ def generate_type_for_filter_set(
 ) -> typing.Tuple[graphene.ObjectType, graphene.InputObjectType]:
     """
 
-    generate_type_for_filter_set(filter_set, used_node, type_name, input_type_name, custom_new_fields_map=None) -> typing.Tuple[graphene.ObjectType, graphene.InputObjectType]
+    generate_type_for_filter_set(filter_set, used_node, type_name, input_type_name, custom_new_fields_map=None) ->
+    typing.Tuple[graphene.ObjectType, graphene.InputObjectType]
 
     Generates a GraphQL type for a given filter set.
 
@@ -204,10 +215,12 @@ def generate_type_for_filter_set(
     - used_node (Node): The node used to fetch the filter set.
     - type_name (str): The name of the generated GraphQL type.
     - input_type_name (str): The name of the generated GraphQL input type.
-    - custom_new_fields_map (dict, optional): A custom dictionary mapping new fields to be added to the generated GraphQL type. Default is None.
+    - custom_new_fields_map (dict, optional): A custom dictionary mapping new fields to be added to the generated
+    GraphQL type. Default is None.
 
     Returns:
-    - typing.Tuple[graphene.ObjectType, graphene.InputObjectType]: A tuple containing the generated GraphQL type and input type.
+    - typing.Tuple[graphene.ObjectType, graphene.InputObjectType]: A tuple containing the generated GraphQL type and
+    input type.
 
     Note:
     - If the given filter set already exists in the cache, the cached types are returned.

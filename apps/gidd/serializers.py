@@ -19,7 +19,8 @@ class CountrySerializer(serializers.ModelSerializer):
 
     Meta options:
     - model: The model that this serializer is used for, which is Country.
-    - fields: The fields to include in the serialized representation of the model, which are iso2, iso3, and country_name.
+    - fields: The fields to include in the serialized representation of the model, which are iso2, iso3, and
+    country_name.
     - lookup_field: The field to use for lookups, which is the id field of the model.
 
     Example usage:
@@ -64,7 +65,8 @@ class DisasterSerializer(serializers.ModelSerializer):
     Class: DisasterSerializer
 
     Description:
-    This class is a serializer for the Disaster model. It defines the fields that should be serialized and provides serialization and deserialization capabilities for instances of the Disaster model.
+    This class is a serializer for the Disaster model. It defines the fields that should be serialized and provides
+    serialization and deserialization capabilities for instances of the Disaster model.
 
     Attributes:
     - model: The Disaster model that this serializer is associated with.
@@ -175,7 +177,8 @@ class StatusLogSerializer(serializers.ModelSerializer):
 
     Attributes:
         model (django.db.models.Model): The StatusLog model that the serializer is based on.
-        fields (str): A string representing the fields from the model that should be included in the serialized representation. If set to '__all__', all fields will be included.
+        fields (str): A string representing the fields from the model that should be included in the serialized
+        representation. If set to '__all__', all fields will be included.
 
     """
     class Meta:
@@ -192,10 +195,12 @@ class ReleaseMetadataSerializer(serializers.ModelSerializer):
         This class is responsible for serializing and deserializing ReleaseMetadata objects.
 
     Methods:
-        - create(self, validated_data): This method is used to create a new ReleaseMetadata object with the given validated data.
+        - create(self, validated_data): This method is used to create a new ReleaseMetadata object with the given
+        validated data.
 
     Attributes:
-        - Meta (nested class): This is a nested class that defines the metadata for the serializer. It specifies the model to be used and the fields to include in the serialization process.
+        - Meta (nested class): This is a nested class that defines the metadata for the serializer. It specifies the
+        model to be used and the fields to include in the serialization process.
 
     Authors:
         [Your Name]
@@ -260,14 +265,18 @@ class IdpsSaddEstimateSerializer(serializers.ModelSerializer):
     """
     Class: IdpsSaddEstimateSerializer
 
-    This class is a serializer for the IdpsSaddEstimate model. It is used to serialize and validate data when creating or updating instances of the model.
+    This class is a serializer for the IdpsSaddEstimate model. It is used to serialize and validate data when creating
+    or updating instances of the model.
 
     Attributes:
     - model: The model class associated with this serializer.
     - exclude: A list of field names to be excluded from the serialized representation.
 
     Methods:
-    - validate(validated_data): This method is called to perform validation on the input data. It is called after the default validation performed by the superclass. It takes the validated data as input and returns the validated data after performing additional validation. In this method, the country name and iso3 fields are calculated based on the country field and added to the validated data.
+    - validate(validated_data): This method is called to perform validation on the input data. It is called after the
+    default validation performed by the superclass. It takes the validated data as input and returns the validated data
+    after performing additional validation. In this method, the country name and iso3 fields are calculated based on the
+    country field and added to the validated data.
 
     Example Usage:
     serializer = IdpsSaddEstimateSerializer(data=data)

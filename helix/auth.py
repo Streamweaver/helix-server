@@ -9,13 +9,17 @@ class WhiteListMiddleware:
     """
     Class: WhiteListMiddleware
 
-    This class provides middleware functionality to check if a user is authenticated and has access to whitelisted nodes in a GraphQL API.
+    This class provides middleware functionality to check if a user is authenticated and has access to whitelisted nodes
+    in a GraphQL API.
 
     Attributes:
         None
 
     Methods:
-        - resolve(next, root, info, **args): This method is a custom resolver that gets called by the GraphQL execution engine for each resolver in the execution process. It checks if the user is authenticated and has access to the requested node. If not, it raises a PermissionDenied exception. This check is only performed at the root node and not in deeper nodes.
+        - resolve(next, root, info, **args): This method is a custom resolver that gets called by the GraphQL execution
+        engine for each resolver in the execution process. It checks if the user is authenticated and has access to the
+        requested node. If not, it raises a PermissionDenied exception. This check is only performed at the root node
+        and not in deeper nodes.
 
     Args:
         - next: The next resolver function to be called in the execution process.

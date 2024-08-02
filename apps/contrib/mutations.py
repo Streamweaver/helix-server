@@ -116,7 +116,8 @@ class CreateClient(graphene.Mutation):
         - data: The input data for creating the client.
 
         Returns:
-        - If the mutation is valid and successful, it returns an instance of CreateClient with the created client object and no errors.
+        - If the mutation is valid and successful, it returns an instance of CreateClient with the created client object
+        and no errors.
         - If the mutation is not valid, it returns an instance of CreateClient with the errors and ok set to False.
     """
     class Arguments:
@@ -164,7 +165,8 @@ class UpdateClient(graphene.Mutation):
                 If the client object with the specified ID does not exist, it returns an instance of the
                 ClientUpdateSerializer class with an error object.
                 If the mutation data is not valid, it returns an instance of the UpdateClient class with error objects.
-                Otherwise, it updates the client object and returns an instance of the UpdateClient class with the updated client.
+                Otherwise, it updates the client object and returns an instance of the UpdateClient class with the
+                updated client.
     """
     class Arguments:
         data = ClientUpdateInputType(required=True)
@@ -198,7 +200,8 @@ class ExportBaseMutation(graphene.Mutation, abstract=True):
     """
     ExportBaseMutation
 
-    This class is a base mutation class for exporting data. It is a subclass of graphene.Mutation and is designed to be extended by other mutation classes.
+    This class is a base mutation class for exporting data. It is a subclass of graphene.Mutation and is designed to be
+    extended by other mutation classes.
 
     Attributes:
         errors (List[CustomErrorType]): A list of custom error types.
@@ -208,8 +211,10 @@ class ExportBaseMutation(graphene.Mutation, abstract=True):
         DOWNLOAD_TYPE (ExcelDownload.DOWNLOAD_TYPES): A class variable representing the download type for the mutation.
 
     Methods:
-        __init_subclass__(cls, **kwargs): Special method called when a subclass is created. It checks for the presence of required attributes and raises an error if any are missing.
-        mutate(cls, _, info, filters): Executes the mutation. It creates an instance of ExcelDownloadSerializer and saves the data. Returns an instance of the class with the appropriate errors and success flag.
+        __init_subclass__(cls, **kwargs): Special method called when a subclass is created. It checks for the presence
+        of required attributes and raises an error if any are missing.
+        mutate(cls, _, info, filters): Executes the mutation. It creates an instance of ExcelDownloadSerializer and
+        saves the data. Returns an instance of the class with the appropriate errors and success flag.
 
     """
     class Arguments:
@@ -257,7 +262,8 @@ class ExportTrackingData(ExportBaseMutation):
         DOWNLOAD_TYPE (str): The download type for the exported tracking data.
 
     Methods:
-        Arguments: A class that extends ExportBaseMutation.Arguments and defines the arguments for exporting tracking data.
+        Arguments: A class that extends ExportBaseMutation.Arguments and defines the arguments for exporting tracking
+        data.
 
     Args:
         filters (ClientTrackInfoFilterDataInputType): The filters to be applied for exporting tracking data.
@@ -277,10 +283,12 @@ class ExportTrackingData(ExportBaseMutation):
 class ExportClients(ExportBaseMutation):
     """
 
-    The ExportClients class is a subclass of the ExportBaseMutation class and is used for exporting client data in Excel format. It provides a method to execute the export operation.
+    The ExportClients class is a subclass of the ExportBaseMutation class and is used for exporting client data in Excel
+    format. It provides a method to execute the export operation.
 
     Attributes:
-        DOWNLOAD_TYPE (str): The download type for exporting client data. The value is set to 'CLIENT' indicating the client download type.
+        DOWNLOAD_TYPE (str): The download type for exporting client data. The value is set to 'CLIENT' indicating the
+        client download type.
 
     """
     class Arguments:
@@ -290,7 +298,8 @@ class ExportClients(ExportBaseMutation):
 
 class TriggerBulkOperation(graphene.Mutation):
     """
-    The `TriggerBulkOperation` class is a subclass of `graphene.Mutation` and represents a GraphQL mutation for triggering bulk operations.
+    The `TriggerBulkOperation` class is a subclass of `graphene.Mutation` and represents a GraphQL mutation for
+    triggering bulk operations.
 
     Attributes:
         Arguments:
@@ -310,7 +319,8 @@ class TriggerBulkOperation(graphene.Mutation):
                 - data: An instance of the `BulkApiOperationInputType` class, providing the input data for the mutation.
 
             Returns:
-                An instance of the `TriggerBulkOperation` class, with the appropriate attributes set based on the mutation logic.
+                An instance of the `TriggerBulkOperation` class, with the appropriate attributes set based on the
+                mutation logic.
     """
     class Arguments:
         data = BulkApiOperationInputType(required=True)

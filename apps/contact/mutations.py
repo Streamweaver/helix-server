@@ -58,7 +58,8 @@ class CreateContact(graphene.Mutation):
 class UpdateContact(graphene.Mutation):
     """
 
-    The UpdateContact class is a mutation class used to update an existing contact record. It is a subclass of the graphene.Mutation class.
+    The UpdateContact class is a mutation class used to update an existing contact record. It is a subclass of the
+    graphene.Mutation class.
 
     Attributes:
     - errors: A list of CustomErrorType objects representing any validation or error messages.
@@ -117,13 +118,15 @@ class UpdateContact(graphene.Mutation):
 
 class DeleteContact(graphene.Mutation):
     """
-    The DeleteContact class is a graphene mutation for deleting a contact. It inherits from the Mutation class provided by graphene.
+    The DeleteContact class is a graphene mutation for deleting a contact. It inherits from the Mutation class provided
+    by graphene.
 
     Attributes:
         Arguments:
             - id (graphene.ID): The ID of the contact to be deleted. This argument is required.
 
-        errors (graphene.List): A list of CustomErrorType objects representing any errors that occurred during the mutation.
+        errors (graphene.List): A list of CustomErrorType objects representing any errors that occurred during the
+        mutation.
 
         ok (graphene.Boolean): A boolean indicating whether the deletion was successful or not.
 
@@ -139,8 +142,10 @@ class DeleteContact(graphene.Mutation):
                 - id (graphene.ID): The ID of the contact to be deleted.
 
             Returns:
-                - If the contact with the given ID does not exist, an UpdateContact mutation with appropriate error message is returned.
-                - If the contact is successfully deleted, a DeleteContact mutation with the deleted contact and no errors is returned.
+                - If the contact with the given ID does not exist, an UpdateContact mutation with appropriate error
+                message is returned.
+                - If the contact is successfully deleted, a DeleteContact mutation with the deleted contact and no
+                errors is returned.
     """
     class Arguments:
         id = graphene.ID(required=True)

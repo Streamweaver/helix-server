@@ -14,14 +14,21 @@ class Conflict(models.Model):
     This class represents a Conflict object.
 
     Attributes:
-        country (ForeignKey): A foreign key to the Country model, related name is 'country_conflict'. Used to determine the country associated with the conflict.
-        total_displacement (BigIntegerField): The total displacement caused by the conflict, in terms of number of people affected. Can be blank or null.
-        new_displacement (BigIntegerField): The new displacement caused by the conflict, in terms of number of people affected. Can be blank or null.
-        total_displacement_rounded (BigIntegerField): The rounded value of total_displacement. Used for display and sorting purposes only. Can be blank or null.
-        new_displacement_rounded (BigIntegerField): The rounded value of new_displacement. Used for display and sorting purposes only. Can be blank or null.
+        country (ForeignKey): A foreign key to the Country model, related name is 'country_conflict'. Used to determine
+        the country associated with the conflict.
+        total_displacement (BigIntegerField): The total displacement caused by the conflict, in terms of number of
+        people affected. Can be blank or null.
+        new_displacement (BigIntegerField): The new displacement caused by the conflict, in terms of number of people
+        affected. Can be blank or null.
+        total_displacement_rounded (BigIntegerField): The rounded value of total_displacement. Used for display and
+        sorting purposes only. Can be blank or null.
+        new_displacement_rounded (BigIntegerField): The rounded value of new_displacement. Used for display and sorting
+        purposes only. Can be blank or null.
         year (IntegerField): The year in which the conflict occurred.
-        country_name (CharField): The name of the country associated with the conflict. Used for caching and snapshot purposes.
-        iso3 (CharField): The ISO3 code of the country associated with the conflict. Used for caching and snapshot purposes.
+        country_name (CharField): The name of the country associated with the conflict. Used for caching and snapshot
+        purposes.
+        iso3 (CharField): The ISO3 code of the country associated with the conflict. Used for caching and snapshot
+        purposes.
         created_at (DateTimeField): The timestamp indicating when the conflict object was created.
         updated_at (DateTimeField): The timestamp indicating when the conflict object was last updated.
 
@@ -75,10 +82,13 @@ class Disaster(models.Model):
         end_date (DateField): The end date of the disaster.
         end_date_accuracy (TextField): The accuracy of the end date of the disaster.
 
-        hazard_category (ForeignKey): A foreign key to the DisasterCategory model representing the hazard category of the disaster.
-        hazard_sub_category (ForeignKey): A foreign key to the DisasterSubCategory model representing the hazard subcategory of the disaster.
+        hazard_category (ForeignKey): A foreign key to the DisasterCategory model representing the hazard category of
+        the disaster.
+        hazard_sub_category (ForeignKey): A foreign key to the DisasterSubCategory model representing the hazard
+        subcategory of the disaster.
         hazard_type (ForeignKey): A foreign key to the DisasterType model representing the hazard type of the disaster.
-        hazard_sub_type (ForeignKey): A foreign key to the DisasterSubType model representing the hazard subtype of the disaster.
+        hazard_sub_type (ForeignKey): A foreign key to the DisasterSubType model representing the hazard subtype of the
+        disaster.
 
         new_displacement (BigIntegerField): The new displacement caused by the disaster.
         total_displacement (BigIntegerField): The total displacement caused by the disaster.
@@ -97,11 +107,13 @@ class Disaster(models.Model):
         hazard_sub_type_name (CharField): The name of the hazard subtype of the disaster.
         hazard_type_name (CharField): The name of the hazard type of the disaster.
 
-        displacement_occurred (ArrayField): An array field storing the displacement occurred values associated with the disaster.
+        displacement_occurred (ArrayField): An array field storing the displacement occurred values associated with the
+        disaster.
 
         glide_numbers (ArrayField) - Deprecated: An array field storing the glide numbers associated with the disaster.
         event_codes (ArrayField) - Deprecated: An array field storing the event codes associated with the disaster.
-        event_codes_type (ArrayField) - Deprecated: An array field storing the event code types associated with the disaster.
+        event_codes_type (ArrayField) - Deprecated: An array field storing the event code types associated with the
+        disaster.
 
     Meta:
         verbose_name (str): The verbose name of the Disaster class.
@@ -201,13 +213,15 @@ class Disaster(models.Model):
 
 class StatusLog(models.Model):
     """
-    The `StatusLog` class represents a model for tracking status logs. It contains information about the trigger, completion, and status of a log.
+    The `StatusLog` class represents a model for tracking status logs. It contains information about the trigger,
+    completion, and status of a log.
 
     Attributes:
         triggered_by (ForeignKey): Represents the user who triggered the log.
         triggered_at (DateTimeField): Represents the timestamp when the log was triggered.
         completed_at (DateTimeField): Represents the timestamp when the log was completed (can be null or blank).
-        status (Status): Represents the status of the log, which can be one of the following: PENDING, SUCCESS, or FAILED.
+        status (Status): Represents the status of the log, which can be one of the following: PENDING, SUCCESS, or
+        FAILED.
 
         Status (enum.Enum): Represents an enumeration of possible log status values: PENDING, SUCCESS, FAILED.
 
@@ -219,7 +233,8 @@ class StatusLog(models.Model):
     Methods:
         __str__(): Returns a string representation of the triggered timestamp.
 
-        last_release_date(): Returns the formatted completion date of the last log entry, or None if no log entries exist.
+        last_release_date(): Returns the formatted completion date of the last log entry, or None if no log entries
+        exist.
 
     Note:
         This class inherits from the `models.Model` class provided by Django.
@@ -275,8 +290,10 @@ class ConflictLegacy(models.Model):
     A class representing a legacy conflict.
 
     Attributes:
-        total_displacement (BigIntegerField): The total displacement caused by the conflict (optional, can be blank or null).
-        new_displacement (BigIntegerField): The new displacement caused by the conflict (optional, can be blank or null).
+        total_displacement (BigIntegerField): The total displacement caused by the conflict (optional, can be blank or
+        null).
+        new_displacement (BigIntegerField): The new displacement caused by the conflict (optional, can be blank or
+        null).
         year (IntegerField): The year in which the conflict occurred.
         iso3 (CharField): The ISO3 code associated with the conflict.
 
@@ -436,23 +453,28 @@ class ReleaseMetadata(models.Model):
 class PublicFigureAnalysis(models.Model):
     """
 
-    The PublicFigureAnalysis class is a Django model that represents the analysis of public figures in a specific crisis or event. It has the following fields:
+    The PublicFigureAnalysis class is a Django model that represents the analysis of public figures in a specific crisis
+    or event. It has the following fields:
 
     1. iso3 (CharField): Represents the ISO3 code of the country associated with the analysis.
 
-    2. figure_cause (EnumField): Represents the cause of the figures in the analysis. It is an enumeration field that accepts values from the Crisis.CRISIS_TYPE enumeration.
+    2. figure_cause (EnumField): Represents the cause of the figures in the analysis. It is an enumeration field that
+    accepts values from the Crisis.CRISIS_TYPE enumeration.
 
-    3. figure_category (EnumField): Represents the category of the figures in the analysis. It is an enumeration field that accepts values from the Figure.FIGURE_CATEGORY_TYPES enumeration.
+    3. figure_category (EnumField): Represents the category of the figures in the analysis. It is an enumeration field
+    that accepts values from the Figure.FIGURE_CATEGORY_TYPES enumeration.
 
     4. year (IntegerField): Represents the year of the analysis.
 
     5. figures (IntegerField): Represents the total number of figures in the analysis. This field allows null values.
 
-    6. figures_rounded (IntegerField): Represents the rounded number of figures in the analysis. This field allows null values.
+    6. figures_rounded (IntegerField): Represents the rounded number of figures in the analysis. This field allows null
+    values.
 
     7. description (TextField): Represents the description of the analysis. This field allows null values.
 
-    8. report (ForeignKey): Represents the report associated with the analysis. It is a foreign key to the 'report.Report' model. This field allows null values.
+    8. report (ForeignKey): Represents the report associated with the analysis. It is a foreign key to the
+    'report.Report' model. This field allows null values.
 
     """
     iso3 = models.CharField(verbose_name=_('ISO3'), max_length=5)
@@ -710,7 +732,8 @@ class GiddFigure(MetaInformationAbstractModel):
     """
     Class GiddFigure
 
-    This class represents a GiddFigure, which is a model that contains various fields related to a figure in the GIDD system.
+    This class represents a GiddFigure, which is a model that contains various fields related to a figure in the GIDD
+    system.
 
     Attributes:
     - iso3: CharField, represents the ISO3 code of the country where the figure belongs

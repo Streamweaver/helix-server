@@ -18,7 +18,8 @@ class ParkedItemType(DjangoObjectType):
     """
     Class representing a ParkedItemType.
 
-    This class is a subclass of DjangoObjectType and is used to translate ParkedItem model fields into GraphQL fields. It provides additional fields for status, status_display, source, source_display, and entry.
+    This class is a subclass of DjangoObjectType and is used to translate ParkedItem model fields into GraphQL fields.
+    It provides additional fields for status, status_display, source, source_display, and entry.
 
     Attributes:
         status (graphene.Field): A field representing the status of the ParkedItemType.

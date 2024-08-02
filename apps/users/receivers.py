@@ -104,7 +104,8 @@ def update_user_group_post_save(sender, instance, **kwargs):
     """
     Update the user group after saving a portfolio.
 
-    This method is triggered by the post_save signal when a Portfolio object is saved. It updates the user group of the user associated with the portfolio by removing their guest portfolio status and setting their role.
+    This method is triggered by the post_save signal when a Portfolio object is saved. It updates the user group of the
+    user associated with the portfolio by removing their guest portfolio status and setting their role.
 
     Args:
         sender (class): The class sending the signal.

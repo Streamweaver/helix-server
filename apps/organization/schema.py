@@ -64,7 +64,8 @@ class OrganizationType(DjangoObjectType):
 
 class OrganizationListType(CustomDjangoListObjectType):
     """
-    The OrganizationListType class is a subclass of CustomDjangoListObjectType and represents a GraphQL object type for a list of organizations.
+    The OrganizationListType class is a subclass of CustomDjangoListObjectType and represents a GraphQL object type for
+    a list of organizations.
 
     Attributes:
         Meta.filterset_class (class): The filterset class for filtering the list of organizations.
@@ -113,16 +114,24 @@ class OrganizationKindListType(CustomDjangoListObjectType):
 
 class Query:
     """
-    Query class represents the GraphQL query object for performing queries related to organizations and organization kinds.
+    Query class represents the GraphQL query object for performing queries related to organizations and organization
+    kinds.
 
     Attributes:
-        organization: A DjangoObjectField that represents querying a single organization. It takes an instance of OrganizationType as its parameter.
+        organization: A DjangoObjectField that represents querying a single organization. It takes an instance of
+        OrganizationType as its parameter.
 
-        organization_list: A DjangoPaginatedListObjectField that represents querying a paginated list of organizations. It takes an instance of OrganizationListType as its parameter. It also accepts pagination options using PageGraphqlPaginationWithoutCount, with the ability to set the page size query parameter.
+        organization_list: A DjangoPaginatedListObjectField that represents querying a paginated list of organizations.
+        It takes an instance of OrganizationListType as its parameter. It also accepts pagination options using
+        PageGraphqlPaginationWithoutCount, with the ability to set the page size query parameter.
 
-        organization_kind: A DjangoObjectField that represents querying a single organization kind. It takes an instance of OrganizationKindObjectType as its parameter.
+        organization_kind: A DjangoObjectField that represents querying a single organization kind. It takes an instance
+        of OrganizationKindObjectType as its parameter.
 
-        organization_kind_list: A DjangoPaginatedListObjectField that represents querying a paginated list of organization kinds. It takes an instance of OrganizationKindListType as its parameter. It also accepts pagination options using PageGraphqlPaginationWithoutCount, with the ability to set the page size query parameter.
+        organization_kind_list: A DjangoPaginatedListObjectField that represents querying a paginated list of
+        organization kinds. It takes an instance of OrganizationKindListType as its parameter. It also accepts
+        pagination options using PageGraphqlPaginationWithoutCount, with the ability to set the page size query
+        parameter.
     """
     organization = DjangoObjectField(OrganizationType)
     organization_list = DjangoPaginatedListObjectField(OrganizationListType,

@@ -59,7 +59,8 @@ class GQLContext:
 
     Methods:
         user(): Returns the user object associated with the current request.
-        get_dataloader(parent: str, related_name: str): Returns a OneToManyLoader object for the given parent and related name.
+        get_dataloader(parent: str, related_name: str): Returns a OneToManyLoader object for the given parent and
+        related name.
         get_count_loader(parent: str, child: str): Returns a CountLoader object for the given parent and child.
         entry_entry_total_stock_idp_figures(): Returns a TotalIDPFigureByEntryLoader object.
         entry_entry_total_flow_nd_figures(): Returns a TotalNDFigureByEntryLoader object.
@@ -69,10 +70,14 @@ class GQLContext:
         event_event_total_stock_idp_figures(): Returns a TotalIDPFigureByEventLoader object.
         event_event_total_flow_nd_figures(): Returns a TotalNDFigureByEventLoader object.
         event_stock_idp_figures_max_end_date(): Returns a MaxStockIDPFigureEndDateByEventLoader object.
-        country_country_this_year_idps_disaster_loader(): Returns a TotalFigureThisYearByCountryCategoryEventTypeLoader object for IDPs in disaster.
-        country_country_this_year_idps_conflict_loader(): Returns a TotalFigureThisYearByCountryCategoryEventTypeLoader object for IDPs in conflict.
-        country_country_this_year_nd_conflict_loader(): Returns a TotalFigureThisYearByCountryCategoryEventTypeLoader object for new displacements in conflict.
-        country_country_this_year_nd_disaster_loader(): Returns a TotalFigureThisYearByCountryCategoryEventTypeLoader object for new displacements in disaster.
+        country_country_this_year_idps_disaster_loader(): Returns a TotalFigureThisYearByCountryCategoryEventTypeLoader
+        object for IDPs in disaster.
+        country_country_this_year_idps_conflict_loader(): Returns a TotalFigureThisYearByCountryCategoryEventTypeLoader
+        object for IDPs in conflict.
+        country_country_this_year_nd_conflict_loader(): Returns a TotalFigureThisYearByCountryCategoryEventTypeLoader
+        object for new displacements in conflict.
+        country_country_this_year_nd_disaster_loader(): Returns a TotalFigureThisYearByCountryCategoryEventTypeLoader
+        object for new displacements in disaster.
         monitoring_sub_region_country_loader(): Returns a MonitoringSubRegionCountryLoader object.
         monitoring_sub_region_country_count_loader(): Returns a MonitoringSubRegionCountryCountLoader object.
         event_entry_count_dataloader(): Returns an EventEntryCountLoader object.

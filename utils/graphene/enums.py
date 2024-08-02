@@ -51,7 +51,8 @@ def convert_enum_to_graphene_enum(enum, name=None, description=enum_description,
     Parameters:
         enum (Enum): The Python enum to be converted.
         name (str, optional): The name of the Graphene enum. If not provided, the name of the Python enum will be used.
-        description (str, optional): The description of the Graphene enum. If not provided, the docstring of the Python enum will be used.
+        description (str, optional): The description of the Graphene enum. If not provided, the docstring of the Python
+        enum will be used.
         deprecation_reason (str, optional): The deprecation reason for the Graphene enum.
 
     Returns:
@@ -70,7 +71,9 @@ def convert_enum_to_graphene_enum(enum, name=None, description=enum_description,
         class MyQuery(graphene.ObjectType):
             my_field = graphene.Field(MyGrapheneEnum)
 
-    Note: This method creates a new type dynamically based on the provided Python enum. It uses the enum's name and docstring as the name and description of the Graphene enum. The Graphene enum will have the same values and attributes as the Python enum.
+    Note: This method creates a new type dynamically based on the provided Python enum. It uses the enum's name and
+    docstring as the name and description of the Graphene enum. The Graphene enum will have the same values and
+    attributes as the Python enum.
     """
     description = description or enum.__doc__
     name = name or enum.__name__
@@ -99,7 +102,8 @@ def get_enum_name_from_django_field(
     Get the enum name from a Django field.
 
     Args:
-        field (Union[None, serializers.ChoiceField, models.CharField, models.IntegerField, ArrayField, models.query_utils.DeferredAttribute]): The Django field.
+        field (Union[None, serializers.ChoiceField, models.CharField, models.IntegerField, ArrayField,
+        models.query_utils.DeferredAttribute]): The Django field.
         field_name (str, optional): The name of the field. Defaults to None.
         model_name (str, optional): The name of the model. Defaults to None.
 
@@ -110,7 +114,8 @@ def get_enum_name_from_django_field(
         Exception: If either the `model_name` or `field_name` is None.
 
     Notes:
-        - The `field` parameter should be one of the valid field types: `serializers.ChoiceField`, `models.CharField`, `models.IntegerField`, `ArrayField`, `models.query_utils.DeferredAttribute`.
+        - The `field` parameter should be one of the valid field types: `serializers.ChoiceField`, `models.CharField`,
+        `models.IntegerField`, `ArrayField`, `models.query_utils.DeferredAttribute`.
         - If `field_name` and `model_name` are not provided, they will be inferred from the `field` parameter.
 
     Examples:
@@ -159,7 +164,8 @@ class EnumDescription(graphene.Scalar):
     NOTE: This class is designed to be used only for fields and is not usable as an input field or argument.
 
     Methods:
-    - coerce_string(value): Coerces the given value to a string. The value should always be a callable representing the function get_FOO_display, where FOO is a field name.
+    - coerce_string(value): Coerces the given value to a string. The value should always be a callable representing the
+    function get_FOO_display, where FOO is a field name.
         - Parameters:
             - value: The value to be coerced.
         - Returns: The coerced value as a string.
@@ -167,7 +173,8 @@ class EnumDescription(graphene.Scalar):
     Attributes:
     - serialize: A reference to the coerce_string method. This attribute is used for serialization.
     - parse_value: A reference to the coerce_string method. This attribute is used for parsing a value.
-    - parse_literal: A reference to the graphene.String.parse_literal method. This attribute is used for parsing a literal.
+    - parse_literal: A reference to the graphene.String.parse_literal method. This attribute is used for parsing a
+    literal.
 
     """
 

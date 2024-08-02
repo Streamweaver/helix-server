@@ -58,7 +58,8 @@ class ViolenceSubObjectType(DjangoObjectType):
 
 class ViolenceSubObjectListType(CustomDjangoListObjectType):
     """
-    This class is a custom Django list object type for ViolenceSubType model. It inherits from CustomDjangoListObjectType.
+    This class is a custom Django list object type for ViolenceSubType model. It inherits from
+    CustomDjangoListObjectType.
 
     Attributes:
         model (Model): The Django model that this object list type is related to.
@@ -74,7 +75,8 @@ class ViolenceType(DjangoObjectType):
     """
     A class representing the ViolenceType.
 
-    ViolenceType is a DjangoObjectType class used to define the structure and behavior of the 'Violence' model in the database.
+    ViolenceType is a DjangoObjectType class used to define the structure and behavior of the 'Violence' model in the
+    database.
 
     Attributes:
         Meta: A class representing the meta options for the ViolenceType class.
@@ -82,8 +84,10 @@ class ViolenceType(DjangoObjectType):
             exclude_fields (tuple): The fields to be excluded from the ViolenceType.
         sub_types: A DjangoPaginatedListObjectField representing the related 'sub_types' field in the Violence model.
             ViolenceSubObjectListType (class): The type of the related 'sub_types' field.
-            related_name (str): The related name used to access the 'sub_types' field from the ViolenceSubObjectListType.
-            reverse_related_name (str): The reverse related name used to access the 'violence' field from the ViolenceSubObjectListType.
+            related_name (str): The related name used to access the 'sub_types' field from the
+            ViolenceSubObjectListType.
+            reverse_related_name (str): The reverse related name used to access the 'violence' field from the
+            ViolenceSubObjectListType.
     """
     class Meta:
         model = Violence
@@ -233,7 +237,8 @@ class DisasterSubCategoryType(DjangoObjectType):
         - exclude_fields (Tuple): A tuple of field names to be excluded from the ObjectType.
 
     Methods:
-        - types (DjangoPaginatedListObjectField): A field that represents the reversed relationship between `DisasterSubCategoryType` and `DisasterTypeObjectListType`.
+        - types (DjangoPaginatedListObjectField): A field that represents the reversed relationship between
+        `DisasterSubCategoryType` and `DisasterTypeObjectListType`.
 
     """
     class Meta:
@@ -250,7 +255,8 @@ class DisasterSubCategoryType(DjangoObjectType):
 class DisasterSubCategoryListType(CustomDjangoListObjectType):
     """
 
-    The DisasterSubCategoryListType class is a custom Django ListObjectType that is used to represent a list of DisasterSubCategory objects.
+    The DisasterSubCategoryListType class is a custom Django ListObjectType that is used to represent a list of
+    DisasterSubCategory objects.
 
     Attributes:
         - model (Class): The Django model class for DisasterSubCategory.
@@ -289,7 +295,8 @@ class DisasterCategoryListType(CustomDjangoListObjectType):
     """
     This class represents a list type for DisasterCategory objects in the Django application.
 
-    It inherits from the CustomDjangoListObjectType class and provides a Meta inner class that specifies the model as DisasterCategory and the filterset_class as DisasterCategoryFilter.
+    It inherits from the CustomDjangoListObjectType class and provides a Meta inner class that specifies the model as
+    DisasterCategory and the filterset_class as DisasterCategoryFilter.
 
     Attributes:
         - model (Django model): The model class representing the DisasterCategory object.
@@ -332,7 +339,8 @@ class EventReviewCountType(graphene.ObjectType):
 class OsvSubObjectType(DjangoObjectType):
     """
 
-    The OsvSubObjectType class is a subclass of DjangoObjectType. It represents the GraphQL object type for the OsvSubType model.
+    The OsvSubObjectType class is a subclass of DjangoObjectType. It represents the GraphQL object type for the
+    OsvSubType model.
 
     Attributes:
         model (Model): The Django model that this object type represents.
@@ -423,7 +431,8 @@ class EventType(DjangoObjectType):
     - resolve_event_typology: Resolve the typology of the event.
     - resolve_figure_typology: Resolve the typology of the figures associated with the event.
     - resolve_total_stock_idp_figures: Resolve the total stock IDP figures associated with the event.
-    - resolve_stock_idp_figures_max_end_date: Resolve the maximum end date for the stock IDP figures associated with the event.
+    - resolve_stock_idp_figures_max_end_date: Resolve the maximum end date for the stock IDP figures associated with the
+    event.
     - resolve_total_flow_nd_figures: Resolve the total flow ND figures associated with the event.
     - resolve_review_count: Resolve the count of reviews associated with the event.
     """
@@ -531,7 +540,8 @@ class ContextOfViolenceType(DjangoObjectType):
     """
     Django Object Type representing the ContextOfViolence model.
 
-    This class is responsible for defining the GraphQL type for the ContextOfViolence model, allowing it to be queried and manipulated through GraphQL.
+    This class is responsible for defining the GraphQL type for the ContextOfViolence model, allowing it to be queried
+    and manipulated through GraphQL.
 
     Attributes:
         - model (Model): The Django model used for the ContextOfViolence type.
@@ -572,14 +582,16 @@ class Query:
     - actor: A DjangoObjectField representing an ActorType object.
     - actor_list: A DjangoPaginatedListObjectField representing a list of ActorListType objects with pagination.
     - disaster_category_list: A DjangoPaginatedListObjectField representing a list of DisasterCategoryListType objects.
-    - disaster_sub_category_list: A DjangoPaginatedListObjectField representing a list of DisasterSubCategoryListType objects.
+    - disaster_sub_category_list: A DjangoPaginatedListObjectField representing a list of DisasterSubCategoryListType
+    objects.
     - disaster_type_list: A DjangoPaginatedListObjectField representing a list of DisasterTypeObjectListType objects.
     - disaster_sub_type_list: A DjangoPaginatedListObjectField representing a list of DisasterSubObjectListType objects.
     - event: A DjangoObjectField representing an EventType object.
     - event_list: A DjangoPaginatedListObjectField representing a list of EventListType objects with pagination.
     - osv_sub_type_list: A DjangoPaginatedListObjectField representing a list of OsvSubTypeList objects.
     - context_of_violence: A DjangoObjectField representing a ContextOfViolenceType object.
-    - context_of_violence_list: A DjangoPaginatedListObjectField representing a list of ContextOfViolenceListType objects.
+    - context_of_violence_list: A DjangoPaginatedListObjectField representing a list of ContextOfViolenceListType
+    objects.
     - other_sub_type_list: A DjangoPaginatedListObjectField representing a list of OtherSub"""
     violence_list = DjangoPaginatedListObjectField(ViolenceListType)
     actor = DjangoObjectField(ActorType)

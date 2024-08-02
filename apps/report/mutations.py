@@ -132,12 +132,14 @@ class DeleteReport(graphene.Mutation):
     The DeleteReport class is a mutation class that is used to delete a report object.
 
     Attributes:
-        errors (graphene.List[graphene.NonNull[CustomErrorType]]): A list of errors encountered during the mutation process.
+        errors (graphene.List[graphene.NonNull[CustomErrorType]]): A list of errors encountered during the mutation
+        process.
         ok (graphene.Boolean): A boolean flag indicating whether the mutation was successful.
         result (graphene.Field[ReportType]): The deleted report object.
 
     Methods:
-        mutate(root, info, id): This static method is the entry point for the mutation. It takes in the root, info, and id arguments.
+        mutate(root, info, id): This static method is the entry point for the mutation. It takes in the root, info, and
+        id arguments.
     """
     class Arguments:
         id = graphene.ID(required=True)
@@ -373,12 +375,14 @@ class GenerateReport(graphene.Mutation):
 
 class SignOffReport(graphene.Mutation):
     """
-    The SignOffReport class is a subclass of the graphene.Mutation class. It represents a GraphQL mutation for signing off on a report.
+    The SignOffReport class is a subclass of the graphene.Mutation class. It represents a GraphQL mutation for signing
+    off on a report.
 
     Attributes:
         Arguments:
             - id (graphene.ID): The ID of the report to be signed off. Required.
-            - include_history (graphene.Boolean): Determines whether to include history in the signed off report. Optional.
+            - include_history (graphene.Boolean): Determines whether to include history in the signed off report.
+            Optional.
 
         errors (graphene.List[CustomErrorType]): List of custom error types encountered during the mutation.
         ok (graphene.Boolean): Indicates whether the mutation was successful or not.
@@ -423,7 +427,8 @@ class ApproveReport(graphene.Mutation):
     """
     ApproveReport
 
-    This class is used to handle the mutation for approving a report. It is a subclass of `graphene.Mutation` and contains the necessary arguments, fields, and methods for the mutation.
+    This class is used to handle the mutation for approving a report. It is a subclass of `graphene.Mutation` and
+    contains the necessary arguments, fields, and methods for the mutation.
 
     Attributes:
         - `errors`: A list of `CustomErrorType` objects. Represents any errors encountered during the mutation.
@@ -431,7 +436,8 @@ class ApproveReport(graphene.Mutation):
         - `result`: A `ReportType` object representing the result of the mutation.
 
     Methods:
-        - `mutate`: A static method used to perform the mutation. It takes the `root`, `info`, `id`, and `approve` arguments and returns an instance of `ApproveReport`.
+        - `mutate`: A static method used to perform the mutation. It takes the `root`, `info`, `id`, and `approve`
+        arguments and returns an instance of `ApproveReport`.
 
     Example usage:
         >>> mutation = ApproveReport.mutate(root, info, id, approve)
@@ -536,7 +542,8 @@ class SetPfaVisibleInGidd(graphene.Mutation):
     Attributes:
         Arguments (class): A subclass of graphene.ObjectType containing the arguments required for the mutation.
             report_id (graphene.ID): A required argument representing the ID of the report.
-            is_pfa_visible_in_gidd (graphene.Boolean): A required argument representing the visibility status of the PFA in GIDD.
+            is_pfa_visible_in_gidd (graphene.Boolean): A required argument representing the visibility status of the PFA
+            in GIDD.
 
         errors (graphene.List[graphene.NonNull(CustomErrorType)]): A list of custom error types.
         ok (graphene.Boolean): A boolean representing the success status of the mutation.

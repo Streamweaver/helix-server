@@ -175,7 +175,8 @@ class CommunicationMedium(models.Model):
 class Communication(MetaInformationArchiveAbstractModel, models.Model):
     """
 
-    Communication class is a model class that represents a communication between a contact and a user. It extends the MetaInformationArchiveAbstractModel and models.Model classes.
+    Communication class is a model class that represents a communication between a contact and a user. It extends the
+    MetaInformationArchiveAbstractModel and models.Model classes.
 
     Attributes:
     - contact (ForeignKey): Represents the related contact for the communication.

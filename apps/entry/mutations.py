@@ -53,7 +53,9 @@ class CreateEntry(graphene.Mutation):
     Class: CreateEntry
 
     Description:
-    This class is a mutation class that allows the creation of new entries. It takes in data of type 'EntryCreateInputType' as an argument and returns a response containing information about the success of the mutation and any errors that occurred.
+    This class is a mutation class that allows the creation of new entries. It takes in data of type
+    'EntryCreateInputType' as an argument and returns a response containing information about the success of the
+    mutation and any errors that occurred.
 
     Attributes:
     - Arguments:
@@ -370,15 +372,21 @@ class UpdateFigureTag(graphene.Mutation):
     - info: The GraphQL resolve info.
     - data: An instance of FigureTagUpdateInputType representing the data to update the FigureTag with.
 
-    The mutate() method first tries to retrieve the FigureTag object with the provided ID from the database. If the object does not exist, it returns an UpdateFigureTag object with an error indicating that the tag does not exist.
+    The mutate() method first tries to retrieve the FigureTag object with the provided ID from the database. If the
+    object does not exist, it returns an UpdateFigureTag object with an error indicating that the tag does not exist.
 
-    Next, it creates a FigureTagCreateSerializer instance with the retrieved FigureTag object, the provided data, and the request context. The partial argument is set to True, indicating that only the provided fields should be updated.
+    Next, it creates a FigureTagCreateSerializer instance with the retrieved FigureTag object, the provided data, and
+    the request context. The partial argument is set to True, indicating that only the provided fields should be
+    updated.
 
-    If the serializer's validation fails, it returns an UpdateFigureTag object with the validation errors and a value of False for the ok attribute.
+    If the serializer's validation fails, it returns an UpdateFigureTag object with the validation errors and a value of
+    False for the ok attribute.
 
-    If the validation succeeds, it saves the serializer and assigns the updated FigureTag object to the instance variable.
+    If the validation succeeds, it saves the serializer and assigns the updated FigureTag object to the instance
+    variable.
 
-    Finally, it returns an UpdateFigureTag object with the updated FigureTag, a value of True for the ok attribute, and no errors.
+    Finally, it returns an UpdateFigureTag object with the updated FigureTag, a value of True for the ok attribute, and
+    no errors.
 
     """
     class Arguments:
@@ -409,13 +417,16 @@ class UpdateFigureTag(graphene.Mutation):
 class DeleteFigureTag(graphene.Mutation):
     """
 
-    `DeleteFigureTag` is a mutation class that is used to delete a specific `FigureTag` object from the database. This class is a part of a GraphQL schema.
+    `DeleteFigureTag` is a mutation class that is used to delete a specific `FigureTag` object from the database. This
+    class is a part of a GraphQL schema.
 
     ## Arguments
-    - `id`: Required argument of type `graphene.ID`. It represents the unique identifier of the `FigureTag` object that needs to be deleted.
+    - `id`: Required argument of type `graphene.ID`. It represents the unique identifier of the `FigureTag` object that
+    needs to be deleted.
 
     ## Output
-    - `errors`: A list of `CustomErrorType` objects. It represents any errors that may have occurred during the deletion process.
+    - `errors`: A list of `CustomErrorType` objects. It represents any errors that may have occurred during the deletion
+    process.
     - `ok`: A boolean value indicating the success of the deletion operation.
     - `result`: A `FigureTagType` object representing the deleted `FigureTag` instance.
 
@@ -461,7 +472,8 @@ class DeleteFigureTag(graphene.Mutation):
             return DeleteFigureTag(result=instance, errors=None, ok=True)
     ```
 
-    Note: The above code assumes that you have defined the `is_authenticated` and `permission_checker` decorators, as well as the `FigureTagType` and `CustomErrorType` types, in your module.
+    Note: The above code assumes that you have defined the `is_authenticated` and `permission_checker` decorators, as
+    well as the `FigureTagType` and `CustomErrorType` types, in your module.
 
     """
     class Arguments:
@@ -489,7 +501,8 @@ class DeleteFigureTag(graphene.Mutation):
 class ExportEntries(ExportBaseMutation):
     """A class for exporting entries to Excel format.
 
-    ExportEntries is a subclass of ExportBaseMutation and is used to export entries to Excel format. It takes the required `filters` argument of type EntryExtractionFilterDataInputType.
+    ExportEntries is a subclass of ExportBaseMutation and is used to export entries to Excel format. It takes the
+    required `filters` argument of type EntryExtractionFilterDataInputType.
 
     Example usage:
         export = ExportEntries(filters={'type': 'book'})
@@ -520,7 +533,8 @@ class ExportFigures(ExportBaseMutation):
         DOWNLOAD_TYPE (str): The download type for figures, set to 'FIGURE'.
 
     Arguments:
-        filters (FigureExtractionFilterDataInputType): Required argument that specifies the filters for figure extraction.
+        filters (FigureExtractionFilterDataInputType): Required argument that specifies the filters for figure
+        extraction.
 
     """
     class Arguments(ExportBaseMutation.Arguments):
@@ -541,7 +555,8 @@ class ExportFigureTags(ExportBaseMutation):
 
 class DeleteFigure(graphene.Mutation):
     """
-    The DeleteFigure class is a mutation class used to delete a figure object. It inherits from the graphene.Mutation class.
+    The DeleteFigure class is a mutation class used to delete a figure object. It inherits from the graphene.Mutation
+    class.
 
     Attributes:
         - Arguments (class): A nested class that defines the arguments required for the mutation.
@@ -558,10 +573,13 @@ class DeleteFigure(graphene.Mutation):
             - id (graphene.ID): The ID of the figure to be deleted.
 
             Returns:
-                - If the figure with the provided ID does not exist, a DeleteFigure object with a list of errors is returned.
-                - If the figure is successfully deleted, a DeleteFigure object with ok set to True and errors set to None is returned.
+                - If the figure with the provided ID does not exist, a DeleteFigure object with a list of errors is
+                returned.
+                - If the figure is successfully deleted, a DeleteFigure object with ok set to True and errors set to
+                None is returned.
 
-                Deletes the figure with the provided ID, and sends appropriate notifications based on the event's review status.
+                Deletes the figure with the provided ID, and sends appropriate notifications based on the event's review
+                status.
                 Updates the event's status and sends notifications.
     """
     class Arguments:
@@ -641,13 +659,16 @@ class ApproveFigure(graphene.Mutation):
 
     Note:
         - The `mutate` method has the `@staticmethod` decorator and the `@permission_checker(['entry.approve_figure'])`
-          decorator, indicating that it can be called without creating an instance of the class and that the user must have
+          decorator, indicating that it can be called without creating an instance of the class and that the user must
+          have
           the 'entry.approve_figure' permission.
         - The `mutate` method returns an instance of `ApproveFigure` with either the approved figure and no errors,
           or a list of error messages and no result.
-        - The `mutate` method updates the review status of the figure to 'approved', sets the approved by and approved on
+        - The `mutate` method updates the review status of the figure to 'approved', sets the approved by and approved
+        on
           fields, and saves the changes to the database.
-        - The `mutate` method calls the static method `update_event_status_and_send_notifications` of the `Figure` class to
+        - The `mutate` method calls the static method `update_event_status_and_send_notifications` of the `Figure` class
+        to
           update the event status and send notifications for the event associated with the approved figure.
     """
     class Arguments:
@@ -800,9 +821,11 @@ class ReRequestReviewFigure(graphene.Mutation):
                 - id: The ID of the figure to re-request review for.
             Returns:
                 An instance of the ReRequestReviewFigure class with the following attributes:
-                    - errors: A list of CustomErrorType objects representing any errors that occurred during the mutation.
+                    - errors: A list of CustomErrorType objects representing any errors that occurred during the
+                    mutation.
                     - ok: A boolean indicating if the mutation was successful.
-                    - result: A Field object of type FigureType representing the updated figure after re-requesting review.
+                    - result: A Field object of type FigureType representing the updated figure after re-requesting
+                    review.
 
             Raises:
                 None
@@ -867,7 +890,8 @@ class BulkUpdateFigures(BulkUpdateMutation):
 
     Methods:
     - get_queryset(): Returns a QuerySet containing all the figures.
-    - delete_item(figure, context): Deletes the given figure and performs additional operations like sending notifications and adding an event to the bulk manager.
+    - delete_item(figure, context): Deletes the given figure and performs additional operations like sending
+    notifications and adding an event to the bulk manager.
     - mutate(*args, **kwargs): Executes the bulk update mutation operation using the BulkUpdateFigureManager.
 
     """

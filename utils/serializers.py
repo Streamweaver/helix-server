@@ -32,7 +32,8 @@ class GraphqlSupportDrfSerializerJSONField(serializers.JSONField):
     - to_internal_value(data): Converts the given data to its internal representation.
 
     Attributes:
-    - encoder: Optional. The JSON encoder used to encode JSON data. If not provided, the default DjangoJSONEncoder is used.
+    - encoder: Optional. The JSON encoder used to encode JSON data. If not provided, the default DjangoJSONEncoder is
+    used.
 
     Usage:
     1. Instantiate the GraphqlSupportDrfSerializerJSONField class and provide any optional parameters.

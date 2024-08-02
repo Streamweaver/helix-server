@@ -36,7 +36,8 @@ class ContextualAnalysisSerializer(MetaInformationSerializerMixin, serializers.M
     Attributes:
         Meta:
             model (Model): The ContextualAnalysis model that will be serialized.
-            fields (list): The fields to be included in the serialized output. If set to '__all__', all fields of the model will be included.
+            fields (list): The fields to be included in the serialized output. If set to '__all__', all fields of the
+            model will be included.
 
     """
     class Meta:

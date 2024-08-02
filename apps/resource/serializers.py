@@ -46,7 +46,8 @@ class ResourceSerializer(MetaInformationSerializerMixin, serializers.ModelSerial
                 dict: The validated attributes.
 
             Raises:
-                serializers.ValidationError: If the number of resources created by the request user exceeds RESOURCE_NUMBER.
+                serializers.ValidationError: If the number of resources created by the request user exceeds
+                RESOURCE_NUMBER.
     """
     class Meta:
         model = Resource
@@ -94,7 +95,8 @@ class ResourceGroupSerializer(MetaInformationSerializerMixin, serializers.ModelS
     Methods:
         validate(attrs) -> dict:
             This method is used to validate the attributes of the serializer object.
-            It checks if the instance is None and if the number of resource groups created by the user is equal to or greater than a constant value.
+            It checks if the instance is None and if the number of resource groups created by the user is equal to or
+            greater than a constant value.
             If the conditions are met, it raises a validation error.
             Otherwise, it calls the validate() method of the superclass and returns the validated attributes.
 

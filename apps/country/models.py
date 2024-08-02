@@ -154,7 +154,8 @@ class MonitoringSubRegion(models.Model):
 
     MonitoringSubRegion class
 
-    This class represents a monitoring sub-region. It contains methods and properties related to monitoring data for the sub-region.
+    This class represents a monitoring sub-region. It contains methods and properties related to monitoring data for the
+    sub-region.
 
     Attributes:
         name (str): The name of the monitoring sub-region.
@@ -320,7 +321,8 @@ class Country(models.Model):
         idmc_short_name_es (str): The IDMC short name in Spanish.
         idmc_short_name_fr (str): The IDMC short name in French.
         idmc_short_name_ar (str): The IDMC short name in Arabic.
-        contextual_analyses (`QuerySet['ContextualAnalysis']`): The queryset of contextual analyses associated with the country.
+        contextual_analyses (`QuerySet['ContextualAnalysis']`): The queryset of contextual analyses associated with the
+        country.
         summaries (`QuerySet['Summary']`): The queryset of summaries associated with the country.
     """
     GEOJSON_PATH = 'geojsons'
@@ -586,7 +588,8 @@ class ContextualAnalysis(MetaInformationArchiveAbstractModel, models.Model):
         country (ForeignKey): A foreign key to the Country model representing the country associated with the analysis.
         update (TextField): A text field storing the analysis update.
         publish_date (DateField): A field representing the date when the analysis was published. Can be blank and null.
-        crisis_type (EnumField): An enum field representing the type of crisis associated with the analysis. Can be blank and null.
+        crisis_type (EnumField): An enum field representing the type of crisis associated with the analysis. Can be
+        blank and null.
 
     """
     country = models.ForeignKey('Country', verbose_name=_('Country'),
@@ -619,7 +622,8 @@ class HouseholdSize(ArchiveAbstractModel, MetaInformationAbstractModel):
     Class representing the household size for a specific country and year.
 
     Attributes:
-        country (ForeignKey): Foreign key to the Country model representing the country associated with the household size.
+        country (ForeignKey): Foreign key to the Country model representing the country associated with the household
+        size.
         year (PositiveSmallIntegerField): The year for which the household size is recorded.
         size (FloatField): The size of the household.
         data_source_category (CharField): The category of the data source.

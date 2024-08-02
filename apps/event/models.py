@@ -71,7 +71,8 @@ class ViolenceSubType(NameAttributedModels):
     """
     Class representing a subtype of violence.
 
-    This class extends the NameAttributedModels class and represents a specific subtype of violence. Each subtype is associated with a parent violence instance.
+    This class extends the NameAttributedModels class and represents a specific subtype of violence. Each subtype is
+    associated with a parent violence instance.
 
     Attributes:
         violence (ForeignKey): The parent violence instance to which this subtype belongs.
@@ -85,7 +86,8 @@ class ViolenceSubType(NameAttributedModels):
 class ContextOfViolence(MetaInformationAbstractModel, NameAttributedModels):
     """
 
-    This class represents the context of violence. It extends the MetaInformationAbstractModel and NameAttributedModels classes.
+    This class represents the context of violence. It extends the MetaInformationAbstractModel and NameAttributedModels
+    classes.
 
     Attributes:
         None
@@ -233,10 +235,12 @@ class DisasterType(NameAttributedModels):
 class DisasterSubType(NameAttributedModels):
     """A class representing a disaster sub-type.
 
-    This class extends the NameAttributedModels class and is used to store information about a specific sub-type of a disaster. Each sub-type belongs to a particular disaster type.
+    This class extends the NameAttributedModels class and is used to store information about a specific sub-type of a
+    disaster. Each sub-type belongs to a particular disaster type.
 
     Attributes:
-        type (ForeignKey): A foreign key to the DisasterType model, representing the disaster type that this sub-type belongs to.
+        type (ForeignKey): A foreign key to the DisasterType model, representing the disaster type that this sub-type
+        belongs to.
 
     """
     type = models.ForeignKey('DisasterType', verbose_name=_('Hazard Type'),
@@ -251,20 +255,29 @@ class Event(MetaInformationArchiveAbstractModel, models.Model):
         EVENT_REVIEW_STATUS (enum.Enum): Enumerated type that represents the status of event review.
         ND_FIGURES_ANNOTATE (str): Variable that stores the annotation for total flow ND figures.
         IDP_FIGURES_ANNOTATE (str): Variable that stores the annotation for total stock IDP figures.
-        IDP_FIGURES_REFERENCE_DATE_ANNOTATE (str): Variable that stores the annotation for the reference date of IDP figures.
+        IDP_FIGURES_REFERENCE_DATE_ANNOTATE (str): Variable that stores the annotation for the reference date of IDP
+        figures.
         crisis (models.ForeignKey): ForeignKey to the Crisis model representing the crisis associated with the event.
         name (models.CharField): CharField representing the name of the event.
         event_type (enum.EnumField): EnumField representing the cause of the event.
-        other_sub_type (models.ForeignKey): ForeignKey to the OtherSubType model representing the other sub type of the event.
+        other_sub_type (models.ForeignKey): ForeignKey to the OtherSubType model representing the other sub type of the
+        event.
         glide_numbers (ArrayField): ArrayField of CharFields representing the event codes of the event.
-        violence (models.ForeignKey): ForeignKey to the Violence model representing the violence associated with the event.
-        violence_sub_type (models.ForeignKey): ForeignKey to the ViolenceSubType model representing the violence sub type of the event.
+        violence (models.ForeignKey): ForeignKey to the Violence model representing the violence associated with the
+        event.
+        violence_sub_type (models.ForeignKey): ForeignKey to the ViolenceSubType model representing the violence sub
+        type of the event.
         actor (models.ForeignKey): ForeignKey to the Actor model representing the actors associated with the event.
-        disaster_category (models.ForeignKey): ForeignKey to the DisasterCategory model representing the hazard category of the event.
-        disaster_sub_category (models.ForeignKey): ForeignKey to the DisasterSubCategory model representing the hazard sub category of the event.
-        disaster_type (models.ForeignKey): ForeignKey to the DisasterType model representing the hazard type of the event.
-        disaster_sub_type (models.ForeignKey): ForeignKey to the DisasterSubType model representing the hazard sub type of the event.
-        countries (models.ManyToManyField): ManyToManyField to the Country model representing the countries associated with the event.
+        disaster_category (models.ForeignKey): ForeignKey to the DisasterCategory model representing the hazard category
+        of the event.
+        disaster_sub_category (models.ForeignKey): ForeignKey to the DisasterSubCategory model representing the hazard
+        sub category of the event.
+        disaster_type (models.ForeignKey): ForeignKey to the DisasterType model representing the hazard type of the
+        event.
+        disaster_sub_type (models.ForeignKey): ForeignKey to the DisasterSubType model representing the hazard sub type
+        of the event.
+        countries (models.ManyToManyField): ManyToManyField to the Country model representing the countries associated
+        with the event.
         start_date (models.DateField): DateField representing the start date of the event.
         start_date_accuracy (enum.EnumField): EnumField representing the accuracy of the start date.
         end_date (models.DateField): DateField representing the end date of the event.
@@ -272,12 +285,14 @@ class Event(MetaInformationArchiveAbstractModel, models.Model):
         event_narrative (models.TextField): TextField representing the narrative of the event.
         osv_sub_type (models.ForeignKey): ForeignKey to the OsvSubType model representing the OSV sub type of the event.
         ignore_qa (models.BooleanField): BooleanField indicating whether QA should be ignored for the event.
-        context_of_violence (models.ManyToManyField): ManyToManyField to the ContextOfViolence model representing the context of violence associated with the event.
+        context_of_violence (models.ManyToManyField): ManyToManyField to the ContextOfViolence model representing the
+        context of violence associated with the event.
         assigner (models.ForeignKey): ForeignKey to the User model representing the assigner of the event.
         assignee (models.ForeignKey): ForeignKey to the User model representing the assignee of the event.
         assigned_at (models.DateTimeField): DateTimeField representing the date and time when the event was assigned.
         review_status (enum.EnumField): EnumField representing the status of the event.
-        include_triangulation_in_qa (models.BooleanField): BooleanField indicating whether triangulation should be included in QA for the event.
+        include_triangulation_in_qa (models.BooleanField): BooleanField indicating whether triangulation should be
+        included in QA for the event.
 
     Methods:
         _total_figure_disaggregation_subquery(cls, figures=None, reference_date=None):
@@ -286,7 +301,8 @@ class Event(MetaInformationArchiveAbstractModel, models.Model):
                 figures (QuerySet, optional): QuerySet of Figure objects. Defaults to None.
                 reference_date (date, optional): The reference date for the figure disaggregation. Defaults to None.
             Returns:
-                dict: Dictionary containing the subqueries for total flow ND figures, total stock IDP figures, and the reference date of IDP figures.
+                dict: Dictionary containing the subqueries for total flow ND figures, total stock IDP figures, and the
+                reference date of IDP figures.
 
         annotate_review_figures_count(cls):
             Builds and returns a dictionary with the annotations for review figures count.
