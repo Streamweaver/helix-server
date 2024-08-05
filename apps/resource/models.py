@@ -67,7 +67,7 @@ class Resource(MetaInformationArchiveAbstractModel):
 
     Methods:
     - __str__(): Returns a string representation of the resource.
-    - save(\*args, \*\*kwargs): Overrides the save method to enforce a maximum number of resources that can be created.
+    - save(args, kwargs): Overrides the save method to enforce a maximum number of resources that can be created.
 
     """
     name = models.CharField(verbose_name=_('Name'), max_length=256)
