@@ -1,11 +1,7 @@
-name: Django Test Runner
+name: Django Test Runner - Forks
 
 on:
-  push:
-    branches:
-      - 'develop'
-      - 'project/**'
-  pull_request:
+   pull_request_target:
     branches:
       - 'develop'
       - 'project/**'
@@ -19,7 +15,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: 🐳 Check out the code from the fork
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: 🐳 Prepare Docker
         id: prep
@@ -28,7 +27,6 @@ jobs:
           IMAGE="docker.pkg.github.com/idmc-labs/helix-server"
           echo "tagged_image=${IMAGE}:${TAG}" >> $GITHUB_OUTPUT
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
-
       - name: 🐳 Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@master
@@ -41,7 +39,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-refs/develop
             ${{ runner.os }}-buildx-
-
       - name: 🐳 Build image
         uses: docker/build-push-action@v2
         with:
@@ -64,7 +61,6 @@ jobs:
             diff schema.graphql schema-latest.graphql;
             exit 1;
           }
-
       - name: 🕮 Validate if there are no pending django migrations.
         env:
           DOCKER_IMAGE_SERVER: ${{ steps.prep.outputs.tagged_image }}
@@ -73,7 +69,6 @@ jobs:
             echo 'There are some changes to be reflected in the migration. Make sure to run makemigrations';
             exit 1;
           }
-
       - name: 🤞 Run Test 🧪 & Publish coverage to code climate
         uses: paambaati/codeclimate-action@v2.7.5
         env:
@@ -90,7 +85,6 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-
       - name: Deploy coverage to GH Pages 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
         if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
