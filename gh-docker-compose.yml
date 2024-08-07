@@ -17,7 +17,7 @@ services:
       PYTEST_ADDOPTS: "--color=yes"
 
       HELIX_ENVIRONMENT: development
-      # DJANGO_DEBUG: "true"
+      DJANGO_DEBUG: "true"
       ENABLE_DEBUG_TOOLBAR: "true"
       DJANGO_SECRET_KEY: STATIC-INSECURE-KEY-PLEASE-DONT-USE-IN-PRODUCTION
       DJANGO_ALLOWED_HOST: localhost
