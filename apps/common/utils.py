@@ -13,13 +13,56 @@ def format_locations(
     locations_data: typing.List[typing.Tuple[str, str, str, str]]
 ) -> typing.List[typing.Tuple[str, str, str, str]]:
     """
-    Format the locations data.
+    Format the locations data by converting raw accuracy and type of point values to their corresponding labels.
 
-    :param locations_data: A list of tuples representing location data. Each tuple contains location name,
-                           location, accuracy, and type of point.
+    This function takes a list of tuples representing location data and returns a formatted list where the
+    accuracy and type of point values are replaced with their respective labels.
+
+    :param locations_data: A list of tuples representing location data. Each tuple contains:
+                           (location_name, location, accuracy, type_of_point)
     :type locations_data: List[Tuple[str, str, str, str]]
-    :return: A formatted list of tuples containing the location name, location, accuracy, and type of point.
+
+    :return: A formatted list of tuples containing:
+             (location_name, location, accuracy_label, type_of_point_label)
     :rtype: List[Tuple[str, str, str, str]]
+
+    Accuracy values and their corresponding labels:
+    0: Country/territory (ADM0)
+    1: State/Region/Province (ADM1)
+    2: District/Zone/Department (ADM2)
+    3: County/City/town/Village/Woreda (ADM3)
+    4: Point
+
+    Type of point values and their corresponding labels:
+    0: Origin
+    1: Destination
+    2: Origin and destination
+
+    Example usage:
+    ```
+    raw_locations = [
+        ('United States', 'Washington D.C.', '0', '0'),
+        ('California', 'Sacramento', '1', '1'),
+        ('Los Angeles County', 'Los Angeles', '2', '2'),
+        ('San Francisco', 'Golden Gate Bridge', '3', '0'),
+        ('Yosemite National Park', 'Half Dome', '4', '1'),
+    ]
+    formatted_locations = format_locations(raw_locations)
+    print(formatted_locations)
+    ```
+
+    Expected output:
+    ```
+    [
+        ('United States', 'Washington D.C.', 'Country/territory (ADM0)', 'Origin'),
+        ('California', 'Sacramento', 'State/Region/Province (ADM1)', 'Destination'),
+        ('Los Angeles County', 'Los Angeles', 'District/Zone/Department (ADM2)', 'Origin and destination'),
+        ('San Francisco', 'Golden Gate Bridge', 'County/City/town/Village/Woreda (ADM3)', 'Origin'),
+        ('Yosemite National Park', 'Half Dome', 'Point', 'Destination')
+    ]
+    ```
+
+    Note: The actual labels are retrieved using the OSMName.OSM_ACCURACY and OSMName.IDENTIFIER enums.
     """
     from apps.entry.models import OSMName
 
@@ -53,20 +96,34 @@ def format_locations_raw(
     elements in the following order: location_id (str), location_name (str), location (str), accuracy (str), and
     type_of_point (str).
 
-    The method iterates over each tuple and extracts the required elements. It converts `location_id` and `accuracy` to
-    integers and strips leading and trailing spaces from `location_name`. The transformed elements are then appended to
-    a new list.
+    The method iterates over each tuple and extracts the required elements. It converts `location_id`, `accuracy`, and
+    `type_of_point` to integers and strips leading and trailing spaces from `location_name`. The transformed elements
+    are then appended to a new list.
 
     The method returns a list of tuples, where each tuple represents a formatted location. Each tuple contains 5
     elements in the following order: formatted_location_id (int), formatted_location_name (str), location (str),
     formatted_accuracy (int), and formatted_type_of_point (int).
 
+    Accuracy values:
+    0: Country/territory (ADM0)
+    1: State/Region/Province (ADM1)
+    2: District/Zone/Department (ADM2)
+    3: County/City/town/Village/Woreda (ADM3)
+    4: Point
+
+    Type of point values:
+    0: Origin
+    1: Destination
+    2: Origin and destination
+
     Example usage:
     ```
     raw_locations = [
-        ('1', 'Location 1', '123 Street', '5', '1'),
-        ('2', 'Location 2', '456 Road', '10', '2'),
-        ('3', 'Location 3', '789 Avenue', '15', '3'),
+        ('1', 'United States', 'Washington D.C.', '0', '0'),
+        ('2', 'California', 'Sacramento', '1', '1'),
+        ('3', 'Los Angeles County', 'Los Angeles', '2', '2'),
+        ('4', 'San Francisco', 'Golden Gate Bridge', '3', '0'),
+        ('5', 'Yosemite National Park', 'Half Dome', '4', '1'),
     ]
     formatted_locations = format_locations_raw(raw_locations)
     print(formatted_locations)
@@ -75,9 +132,11 @@ def format_locations_raw(
     Output:
     ```
     [
-        (1, 'Location 1', '123 Street', 5, 1),
-        (2, 'Location 2', '456 Road', 10, 2),
-        (3, 'Location 3', '789 Avenue', 15, 3)
+        (1, 'United States', 'Washington D.C.', 0, 0),
+        (2, 'California', 'Sacramento', 1, 1),
+        (3, 'Los Angeles County', 'Los Angeles', 2, 2),
+        (4, 'San Francisco', 'Golden Gate Bridge', 3, 0),
+        (5, 'Yosemite National Park', 'Half Dome', 4, 1)
     ]
     ```
     """
@@ -98,19 +157,47 @@ def format_locations_as_string(
     locations_data: typing.List[typing.Tuple[str, str, str, str]],
 ) -> str:
     """
-    Format locations data as a string.
+    Format locations data as a string, converting raw values to labels.
+
+    This function takes a list of tuples representing location data, formats it
+    using the format_locations function, and joins the formatted data into a
+    single string.
 
     Args:
-    - locations_data: A list of tuples representing location data. Each tuple should have four string elements:
-                      (city, state, country, postal code).
+        locations_data: A list of tuples representing location data. Each tuple
+                        should have four string elements:
+                        (location_name, location, accuracy, type_of_point)
 
     Returns:
-    - A formatted string representing the locations data.
+        A formatted string representing the locations data, with each location's
+        data separated by EXTERNAL_ARRAY_SEPARATOR and each field within a
+        location separated by EXTERNAL_FIELD_SEPARATOR.
+
+    Accuracy values and their corresponding labels:
+        0: Country/territory (ADM0)
+        1: State/Region/Province (ADM1)
+        2: District/Zone/Department (ADM2)
+        3: County/City/town/Village/Woreda (ADM3)
+        4: Point
+
+    Type of point values and their corresponding labels:
+        0: Origin
+        1: Destination
+        2: Origin and destination
 
     Example:
-    >>> locations_data = [('New York', 'NY', 'USA', '10001'), ('London', 'ENG', 'UK', 'SW1A 1AA')]
-    >>> format_locations_as_string(locations_data)
-    'New York,NY,USA,10001;London,ENG,UK,SW1A 1AA'
+        >>> locations_data = [
+        ...     ('United States', 'Washington D.C.', '0', '0'),
+        ...     ('California', 'Sacramento', '1', '1')
+        ... ]
+        >>> format_locations_as_string(locations_data)
+        'United States,Washington D.C.,Country/territory (ADM0),
+        Origin;California,Sacramento,State/Region/Province (ADM1),Destination'
+
+    Note:
+        The actual separator values (EXTERNAL_ARRAY_SEPARATOR and
+        EXTERNAL_FIELD_SEPARATOR) depends on the input.
+        The example uses ';' and ',' for illustration purposes.
     """
     return EXTERNAL_ARRAY_SEPARATOR.join(
         EXTERNAL_FIELD_SEPARATOR.join(loc)
@@ -125,9 +212,28 @@ class ExtractLocationData(typing.TypedDict):
     Attributes:
         display_name (List[str]): A list of display names for the location.
         lat_lon (List[str]): A list of latitude and longitude coordinates for the location.
-        accuracy (List[str]): A list of accuracy values for the location.
-        type_of_points (List[str]): A list of the type of points for the location.
+        accuracy (List[str]): A list of accuracy values for the location. Valid values are:
+            '0': Country/territory (ADM0)
+            '1': State/Region/Province (ADM1)
+            '2': District/Zone/Department (ADM2)
+            '3': County/City/town/Village/Woreda (ADM3)
+            '4': Point
+        type_of_points (List[str]): A list of the type of points for the location. Valid values are:
+            '0': Origin
+            '1': Destination
+            '2': Origin and destination
 
+    Example:
+        {
+            'display_name': ['United States', 'California', 'Los Angeles'],
+            'lat_lon': ['34.0522', '-118.2437'],
+            'accuracy': ['0', '1', '3'],
+            'type_of_points': ['0', '1', '2']
+        }
+
+    Note:
+        The actual labels for accuracy and type_of_points are typically retrieved using
+        OSMName.OSM_ACCURACY and OSMName.IDENTIFIER enums respectively.
     """
     display_name: typing.List[str]
     lat_lon: typing.List[str]
@@ -187,21 +293,37 @@ def extract_location_data_list(
         'display_name', 'lat_lon', 'accuracy', and 'type_of_points'. The corresponding values are lists that contain the
         extracted data from the input tuples.
 
+    Accuracy values:
+        '0': Country/territory (ADM0)
+        '1': State/Region/Province (ADM1)
+        '2': District/Zone/Department (ADM2)
+        '3': County/City/town/Village/Woreda (ADM3)
+        '4': Point
+
+    Type of points values:
+        '0': Origin
+        '1': Destination
+        '2': Origin and destination
+
     Example:
         data = [
-            ('London', '51.5074', '-0.1278', 'High'),
-            ('Paris', '48.8566', '2.3522', 'Medium'),
-            ('New York', '40.7128', '-74.0060', 'High')
+            ('United States', '38.8951,-77.0364', '0', '0'),
+            ('California', '36.7783,-119.4179', '1', '1'),
+            ('Los Angeles', '34.0522,-118.2437', '3', '2')
         ]
         result = extract_location_data_list(data)
         print(result)
         # Output:
         # {
-        #     'display_name': ['London', 'Paris', 'New York'],
-        #     'lat_lon': ['51.5074', '48.8566', '40.7128'],
-        #     'accuracy': ['-0.1278', '2.3522', '-74.0060'],
-        #     'type_of_points': ['High', 'Medium', 'High']
+        #     'display_name': ['United States', 'California', 'Los Angeles'],
+        #     'lat_lon': ['38.8951,-77.0364', '36.7783,-119.4179', '34.0522,-118.2437'],
+        #     'accuracy': ['0', '1', '3'],
+        #     'type_of_points': ['0', '1', '2']
         # }
+
+    Note:
+        The actual labels for accuracy and type_of_points are typically retrieved using
+        OSMName.OSM_ACCURACY and OSMName.IDENTIFIER enums respectively in the application.
     """
     # Split the formatted location data into individual components
     location_components = format_locations(data)
@@ -259,27 +381,45 @@ def extract_location_data(
     Extracts location data from a list and returns the extracted data as a string.
 
     Parameters:
-    - data: A list of tuples containing location data. Each tuple should have four elements in the order of display
-    name, lat-lon, accuracy, and type of points.
+        data (List[Tuple[str, str, str, str]]): A list of tuples containing location data. Each tuple should have four
+        elements in the order of display name, lat-lon, accuracy, and type of points.
 
     Returns:
-    - A dictionary containing the extracted location data as strings. The dictionary has the following keys:
-        - 'display_name': A string representing the joined display names of the locations.
-        - 'lat_lon': A string representing the joined lat-lon values of the locations.
-        - 'accuracy': A string representing the joined accuracy values of the locations.
-        - 'type_of_points': A string representing the joined type of points values of the locations.
+        Dict[str, str]: A dictionary containing the extracted location data as strings.
+            The dictionary has the following keys:
+            'display_name': A string representing the joined display names of the locations.
+            'lat_lon': A string representing the joined lat-lon values of the locations.
+            'accuracy': A string representing the joined accuracy values of the locations.
+            'type_of_points': A string representing the joined type of points values of the locations.
+
+    Accuracy values:
+        '0': Country/territory (ADM0)
+        '1': State/Region/Province (ADM1)
+        '2': District/Zone/Department (ADM2)
+        '3': County/City/town/Village/Woreda (ADM3)
+        '4': Point
+
+    Type of points values:
+        '0': Origin
+        '1': Destination
+        '2': Origin and destination
 
     Example Usage:
-    >>> data = [
-    ...     ('Location A', '12.345,67.890', 'High', 'Point'),
-    ...     ('Location B', '12.345,67.890', 'Low', 'Area'),
-    ...     ('Location C', '12.345,67.890', 'Medium', 'Line'),
-    ... ]
-    >>> extract_location_data(data)
-    {'display_name': 'Location A,Location B,Location C',
-     'lat_lon': '12.345,67.890,12.345,67.890,12.345,67.890',
-     'accuracy': 'High,Low,Medium',
-     'type_of_points': 'Point,Area,Line'}
+        >>> data = [
+        ...     ('United States', '38.8951,-77.0364', '0', '0'),
+        ...     ('California', '36.7783,-119.4179', '1', '1'),
+        ...     ('Los Angeles', '34.0522,-118.2437', '3', '2'),
+        ... ]
+        >>> extract_location_data(data)
+        {'display_name': 'United States,California,Los Angeles',
+        'lat_lon': '38.8951,-77.0364,36.7783,-119.4179,34.0522,-118.2437',
+        'accuracy': '0,1,3',
+        'type_of_points': '0,1,2'}
+
+    Note:
+        The actual labels for accuracy and type_of_points are typically retrieved using
+        OSMName.OSM_ACCURACY and OSMName.IDENTIFIER enums respectively.
+        The returned strings use EXTERNAL_FIELD_SEPARATOR to join the values.
     """
     location_components = extract_location_data_list(data)
 
@@ -298,13 +438,23 @@ def format_event_codes(
     Formats event codes by retrieving the label for each event code type.
 
     :param event_codes_data: A list of tuples representing event codes.
-        Each tuple can have either 2 or 3 elements.
-        - If the tuple has 3 elements, they represent event code, event code type, and event iso3.
-        - If the tuple has 2 elements, they represent event code and event code type.
+        Each tuple can have either 2 or 3 elements:
+        - If the tuple has 3 elements: (event_code, event_code_type, event_iso3)
+        - If the tuple has 2 elements: (event_code, event_code_type)
+        The event_code_type is a string value between '1' and '5', representing:
+        1: Glide Number
+        2: Government Assigned Identifier
+        3: IFRC Appeal ID
+        4: ACLED ID
+        5: Local Identifier
+
     :return: A list of tuples representing formatted event codes.
-        Each tuple can have either 2 or 3 elements.
-        - If the tuple has 3 elements, they represent event code, event code label, and event iso3.
-        - If the tuple has 2 elements, they represent event code and event code label.
+        Each tuple will have the same number of elements as the input tuple:
+        - If the input tuple had 3 elements: (event_code, event_code_label, event_iso3)
+        - If the input tuple had 2 elements: (event_code, event_code_label)
+        The event_code_label is the string representation of the event code type.
+
+    :raises ValueError: If an invalid event_code_type is provided.
     """
     from apps.event.models import EventCode
 
@@ -343,13 +493,27 @@ def format_event_codes_raw(
 
     Args:
         event_codes_data (List[Tuple[str, str, str, str]]): A list of tuples representing the raw event codes data.
-            Each tuple contains four strings (_id, event_code, event_code_type, event_iso3).
+            Each tuple contains four strings:
+            - _id: A unique identifier for the event code.
+            - event_code: The actual event code.
+            - event_code_type: A string value between '1' and '5', representing:
+              1: Glide Number
+              2: Government Assigned Identifier
+              3: IFRC Appeal ID
+              4: ACLED ID
+              5: Local Identifier
+            - event_iso3: The ISO3 code for the event's location.
 
     Returns:
         List[Tuple[int, str, int, str]]: The formatted event codes data as a list of tuples.
-            Each tuple contains four elements (_id as int, event_code as str, event_code_type as int, event_iso3 as
-            str).
+            Each tuple contains four elements:
+            - _id as int: The unique identifier converted to an integer.
+            - event_code as str: The event code string.
+            - event_code_type as int: The event code type converted to an integer (1-5).
+            - event_iso3 as str: The ISO3 code string.
 
+    Note:
+        Tuples with None as _id are skipped in the output.
     """
     code_list = []
     for code in event_codes_data:
@@ -373,22 +537,35 @@ def format_event_codes_as_string(
 
     Args:
         event_codes_data (List[Union[Tuple[str, str, str], Tuple[str, str]]]):
-            A list of tuples representing event codes data. Each tuple can have either 2 or 3 elements.
-            The first element represents the event code, the second element represents the event name,
-            and the third element (optional) represents the event description.
+            A list of tuples representing event codes data. Each tuple can have either 2 or 3 elements:
+            - If the tuple has 3 elements: (event_code, event_code_type, event_iso3)
+            - If the tuple has 2 elements: (event_code, event_code_type)
+            The event_code_type is a string value between '1' and '5', representing:
+            1: Glide Number
+            2: Government Assigned Identifier
+            3: IFRC Appeal ID
+            4: ACLED ID
+            5: Local Identifier
 
     Returns:
-        str: A string representation of the formatted event codes data.
+        str: A string representation of the formatted event codes data. 
+             The format is "event_code:event_code_label[:event_iso3]" for each tuple, 
+             separated by EXTERNAL_ARRAY_SEPARATOR.
+
+    Note:
+        This function internally calls format_event_codes() to convert event_code_type 
+        to its corresponding label before formatting as a string.
 
     Example usage:
         event_codes_data = [
-            ("001", "Event 1", "This is event 1"),
-            ("002", "Event 2"),
-            ("003", "Event 3", "This is event 3")
+            ("001", "1", "USA"),
+            ("002", "2"),
+            ("003", "3", "GBR")
         ]
         formatted_data = format_event_codes_as_string(event_codes_data)
         print(formatted_data)
-        # Output: "001:Event 1:This is event 1,002:Event 2,003:Event 3:This is event 3"
+        # Output might be: "001:Glide Number:USA,002:Government Assigned Identifier,003:IFRC Appeal ID:GBR"
+        # (actual output depends on EXTERNAL_ARRAY_SEPARATOR and EXTERNAL_FIELD_SEPARATOR values)
 
     """
     return EXTERNAL_ARRAY_SEPARATOR.join(
@@ -405,31 +582,36 @@ def extract_event_code_data_list(
 
     Parameters:
     - data (List[Union[Tuple[str, str, str], Tuple[str, str]]]): The input data containing event code information.
+      Each tuple can have either 2 or 3 elements:
+      - If the tuple has 3 elements: (event_code, event_code_type, event_iso3)
+      - If the tuple has 2 elements: (event_code, event_code_type)
+      The event_code_type is a string value between '1' and '5', representing:
+      1: Glide Number
+      2: Government Assigned Identifier
+      3: IFRC Appeal ID
+      4: ACLED ID
+      5: Local Identifier
 
     Returns:
         A dictionary with the following keys:
         - 'code' (List[str]): A list of event codes extracted from the input data.
-        - 'code_type' (List[str]): A list of event code types extracted from the input data.
-        - 'iso3' (List[str]): A list of ISO3 country codes extracted from the input data.
-
-    Raises:
-        None
+        - 'code_type' (List[str]): A list of event code type labels extracted from the input data.
+        - 'iso3' (List[str]): A list of ISO3 country codes extracted from the input data (if provided).
 
     Note:
-        - The input data should be in the following format:
-            - Tuple[str, str, str]: Represents event codes along with their type and ISO3 code.
-            - Tuple[str, str]: Represents event codes along with their type, without the ISO3 code.
+        - This function internally uses format_event_codes() to convert event_code_type to its corresponding label.
+        - For tuples without an ISO3 code, an empty string will be used in the 'iso3' list.
 
     Example usage:
         data = [
-            ('E001', 'Flood', 'USA'),
-            ('E002', 'Earthquake'),
-            ('E003', 'Drought', 'IND'),
+            ('E001', '1', 'USA'),
+            ('E002', '2'),
+            ('E003', '3', 'IND'),
         ]
         extracted_data = extract_event_code_data_list(data)
 
         print(extracted_data['code'])         # Output: ['E001', 'E002', 'E003']
-        print(extracted_data['code_type'])    # Output: ['Flood', 'Earthquake', 'Drought']
+        print(extracted_data['code_type'])    # Output: ['Glide Number', 'Government Assigned Identifier', 'IFRC Appeal ID']
         print(extracted_data['iso3'])         # Output: ['USA', '', 'IND']
     """
     # Split the formatted event code data into individual components
@@ -448,7 +630,43 @@ def extract_event_code_data(
     data: typing.List[typing.Union[typing.Tuple[str, str, str], typing.Tuple[str, str]]]
 ):
     """
+    Extracts event code data from a given list of tuples and joins each component into strings.
 
+    Parameters:
+    - data (List[Union[Tuple[str, str, str], Tuple[str, str]]]): The input data containing event code information.
+      Each tuple can have either 2 or 3 elements:
+      - If the tuple has 3 elements: (event_code, event_code_type, event_iso3)
+      - If the tuple has 2 elements: (event_code, event_code_type)
+      The event_code_type is a string value between '1' and '5', representing:
+      1: Glide Number
+      2: Government Assigned Identifier
+      3: IFRC Appeal ID
+      4: ACLED ID
+      5: Local Identifier
+
+    Returns:
+        A dictionary with the following keys:
+        - 'code' (str): A string of event codes joined by EXTERNAL_ARRAY_SEPARATOR.
+        - 'code_type' (str): A string of event code type labels joined by EXTERNAL_ARRAY_SEPARATOR.
+        - 'iso3' (str): A string of ISO3 country codes joined by EXTERNAL_ARRAY_SEPARATOR.
+
+    Note:
+        - This function internally uses extract_event_code_data_list() to process the input data.
+        - The event_code_type values are converted to their corresponding labels.
+        - For tuples without an ISO3 code, an empty string will be used in the 'iso3' string.
+
+    Example usage:
+        data = [
+            ('E001', '1', 'USA'),
+            ('E002', '2'),
+            ('E003', '3', 'IND'),
+        ]
+        extracted_data = extract_event_code_data(data)
+
+        # Assuming EXTERNAL_ARRAY_SEPARATOR is ','
+        print(extracted_data['code'])         # Output: 'E001,E002,E003'
+        print(extracted_data['code_type'])    # Output: 'Glide Number,Government Assigned Identifier,IFRC Appeal ID'
+        print(extracted_data['iso3'])         # Output: 'USA,,IND'
     """
     # Split the formatted event code data into individual components
     extracted_data = extract_event_code_data_list(data)
@@ -497,14 +715,46 @@ def extract_event_code_data_raw(
     data: typing.List[typing.Tuple[str, str, str, str]]
 ):
     """
-    Extracts specific components from formatted event code data.
+    Extracts specific components from raw event code data and joins each component into strings.
 
     Args:
-        data (List[Tuple[str, str, str, str]]): List of tuples containing formatted event code data.
+        data (List[Tuple[str, str, str, str]]): List of tuples containing raw event code data.
+            Each tuple should contain four elements in the following order:
+            (_id, event_code, event_code_type, event_iso3)
+
+            The event_code_type is a string value between '1' and '5', representing:
+            1: Glide Number
+            2: Government Assigned Identifier
+            3: IFRC Appeal ID
+            4: ACLED ID
+            5: Local Identifier
 
     Returns:
-        Dict[str, str]: Dictionary with extracted components.
+        Dict[str, str]: Dictionary with extracted components, where each value is a string
+        of elements joined by EXTERNAL_ARRAY_SEPARATOR. The dictionary contains:
+        - 'id': String of _id values.
+        - 'code': String of event_code values.
+        - 'code_type': String of event_code_type values (not converted to labels).
+        - 'iso3': String of event_iso3 values.
 
+    Note:
+        - This function internally uses extract_event_code_data_raw_list() to process the input data.
+        - Unlike some other functions, this one does not convert event_code_type to labels.
+        - EXTERNAL_ARRAY_SEPARATOR is used to join the elements of each component.
+
+    Example usage:
+        data = [
+            ('1', 'E001', '1', 'USA'),
+            ('2', 'E002', '2', 'GBR'),
+            ('3', 'E003', '3', 'IND'),
+        ]
+        extracted_data = extract_event_code_data_raw(data)
+
+        # Assuming EXTERNAL_ARRAY_SEPARATOR is ','
+        print(extracted_data['id'])           # Output: '1,2,3'
+        print(extracted_data['code'])         # Output: 'E001,E002,E003'
+        print(extracted_data['code_type'])    # Output: '1,2,3'
+        print(extracted_data['iso3'])         # Output: 'USA,GBR,IND'
     """
     # Split the formatted event code data into individual components
     extracted_data = extract_event_code_data_raw_list(data)
