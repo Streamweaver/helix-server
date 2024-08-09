@@ -32,3 +32,6 @@ celerybeat-schedule
 coverage.xml
 htmlcov
 sitecus
+
+# Mac OSX files
+.DS_Store
