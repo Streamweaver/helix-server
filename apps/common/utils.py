@@ -548,12 +548,12 @@ def format_event_codes_as_string(
             5: Local Identifier
 
     Returns:
-        str: A string representation of the formatted event codes data. 
-             The format is "event_code:event_code_label[:event_iso3]" for each tuple, 
+        str: A string representation of the formatted event codes data.
+             The format is "event_code:event_code_label[:event_iso3]" for each tuple,
              separated by EXTERNAL_ARRAY_SEPARATOR.
 
     Note:
-        This function internally calls format_event_codes() to convert event_code_type 
+        This function internally calls format_event_codes() to convert event_code_type
         to its corresponding label before formatting as a string.
 
     Example usage:
