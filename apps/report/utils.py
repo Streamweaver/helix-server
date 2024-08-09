@@ -32,11 +32,64 @@ EXCEL_FORMULAE = {
 
 
 def excel_column_key(headers, header) -> str:
+    """
+
+    :param headers: Dictionary containing column headers as keys
+    :param header: The header for which to find the corresponding column key
+    :return: The column key corresponding to the given header
+    :rtype: str
+    """
     seed = ord('A')
     return chr(list(headers.keys()).index(header) + seed)
 
 
 def report_global_numbers(report):
+    """
+    Calculate the global numbers for a given report.
+
+    Parameters:
+    - report: The report for which to calculate the global numbers.
+
+    Returns:
+    - A dictionary containing the following keys:
+      - headers: A dictionary containing formatted headers for the data.
+      - data: A list of dictionaries containing the calculated data.
+      - formulae: A dictionary for any additional formulas, if needed.
+
+    Example Usage:
+        report = get_report()  # Get the report object
+        global_numbers = report_global_numbers(report)
+        print(global_numbers)
+
+    Example Output:
+    {
+        'headers': {
+            'one': '',
+            'two': '',
+            'three': '',
+        },
+        'data': [
+            {'one': 'Conflict'},
+            {'one': 'Data'},
+            {'one': 'Sum of ND Report', 'two': 'Sum of IDPs Report'},
+            {'one': 800, 'two': 1200},
+            {'one': ''},
+            {'one': 'Disaster'},
+            {'one': 'Data'},
+            {'one': 'Sum of ND Report', 'two': 'Number of Events of Report'},
+            {'one': 500, 'two': 3},
+            {'one': ''},
+            {'one': 'Total Internal Displacements (Conflict + Disaster)', 'two': 1300},
+            {'one': 'Conflict', 'two': '61.54%'},
+            {'one': 'Disaster', 'two': '38.46%'},
+            {'one': ''},
+            {'one': 'Number of countries with figures', 'two': 10},
+            {'one': 'Conflict', 'two': 5},
+            {'one': 'Disaster', 'two': 5}
+        ],
+        'formulae': {}
+    }
+    """
     conflict_filter = dict(
         role=Figure.ROLE.RECOMMENDED,
         event__event_type=Crisis.CRISIS_TYPE.CONFLICT,
@@ -190,6 +243,26 @@ def report_global_numbers(report):
 
 
 def report_stat_flow_country(report):
+    """
+    Method: report_stat_flow_country
+
+    This method generates a report for statistical flow by country. It takes a report object as a parameter.
+
+    Parameters:
+        - report (object): The report object containing the necessary data for generating the report.
+
+    Returns:
+        - dictionary: A dictionary containing the following keys:
+            - 'headers': A dictionary mapping the column names to the corresponding data fields.
+            - 'data': A queryset containing the report data for each country.
+            - 'formulae': A dictionary containing any formulae used in the report.
+
+    Example usage:
+
+        report = <report object>
+
+        result = report_stat_flow_country(report)
+    """
     headers = {
         'id': 'ID',
         'iso3': 'ISO3',
@@ -228,6 +301,37 @@ def report_stat_flow_country(report):
 
 
 def report_stat_flow_region(report):
+    """
+    Report statistics for a given flow region.
+
+    :param report: The report object
+    :return: A dictionary containing headers, data, and formulae
+
+    The `report_stat_flow_region` method calculates and returns statistical data for a given flow region based on the
+    provided report. The method takes a single parameter `report`, which is the report object.
+
+    The method starts by defining a dictionary `headers` that maps column names to their corresponding labels. The
+    column names are 'id', 'name', 'Conflict ND {report.name}', 'Disaster ND {report.name}', and 'Total ND
+    {report.name}'. These labels are used to display the column headers in the output.
+
+    Next, the method defines an empty dictionary `formulae` that will hold the calculated formulas.
+
+    The method then retrieves data from the `CountryRegion` model using a filter to get the relevant regions based on
+    the report's country regions. The retrieved data is annotated with the total figure disaggregation subquery for the
+    report, ignoring dates.
+
+    After that, the method calculates the total value by summing the 'Conflict ND' and 'Disaster ND' values for each
+    region using the `Coalesce` and `F` functions. The result is annotated as 'total' for each row.
+
+    Finally, the method returns a dictionary containing the headers, the retrieved data, and the formulae.
+
+    Example usage:
+        report = ...
+        result = report_stat_flow_region(report)
+        headers = result['headers']
+        data = result['data']
+        formulae = result['formulae']
+    """
     headers = {
         'id': 'ID',
         'name': 'Region',
@@ -262,6 +366,21 @@ def report_stat_flow_region(report):
 
 
 def report_stat_conflict_country(report, include_history):
+    """
+    Report statistics by conflict country.
+
+    Parameters:
+    - report: The report object containing the figures.
+    - include_history: Flag indicating whether to include historical data.
+
+    Returns:
+    A dictionary containing the following keys:
+    - headers: An ordered dictionary of the headers and their corresponding labels.
+    - data: The aggregated data for each country, including population, figures for new displacement (flow) and IDPs
+    (stock).
+    - formulae: A dictionary of formulae for calculations based on the aggregated data.
+    - aggregation: None (not used in the current implementation).
+    """
     headers = OrderedDict(dict(
         iso3='ISO3',
         name='Country',
@@ -392,6 +511,29 @@ def report_stat_conflict_country(report, include_history):
 
 
 def report_stat_conflict_region(report, include_history):
+    """
+
+    This method generates a report on statistical conflict regions based on the given report and include_history
+    parameter. It returns a dictionary with the following keys:
+
+    - headers: an OrderedDict containing the column headers for the report. The keys represent the column names and the
+    values represent the column labels.
+    - data: a queryset that contains the data for the report. It includes the following fields: region,
+    region_population, name, flow_total, stock_total.
+    - formulae: an OrderedDict containing the formulas to calculate additional statistics for each region. The keys
+    represent the statistic names and the values represent the formula templates.
+    - aggregation: currently set to None.
+
+    Parameters:
+    - report: the report object.
+    - include_history: a boolean indicating whether to include historical data in the report.
+
+    Example usage:
+    report = ...
+    include_history = True
+    result = report_stat_conflict_region(report, include_history)
+
+    """
     headers = OrderedDict(dict(
         name='Region',
         region_population='Population',
@@ -522,6 +664,37 @@ def report_stat_conflict_region(report, include_history):
 
 
 def report_stat_conflict_typology(report):
+    """
+    Report Stat Conflict Typology
+
+    This method takes a 'report' object as a parameter and generates a statistical report on conflict typologies.
+
+    Parameters:
+    - report: The report object containing the data for analysis
+
+    Returns:
+    This method returns a dictionary containing the following keys:
+    - 'headers': An ordered dictionary with the following keys:
+        - 'iso3': ISO3 code
+        - 'name': IDMC short name
+        - 'typology': Conflict typology
+        - 'total': Figure
+    - 'data': A queryset containing the filtered and annotated data for each conflict typology
+    - 'formulae': An empty dictionary
+    - 'aggregation': A sub-dictionary containing the aggregated data:
+        - 'headers': An ordered dictionary with the following keys:
+            - 'typology': Conflict typology
+            - 'total': Sum of figure
+        - 'formulae': An empty dictionary
+        - 'data': A list of dictionaries containing the aggregated data for each conflict typology
+
+    Note: The method uses OrderedDict and models from Django to perform the data processing and aggregation.
+
+    Example Usage:
+    report = get_report()  # get the report object
+    result = report_stat_conflict_typology(report)  # analyze the conflict typologies in the report
+    print(result)  # display the generated statistical report
+    """
     headers = OrderedDict(dict(
         iso3='ISO3',
         name='IDMC short name',
@@ -634,6 +807,30 @@ def report_stat_conflict_typology(report):
 
 
 def report_disaster_event(report):
+    """
+
+    report_disaster_event(report)
+
+    This method generates a report for a given disaster event.
+
+    Parameters:
+    - report: The report object for which the disaster event report needs to be generated.
+
+    Returns:
+    A dictionary containing the following keys:
+    - 'headers': An ordered dictionary containing the column names and their corresponding display names for the report.
+    - 'data': The data for the report in the form of a queryset.
+    - 'formulae': A dictionary containing formulae used for calculations in the report.
+
+    Example Usage:
+
+        report = Report.objects.get(id=1)
+        result = report_disaster_event(report)
+        headers = result['headers']
+        data = result['data']
+        formulae = result['formulae']
+
+    """
     headers = OrderedDict(dict(
         event_id='Event ID',
         event_name='Event name',
@@ -684,6 +881,20 @@ def report_disaster_event(report):
 
 
 def report_disaster_country(report, include_history):
+    """
+    Reports the disaster data for each country.
+
+    Parameters:
+    - report (Report): The report object representing the dataset for the report.
+    - include_history (bool): Flag indicating whether to include historical data.
+
+    Returns:
+    - dict: A dictionary containing the following keys:
+            - 'headers': An ordered dictionary representing the headers of the data.
+            - 'data': The queried data for each country.
+            - 'formulae': A dictionary of formulas for calculated values.
+            - 'aggregation': None (not used in this method).
+    """
     headers = OrderedDict(dict(
         country_iso3='ISO3',
         country_name='Name',
@@ -774,6 +985,14 @@ def report_disaster_country(report, include_history):
 
 
 def report_disaster_region(report, include_history):
+    """
+    Report disaster region.
+
+    :param report: The report object.
+    :param include_history: Whether to include historical data or not.
+
+    :return: A dictionary containing headers, data, and formulae.
+    """
     headers = OrderedDict(dict(
         region_name='Region',
         events_count='Events count',
@@ -864,9 +1083,21 @@ def report_disaster_region(report, include_history):
 
 
 def report_get_excel_sheets_data(report, include_history=False):
-    '''
-    Returns title and corresponding computed property
-    '''
+    """
+    Get the data for each sheet in the report Excel file.
+
+    Parameters:
+    - report (str): The path to the report Excel file.
+    - include_history (bool, optional): Include historical data if True. Default is False.
+
+    Returns:
+    (dict): A dictionary containing the data for each sheet in the report Excel file.
+    The keys are the sheet names and the values are the data specific to each sheet.
+
+    Example usage:
+    report = 'path/to/report.xlsx'
+    data = report_get_excel_sheets_data(report, include_history=True)
+    """
     return {
         'Global Numbers': report_global_numbers(report),
         'ND Country': report_stat_flow_country(report),

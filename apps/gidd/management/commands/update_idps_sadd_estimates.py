@@ -23,7 +23,8 @@ class Command(BaseCommand):
         Creates a dictionary mapping ISO3 country codes to country data, with error handling and optimized fetching.
 
         Returns:
-            Dict[str, CountryDataType]: A case-insensitive dictionary where keys are ISO3 codes and values are country data.
+            Dict[str, CountryDataType]: A case-insensitive dictionary where keys are ISO3 codes and values are country
+            data.
         """
         countries = Country.objects.filter(iso3__isnull=False)
         return CaseInsensitiveDict({

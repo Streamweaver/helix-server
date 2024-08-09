@@ -13,6 +13,24 @@ User = get_user_model()
 
 
 class OrganizationKind(MetaInformationArchiveAbstractModel, models.Model):
+    """
+    Class: OrganizationKind
+
+    This class represents the model for an organization kind. It inherits from `MetaInformationArchiveAbstractModel` and
+    `models.Model`.
+
+    Attributes:
+    - name: A `CharField` representing the title of the organization kind.
+    - reliability: An `EnumField` representing the reliability of the organization kind. It has the following possible
+    values:
+        - LOW: 0
+        - MEDIUM: 1
+        - HIGH: 2
+
+    Methods:
+    - __str__(): Returns the name of the organization kind as a string.
+
+    """
     class ORGANIZATION_RELIABILITY(enum.Enum):
         LOW = 0
         MEDIUM = 1
@@ -30,6 +48,27 @@ class OrganizationKind(MetaInformationArchiveAbstractModel, models.Model):
 class Organization(MetaInformationArchiveAbstractModel,
                    SoftDeleteModel,
                    models.Model):
+    """
+    Class representing an organization.
+
+    This class inherits from `MetaInformationArchiveAbstractModel`, `SoftDeleteModel`, and `models.Model`.
+
+    Attributes:
+        name (CharField): The title of the organization.
+        short_name (CharField): The short name of the organization.
+        category (EnumField): The geographical coverage category of the organization.
+        countries (ManyToManyField): The countries associated with the organization.
+        organization_kind (ForeignKey): The type of organization.
+        methodology (TextField): Methodology description of the organization.
+        parent (ForeignKey): The parent organization.
+
+    Methods:
+        get_excel_sheets_data(cls, user_id, filters): Returns data for Excel sheets.
+        __str__(): Returns a string representation of the organization.
+
+    Nested Classes:
+        ORGANIZATION_CATEGORY (Enum): Enumeration representing the organization category.
+    """
     class ORGANIZATION_CATEGORY(enum.Enum):
         UNKNOWN = 0
         REGIONAL = 1

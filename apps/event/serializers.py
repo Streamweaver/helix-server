@@ -20,6 +20,17 @@ from apps.notification.models import Notification
 
 class ActorSerializer(MetaInformationSerializerMixin,
                       serializers.ModelSerializer):
+    """
+    Serializer class for the Actor model.
+
+    This serializer class is used to serialize and deserialize Actor objects for use in API views and endpoints.
+
+    Attributes:
+        model: The model class that this serializer is associated with (Actor).
+        fields: A list of field names to include in the serialized representation of an Actor object. Use '__all__' to
+        include all fields.
+
+    """
     class Meta:
         model = Actor
         fields = '__all__'
@@ -27,13 +38,44 @@ class ActorSerializer(MetaInformationSerializerMixin,
 
 class ActorUpdateSerializer(UpdateSerializerMixin,
                             ActorSerializer):
-    """Just to create input type"""
+    """Serializer for updating an Actor.
+
+    This class is used to serialize and validate the data when updating an Actor.
+    It inherits from the UpdateSerializerMixin and ActorSerializer classes.
+
+    Attributes:
+        id (IntegerIDField): The ID field of the Actor being updated.
+
+    """
     id = IntegerIDField(required=True)
 
 
 class EventCodeSerializer(MetaInformationSerializerMixin,
                           serializers.ModelSerializer):
+    """
+    Serializer for serializing and deserializing EventCode instances.
 
+    This serializer inherits from MetaInformationSerializerMixin and ModelSerializer.
+
+    Attributes:
+        model (class): The model class associated with the serializer.
+        fields (list): The fields to include in the serialized output.
+        extra_kwargs (dict): Extra keyword arguments for specific fields.
+
+    Example usage:
+
+        >>> serializer = EventCodeSerializer(data={'country': 'US', 'uuid': '123456789', 'event_code': 'ABC',
+        'event_code_type': 'TypeA'})
+        >>> serializer.is_valid()
+        True
+        >>> serializer.save()
+        <EventCode: 123456789-ABC>
+
+        >>> serializer = EventCodeSerializer(instance=event_code)
+        >>> serializer.data
+        {'country': 'US', 'uuid': '123456789', 'event_code': 'ABC', 'event_code_type': 'TypeA'}
+
+    """
     class Meta:
         model = EventCode
         fields = ['country', 'uuid', 'event_code', 'event_code_type']
@@ -46,6 +88,31 @@ class EventCodeSerializer(MetaInformationSerializerMixin,
 
 
 class EventCodeUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for updating an EventCode instance.
+
+    This serializer is used to validate and deserialize the JSON data received for updating an EventCode instance. It
+    also provides the necessary fields to be included in the serialized response.
+
+    Attributes:
+        id (IntegerField): ID field for the EventCode instance (optional).
+
+    Meta:
+        model (EventCode): The model class associated with this serializer.
+        exclude (List[str]): A list of fields to be excluded from the serialized response.
+        extra_kwargs (dict): Additional arguments to be passed to the fields.
+
+    Example usage:
+
+        serializer = EventCodeUpdateSerializer(data=request.data)
+        if serializer.is_valid():
+            validated_data = serializer.validated_data
+            # Perform update operation using validated_data
+        else:
+            errors = serializer.errors
+            # Handle validation errors
+
+    """
     id = IntegerIDField(required=False)
 
     class Meta:
@@ -61,7 +128,93 @@ class EventCodeUpdateSerializer(serializers.ModelSerializer):
 
 class EventSerializer(MetaInformationSerializerMixin,
                       serializers.ModelSerializer):
+    """
 
+    This class is used to serialize and deserialize Event instances. It inherits from MetaInformationSerializerMixin and
+    serializers.ModelSerializer.
+
+    Declaration:
+
+    class EventSerializer(MetaInformationSerializerMixin,
+                          serializers.ModelSerializer):
+
+    Methods:
+
+    - validate_violence_sub_type_and_type(self, attrs)
+        - This method validates the violence_sub_type and violence_type fields.
+        - Parameters:
+            - attrs: The input attributes to validate.
+        - Returns:
+            - errors: The dictionary containing any validation errors.
+
+    - validate_event_type_with_crisis_type(self, attrs)
+        - This method validates the event_type against the crisis_type field.
+        - Parameters:
+            - attrs: The input attributes to validate.
+        - Returns:
+            - errors: The dictionary containing any validation errors.
+
+    - validate_disaster_disaster_sub_type(self, attrs)
+        - This method validates the disaster_sub_type field.
+        - Parameters:
+            - attrs: The input attributes to validate.
+        - Returns:
+            - errors: The dictionary containing any validation errors.
+
+    - validate_event_type_against_crisis_type(self, event_type, attrs)
+        - This method validates the event_type against the crisis_type field.
+        - Parameters:
+            - event_type: The event_type value to validate.
+            - attrs: The input attributes to validate.
+
+    - validate_figures_countries(self, attrs)
+        - This method validates the countries field.
+        - Parameters:
+            - attrs: The input attributes to validate.
+        - Returns:
+            - errors: The dictionary containing any validation errors.
+
+    - validate_figures_dates(self, attrs)
+        - This method validates the start_date field against the minimum start_date value of the related Figure
+        instances.
+        - Parameters:
+            - attrs: The input attributes to validate.
+        - Returns:
+            - errors: The dictionary containing any validation errors.
+
+    - validate_empty_countries(self, attrs)
+        - This method validates the countries field for empty values.
+        - Parameters:
+            - attrs: The input attributes to validate.
+        - Returns:
+            - errors: The dictionary containing any validation errors.
+
+    - _update_event_codes(self, event, event_codes)
+        - This method updates the event codes for the given event.
+        - Parameters:
+            - event: The Event instance to update event codes for.
+            - event_codes: The list of event codes to update.
+
+    - _update_parent_fields(self, attrs)
+        - This method updates the parent fields based on the child fields.
+        - Parameters:
+            - attrs: The input attributes to update.
+
+    - validate(self, attrs)
+        - This method validates the input attributes.
+        - Parameters:
+            - attrs: The input attributes to validate.
+        - Returns:
+            - attrs: The validated attributes.
+
+    - create(self, validated_data)
+        - This method creates a new Event instance.
+        - Parameters:
+            - validated_data: The validated data to create the Event instance.
+        - Returns:
+            - event: The created Event instance.
+
+    """
     event_codes = EventCodeSerializer(many=True, required=False)
 
     class Meta:
@@ -340,11 +493,32 @@ class EventSerializer(MetaInformationSerializerMixin,
 
 
 class EventUpdateSerializer(UpdateSerializerMixin, EventSerializer):
+    """
+    Serializer class for updating events.
+
+    Inherits from UpdateSerializerMixin and EventSerializer.
+
+    Attributes:
+        id: IntegerIDField instance for event ID field (required)
+        event_codes: EventCodeUpdateSerializer instance for event codes (many=True, required)
+    """
     id = IntegerIDField(required=True)
     event_codes = EventCodeUpdateSerializer(many=True, required=True)
 
 
 class CloneEventSerializer(serializers.Serializer):
+    """
+    CloneEventSerializer
+
+    Serializer class for cloning an event.
+
+    Attributes:
+        event (PrimaryKeyRelatedField): Field for selecting the event to be cloned.
+
+    Methods:
+        save: Save method for cloning and saving the event.
+
+    """
     event = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all())
 
     def save(self, *args, **kwargs):
@@ -356,11 +530,23 @@ class CloneEventSerializer(serializers.Serializer):
 
 
 class ContextOfViolenceSerializer(MetaInformationSerializerMixin, serializers.ModelSerializer):
+    """
+    Serializer class for ContextOfViolence model.
+    """
     class Meta:
         model = ContextOfViolence
         fields = '__all__'
 
 
 class ContextOfViolenceUpdateSerializer(UpdateSerializerMixin, ContextOfViolenceSerializer):
-    """Just to create input type"""
+    """
+    ContextOfViolenceUpdateSerializer
+
+    This class is used for serializing and validating updates to an existing ContextOfViolence object.
+
+    Attributes:
+        id: An IntegerIDField attribute that specifies the ID of the ContextOfViolence object to be updated. It is
+        required.
+
+    """
     id = IntegerIDField(required=True)

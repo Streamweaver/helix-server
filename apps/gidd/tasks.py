@@ -46,6 +46,17 @@ logger = logging.getLogger(__name__)
 
 
 def get_gidd_years():
+    """
+    Return a list of distinct GIDD report years.
+
+    This method retrieves the distinct GIDD report years from the Report model.
+    The reports must have the `is_gidd_report` field set to True.
+    The list of GIDD report years is sorted in ascending order.
+
+    Returns:
+        list: A list of distinct GIDD report years.
+
+    """
     return Report.objects.filter(is_gidd_report=True)\
         .order_by('gidd_report_year')\
         .distinct('gidd_report_year')\
@@ -53,6 +64,18 @@ def get_gidd_years():
 
 
 def annotate_conflict(qs, year):
+    """
+
+    Annotates the given queryset with the provided year and returns a new queryset with additional annotations.
+
+    Parameters:
+        - qs (QuerySet): The queryset to annotate.
+        - year (int): The year to annotate the queryset with.
+
+    Returns:
+        QuerySet: A new queryset with additional annotations.
+
+    """
     return qs.annotate(
         year=Value(year, output_field=IntegerField()),
     ).values('year', 'country__idmc_short_name', 'country__iso3').annotate(
@@ -79,6 +102,21 @@ def annotate_conflict(qs, year):
 
 
 def update_gidd_legacy_data():
+    """
+
+    This method update_gidd_legacy_data updates the GIDD legacy data in the system. It performs two main bulk operations
+    to create Conflict and Disaster objects.
+
+    Parameters:
+    - None
+
+    Returns:
+    - None
+
+    Example usage:
+    update_gidd_legacy_data()
+
+    """
     iso3_to_country_id_map = {
         country['iso3']: country['id'] for country in Country.objects.values('iso3', 'id')
     }
@@ -164,6 +202,18 @@ def update_gidd_legacy_data():
 
 
 def update_conflict_and_disaster_data():
+    """
+
+    This method updates the conflict and disaster data by querying the Figure model and creating new Conflict and
+    Disaster objects.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+
+    """
     figure_queryset = Figure.objects.filter(
         role=Figure.ROLE.RECOMMENDED
     )
@@ -325,6 +375,28 @@ def update_conflict_and_disaster_data():
 
 
 def update_public_figure_analysis():
+    """
+
+    Update Public Figure Analysis
+
+    Update the public figure analysis for reports that are visible in the GIDD. This method retrieves the necessary data
+    from the reports and creates or updates the corresponding PublicFigureAnalysis objects.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+
+    Notes:
+        - Exactly one aggregation should be obtained for PFA.
+        - There must be exactly one country.
+        - The 'gidd_published_date' field in the Report model is updated for all GIDD reports.
+        - The 'is_pfa_published_in_gidd' field in the Report model is set to True for all visible PFA reports.
+        - The 'gidd_published_date' field in the visible PFA reports is updated to the current time.
+        - The existing PublicFigureAnalysis objects are cleaned up before updating.
+
+    """
     # NOTE:- Exactly one aggregation should obtained for PFA
     # NOTE:- There must be exaclty one country
     data = []
@@ -405,6 +477,23 @@ def update_public_figure_analysis():
 
 
 def update_displacement_data():
+    """
+
+    Update Displacement Data
+
+    This method updates the displacement data for each country by calculating the total and new displacements caused by
+    conflicts and disasters for each year.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+
+    Example Usage:
+        update_displacement_data()
+
+    """
     start_year = min(
         Disaster.objects.order_by('year').first().year,
         Conflict.objects.order_by('year').first().year
@@ -491,6 +580,20 @@ def update_displacement_data():
 
 
 def update_idps_sadd_estimates_country_names():
+    """
+
+    Update IDPs SADD Estimates Country Names
+
+    This method updates the country names for IDPs SADD (Sudden-Onset Disasters) estimates based on the IDMC short name
+    of the country.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+
+    """
     country_name_map = {
         country['id']: country['idmc_short_name'] for country in Country.objects.values('id', 'idmc_short_name')
     }
@@ -500,9 +603,24 @@ def update_idps_sadd_estimates_country_names():
 
 
 def update_gidd_event_and_gidd_figure_data():
-    '''
-    Updates GiddEvent and GiddFigure data
-    '''
+    """
+    Update Gidd Event and Gidd Figure Data
+
+    This method updates the GiddEvent and GiddFigure models in the database based on the Event and Figure models. It
+    performs the following actions:
+
+    1. Retrieves all the events from the Event model and annotates them with event codes for referencing.
+    2. Creates new GiddEvent instances in bulk based on the annotated event queryset.
+    3. Retrieves figures from the Figure model and annotates them with additional data for referencing.
+    4. Creates new GiddFigure instances in bulk based on the annotated figure queryset.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+
+    """
 
     event_queryset = Event.objects.annotate(
         event_codes=ArrayAgg(
@@ -801,6 +919,31 @@ def update_gidd_event_and_gidd_figure_data():
 
 @celery_app.task
 def update_gidd_data(log_id):
+    """
+    Update GIDD data.
+
+    This method updates the GIDD data by performing the following steps:
+    1. Deletes all conflicting data from the Conflict model.
+    2. Deletes all data from the Disaster model.
+    3. Deletes all data from the PublicFigureAnalysis model.
+    4. Deletes all data from the DisplacementData model.
+    5. Deletes all data from the GiddFigure model.
+    6. Deletes all data from the GiddEvent model.
+    7. Calls the update_gidd_legacy_data() method to create new data for GIDD.
+    8. Calls the update_conflict_and_disaster_data() method to update conflict and disaster data.
+    9. Calls the update_public_figure_analysis() method to update public figure analysis data.
+    10. Calls the update_displacement_data() method to update displacement data.
+    11. Calls the update_idps_sadd_estimates_country_names() method to update IDPs SADD estimates and country names.
+    12. Calls the update_gidd_event_and_gidd_figure_data() method to update GIDD event and GIDD figure data.
+    13. Updates the status log with a SUCCESS status and the current timestamp.
+
+    Parameters:
+    - log_id (int): The ID of the status log entry.
+
+    Returns:
+    - None
+
+    """
     try:
         with transaction.atomic():
             # DELETE

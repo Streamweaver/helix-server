@@ -12,6 +12,39 @@ from apps.users.models import User
 
 
 class Crisis(MetaInformationAbstractModel, models.Model):
+    """
+    Crisis
+
+    Subclass of MetaInformationAbstractModel and models.Model.
+
+    Attributes:
+    - ND_FIGURES_ANNOTATE (str): constant. Disaggregation variable definition for total flow ND figures.
+    - IDP_FIGURES_ANNOTATE (str): constant. Disaggregation variable definition for total stock IDP figures.
+    - IDP_FIGURES_REFERENCE_DATE_ANNOTATE (str): constant. Disaggregation variable definition for reference date of IDP
+    figures.
+
+    Inner Enum:
+    - CRISIS_TYPE (enum.Enum): Enum with values: CONFLICT (0), DISASTER (1), OTHER (2). Inner labels are defined.
+
+    Fields:
+    - name (models.CharField): Field for crisis name. Max length is 256 characters.
+    - crisis_type (enum.EnumField): Field for crisis cause. EnumField of CRISIS_TYPE.
+    - crisis_narrative (models.TextField): Field for crisis narrative/summary.
+    - countries (models.ManyToManyField): Field for countries related to the crisis.
+    - start_date (models.DateField): Field for start date of the crisis. Can be blank and null.
+    - start_date_accuracy (enum.EnumField): Field for accuracy of the start date. EnumField of DATE_ACCURACY. Default:
+    DATE_ACCURACY.DAY. Can be blank and null.
+    - end_date (models.DateField): Field for end date of the crisis. Can be blank and null.
+    - end_date_accuracy (enum.EnumField): Field for accuracy of the end date. EnumField of DATE_ACCURACY. Default:
+    DATE_ACCURACY.DAY. Can be blank and null.
+
+    Methods:
+    - _total_figure_disaggregation_subquery (classmethod): Returns a subquery for total figure disaggregation.
+    - get_excel_sheets_data (classmethod): Returns data for Excel sheets.
+    - __str__ : Returns string representation of the Crisis instance.
+    - annotate_review_figures_count (classmethod): Returns annotated review figures count.
+
+    """
     # NOTE figure disaggregation variable definitions
     ND_FIGURES_ANNOTATE = 'total_flow_nd_figures'
     IDP_FIGURES_ANNOTATE = 'total_stock_idp_figures'

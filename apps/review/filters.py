@@ -4,6 +4,33 @@ from apps.review.models import UnifiedReviewComment
 
 
 class UnifiedReviewCommentFilter(df.FilterSet):
+    """
+
+    The `UnifiedReviewCommentFilter` class is a subclass of `df.FilterSet` and is used for filtering instances of the
+    `UnifiedReviewComment` model.
+
+    Attributes:
+        events (IDListFilter): A filter for filtering by event IDs.
+        figures (IDListFilter): A filter for filtering by figure IDs.
+        fields (StringListFilter): A filter for filtering by field names.
+
+    Methods:
+        filter_events(qs, name, value):
+            Filters the queryset `qs` based on the event IDs in the `value` list.
+
+        filter_figures(qs, name, value):
+            Filters the queryset `qs` based on the figure IDs in the `value` list.
+
+        filter_fields(qs, name, value):
+            Filters the queryset `qs` based on the field names in the `value` list.
+
+    Meta:
+        model: Specifies the model class to be used for filtering (UnifiedReviewComment).
+        fields: Specifies the fields that can be filtered on (is_edited, is_deleted).
+
+    Note:
+        This class does not return any example code and does not include @author and @version tags.
+    """
     events = IDListFilter(method='filter_events')
     figures = IDListFilter(method='filter_figures')
     fields = StringListFilter(method='filter_fields')

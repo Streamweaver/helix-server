@@ -17,11 +17,39 @@ UnifiedReviewCommentCreateInputType = generate_input_type_for_serializer(
 
 
 class UnifiedReviewCommentUpdateInputType(graphene.InputObjectType):
+    """
+
+    Class: UnifiedReviewCommentUpdateInputType
+
+    Represents an input object type for updating a review comment.
+
+    Attributes:
+    - id: The unique ID of the comment. (Required)
+    - comment: The updated comment text. (Required)
+
+    """
     id = graphene.ID(required=True)
     comment = graphene.String(required=True)
 
 
 class CreateUnifiedReviewComment(graphene.Mutation):
+    """
+    Mutation class for creating a unified review comment.
+
+    Args:
+        data (UnifiedReviewCommentCreateInputType): The input data for creating a unified review comment.
+
+    Returns:
+        CreateUnifiedReviewComment: An instance of the CreateUnifiedReviewComment class.
+
+    Attributes:
+        ok (bool): Indicates whether the mutation was successful or not.
+        errors (List[CustomErrorType]): A list of error messages, if any.
+        result (UnifiedReviewCommentType): The created unified review comment.
+
+    Methods:
+        mutate(root, info, data): Method for executing the mutation and creating the unified review comment.
+    """
     class Arguments:
         data = UnifiedReviewCommentCreateInputType(required=True)
 
@@ -103,6 +131,21 @@ class CreateUnifiedReviewComment(graphene.Mutation):
 
 
 class UpdateUnifiedReviewComment(graphene.Mutation):
+    """
+
+    This class represents a GraphQL mutation for updating a UnifiedReviewComment object.
+
+    Attributes:
+        Arguments:
+            - data (UnifiedReviewCommentUpdateInputType): The input data for updating the UnifiedReviewComment object.
+        ok (Boolean): Indicates whether the mutation was successful or not.
+        errors (List[CustomErrorType]): A list of custom error types that occurred during the mutation process.
+        result (UnifiedReviewCommentType): The updated UnifiedReviewComment object.
+
+    Methods:
+        mutate (staticmethod): Updates the UnifiedReviewComment object based on the provided input data.
+
+    """
     class Arguments:
         data = UnifiedReviewCommentUpdateInputType(required=True)
 
@@ -137,6 +180,28 @@ class UpdateUnifiedReviewComment(graphene.Mutation):
 
 
 class DeleteUnifiedReviewComment(graphene.Mutation):
+    """
+    The DeleteUnifiedReviewComment class is a mutation class that allows a user to delete a unified review comment. It
+    is a specific implementation of the graphene.Mutation class.
+
+    Attributes:
+        - Arguments: A nested class that defines the input arguments for the mutation. It contains a single argument,
+        id, which is a required graphene.ID field.
+        - ok: A graphene.Boolean field indicating whether the deletion was successful.
+        - errors: A list of CustomErrorType objects representing any errors that occurred during the deletion.
+        - result: A graphene.Field object representing the deleted UnifiedReviewComment object.
+
+    Methods:
+        - mutate: A static method that executes the mutation logic. It takes in the root, info, and id arguments. It
+        performs the following steps:
+            1. Retrieves the UnifiedReviewComment object with the specified id, created by the authenticated user.
+            2. If no such UnifiedReviewComment exists, returns an instance of DeleteUnifiedReviewComment with
+            appropriate errors and ok=False.
+            3. Sets the is_deleted field of the UnifiedReviewComment object to True and clears the comment field.
+            4. Saves the changes to the UnifiedReviewComment object.
+            5. Returns an instance of DeleteUnifiedReviewComment with the deleted UnifiedReviewComment object as the
+            result, no errors, and ok=True.
+    """
     class Arguments:
         id = graphene.ID(required=True)
 
@@ -168,6 +233,14 @@ class DeleteUnifiedReviewComment(graphene.Mutation):
 
 
 class Mutation(object):
+    """
+    This class defines the mutation operations for review comments.
+
+    Methods:
+        create_review_comment: Creates a new review comment.
+        update_review_comment: Updates an existing review comment.
+        delete_review_comment: Deletes a review comment.
+    """
     create_review_comment = CreateUnifiedReviewComment.Field()
     update_review_comment = UpdateUnifiedReviewComment.Field()
     delete_review_comment = DeleteUnifiedReviewComment.Field()

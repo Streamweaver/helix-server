@@ -13,6 +13,7 @@ from utils.graphene.pagination import PageGraphqlPaginationWithoutCount
 
 
 class ContextualUpdateType(DjangoObjectType):
+    """Represents the GraphQL object type for ContextualUpdate."""
     class Meta:
         model = ContextualUpdate
 
@@ -33,12 +34,30 @@ class ContextualUpdateType(DjangoObjectType):
 
 
 class ContextualUpdateListType(CustomDjangoListObjectType):
+    """
+    A custom list type for ContextualUpdate objects in Django.
+
+    This class extends the CustomDjangoListObjectType and provides a list type for ContextualUpdate model objects. It
+    also specifies the ContextualUpdate model and the ContextualUpdateFilter as the filterset.
+
+    Attributes:
+        model (type): The ContextualUpdate model.
+        filterset_class (type): The ContextualUpdateFilter filterset class.
+
+    """
     class Meta:
         model = ContextualUpdate
         filterset_class = ContextualUpdateFilter
 
 
 class Query:
+    """
+    Class representing a query.
+
+    Attributes:
+        contextual_update (DjangoObjectField): Represents the contextual update.
+        contextual_update_list (DjangoPaginatedListObjectField): Represents the list of contextual updates.
+    """
     contextual_update = DjangoObjectField(ContextualUpdateType)
     contextual_update_list = DjangoPaginatedListObjectField(ContextualUpdateListType,
                                                             pagination=PageGraphqlPaginationWithoutCount(

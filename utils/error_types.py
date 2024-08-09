@@ -12,6 +12,14 @@ CustomErrorType = GenericScalar
 
 
 class ArrayNestedErrorType(ObjectType):
+    """
+    A class representing an array nested error with key, messages, and object_errors.
+
+    Attributes:
+        key (str): The key of the array nested error.
+        messages (str): The messages associated with the array nested error.
+        object_errors (List[CustomErrorType]): The list of custom error types associated with the array nested error.
+    """
     key = graphene.String(required=True)
     messages = graphene.String(required=False)
     object_errors = graphene.List(graphene.NonNull("utils.error_types.CustomErrorType"))
@@ -27,6 +35,34 @@ class ArrayNestedErrorType(ObjectType):
 
 
 class _CustomErrorType(ObjectType):
+    """
+    Class: _CustomErrorType
+
+    This class represents a custom error type. It is a subclass of ObjectType.
+
+    Attributes:
+    - field (str): The field related to the error.
+    - messages (str, optional): Additional error messages.
+    - object_errors (list[_CustomErrorType]): A list of nested _CustomErrorType objects.
+    - array_errors (list[ArrayNestedErrorType]): A list of nested ArrayNestedErrorType objects.
+
+    Methods:
+    - keys(): Returns a list of valid keys for this object.
+    - __getitem__(key): Returns the value of the specified key.
+
+    Example usage:
+        error = _CustomErrorType()
+        error.field = "email"
+        error.messages = "Invalid email format"
+        nested_error = _CustomErrorType()
+        nested_error.field = "name"
+        nested_error.messages = "Name is required"
+        error.object_errors = [nested_error]
+        keys = error.keys()
+        value = error['field']
+
+    Note: Please ensure that the related import statements are included when using this class.
+    """
     field = graphene.String(required=True)
     messages = graphene.String(required=False)
     object_errors = graphene.List(graphene.NonNull("utils.error_types.CustomErrorType"))
@@ -43,6 +79,16 @@ class _CustomErrorType(ObjectType):
 
 
 def serializer_error_to_error_types(errors: dict, initial_data: dict = None) -> List:
+    """
+    Convert serializer errors to custom error types.
+
+    Args:
+        errors (dict): The serializer errors.
+        initial_data (dict, optional): The initial data. Defaults to None.
+
+    Returns:
+        List: The list of custom error types.
+    """
     initial_data = initial_data or dict()
     error_types = list()
     for field, value in errors.items():
@@ -94,7 +140,17 @@ def serializer_error_to_error_types(errors: dict, initial_data: dict = None) -> 
 
 def mutation_is_not_valid(serializer) -> List[dict]:
     """
-    Checks if serializer is valid, if not returns list of errorTypes
+    Checks if the given serializer is valid.
+
+    If the serializer is not valid, it converts the serializer errors to a list of dictionaries
+    representing the error types and returns it. Otherwise, it returns an empty list.
+
+    :param serializer: The serializer to be checked.
+    :type serializer: object
+
+    :return: A list of dictionaries representing the error types if the serializer is not valid,
+             otherwise, an empty list.
+    :rtype: list[dict]
     """
     if not serializer.is_valid():
         errors = serializer_error_to_error_types(serializer.errors, serializer.initial_data)

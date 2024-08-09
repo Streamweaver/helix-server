@@ -23,6 +23,41 @@ CrisisUpdateInputType = generate_input_type_for_serializer(
 
 
 class CreateCrisis(graphene.Mutation):
+    """
+        This class represents a GraphQL mutation for creating a crisis.
+
+        Args:
+            graphene.Mutation: The base mutation class from the Graphene library.
+
+        Attributes:
+            Arguments: A nested class that defines the input arguments for the mutation.
+            - data (CrisisCreateInputType): The data needed to create a crisis.
+
+            errors (List[CustomErrorType]): A list of custom error types.
+            ok (bool): A boolean indicating the success of the mutation.
+            result (CrisisType): The created crisis object.
+
+        Methods:
+            mutate: A static method that defines the logic for executing the mutation.
+
+        Examples:
+            # To create a crisis
+            mutation {
+              createCrisis(data: { name: "Natural Disaster", description: "Hurricane", date: "2022-10-15" }) {
+                result {
+                  id
+                  name
+                  description
+                  date
+                }
+                errors {
+                  code
+                  message
+                }
+                ok
+              }
+            }
+    """
     class Arguments:
         data = CrisisCreateInputType(required=True)
 
@@ -41,6 +76,24 @@ class CreateCrisis(graphene.Mutation):
 
 
 class UpdateCrisis(graphene.Mutation):
+    """
+
+    The `UpdateCrisis` class is a subclass of `graphene.Mutation` and is used to update an existing Crisis object. It
+    takes a `data` argument of type `CrisisUpdateInputType`, which is required.
+
+    Attributes:
+    - `errors`: A list of `CustomErrorType` objects that represent any errors encountered during the update process. It
+    is a non-null list as specified by `graphene.NonNull`.
+    - `ok`: A boolean value indicating the success or failure of the update operation.
+    - `result`: A `CrisisType` object representing the updated Crisis instance.
+
+    Methods:
+    - `mutate`: A static method decorated with `@staticmethod` and `@permission_checker(['crisis.change_crisis'])`. It
+    performs the update operation by retrieving the Crisis instance based on the provided data's ID, then using the
+    `CrisisSerializer` to update the instance with the provided data. If any validation errors occur, the
+    `mutation_is_not_valid` function is called to handle the errors.
+
+    """
     class Arguments:
         data = CrisisUpdateInputType(required=True)
 
@@ -70,6 +123,34 @@ class UpdateCrisis(graphene.Mutation):
 
 
 class DeleteCrisis(graphene.Mutation):
+    """
+    Mutation to delete a crisis by ID.
+
+    Args:
+        id (str): The ID of the crisis to be deleted.
+
+    Returns:
+        DeleteCrisis: The mutation response object.
+
+    Raises:
+        None.
+
+    Example Usage:
+        mutation {
+            deleteCrisis(id: "1") {
+                result {
+                    id
+                    name
+                    description
+                }
+                errors {
+                    field
+                    messages
+                }
+                ok
+            }
+        }
+    """
     class Arguments:
         id = graphene.ID(required=True)
 
@@ -92,12 +173,33 @@ class DeleteCrisis(graphene.Mutation):
 
 
 class ExportCrises(ExportBaseMutation):
+    """
+    ExportCrises class for exporting crisis data in Excel format
+
+    This class extends the ExportBaseMutation class and provides functionality to export crisis data in Excel format.
+
+    Attributes:
+        DOWNLOAD_TYPE (str): Constant defining the download type as 'CRISIS'.
+
+    Args:
+        filters (CrisisFilterDataInputType): The input data for filtering crisis data.
+
+    """
     class Arguments(ExportBaseMutation.Arguments):
         filters = CrisisFilterDataInputType(required=True)
     DOWNLOAD_TYPE = ExcelDownload.DOWNLOAD_TYPES.CRISIS
 
 
 class Mutation(object):
+    """
+    Class representing a set of mutation fields for managing crises
+
+    Attributes:
+        create_crisis (CreateCrisis.Field): Field for creating a new crisis
+        update_crisis (UpdateCrisis.Field): Field for updating an existing crisis
+        delete_crisis (DeleteCrisis.Field): Field for deleting a crisis
+        export_crises (ExportCrises.Field): Field for exporting a list of crises
+    """
     create_crisis = CreateCrisis.Field()
     update_crisis = UpdateCrisis.Field()
     delete_crisis = DeleteCrisis.Field()

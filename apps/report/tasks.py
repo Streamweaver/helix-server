@@ -20,6 +20,24 @@ logger = logging.getLogger(__name__)
 
 
 def generate_excel_file(excel_sheet_data):
+    """
+
+    Generate an Excel file with the provided sheet data.
+
+    Parameters:
+    - excel_sheet_data (list): A list of tuples, where each tuple represents a sheet in the Excel file.
+      - The tuple should contain:
+        - sheet_name (str): The name of the sheet.
+        - sheet_data (dict): A dictionary containing the data for the sheet.
+          - headers (dict): A dictionary of header keys and values for the sheet.
+          - data (list): A list of dictionaries representing the data rows for the sheet.
+          - formulae (dict): A dictionary of header keys and formulae for computed columns in the sheet.
+          - aggregation (dict, optional): A dictionary containing the aggregation data for the sheet. Defaults to None.
+
+    Returns:
+    - wb (Workbook): The created Excel workbook containing the specified sheet data.
+
+    """
     wb = Workbook()
     active = wb.active.title
     del wb[active]
@@ -75,6 +93,19 @@ def generate_excel_file(excel_sheet_data):
 
 
 def generate_report_excel(generation_id):
+    """
+    Generate an Excel report for a given report generation ID.
+
+    Args:
+        generation_id (int): The ID of the report generation.
+
+    Returns:
+        file: The generated Excel report file.
+
+    Example:
+        >>> generate_report_excel(1)
+        <File: generated_report.xlsx>
+    """
     from apps.report.models import ReportGeneration
     generation = ReportGeneration.objects.get(id=generation_id)
     excel_sheet_data = generation.get_excel_sheets_data().items()
@@ -82,6 +113,17 @@ def generate_report_excel(generation_id):
 
 
 def generate_report_snapshot(generation_id):
+    """
+
+    Generate a report snapshot for a specific generation.
+
+    Args:
+        generation_id (int): The ID of the generation for which to generate a snapshot.
+
+    Returns:
+        Workbook: The workbook containing the generated report snapshot.
+
+    """
     from apps.report.models import ReportGeneration
     generation = ReportGeneration.objects.get(id=generation_id)
     snapshot = generation.get_snapshot()
@@ -98,6 +140,18 @@ def generate_report_snapshot(generation_id):
 
 @celery_app.task(time_limit=REPORT_TIMEOUT)
 def trigger_report_generation(generation_id):
+    """
+    Triggers the generation of a report by calling the `generate_report_excel` and `generate_report_snapshot` functions.
+    This function is a Celery task, meaning it can be executed asynchronously.
+
+    Parameters:
+    - generation_id: An integer representing the ID of the report generation.
+
+    Returns: None
+
+    Example usage:
+    trigger_report_generation.delay(generation_id)
+    """
     from apps.report.models import ReportGeneration
     generation = ReportGeneration.objects.get(id=generation_id)
     generation.started_at = timezone.now()

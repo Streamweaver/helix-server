@@ -33,15 +33,30 @@ logger = logging.getLogger(__name__)
 
 
 def path_has_list(info):
-    '''
-    Checks if the parent path contains list
+    """
+    Check if the path contains any numeric values.
 
-    e.g: ['countryList', 'results', 1, 'region']
-    '''
+    Args:
+        info (object): An object containing path information.
+
+    Returns:
+        bool: True if the path contains at least one numeric value, False otherwise.
+    """
     return bool([each for each in info.path if str(each).isdigit()])
 
 
 class CustomDjangoListObjectBase(DjangoListObjectBase):
+    """
+    Constructor for CustomDjangoListObjectBase.
+
+    Args:
+        results (list): The list of results.
+        count (int): The total count of results.
+        page (int): The current page number.
+        pageSize (int): The number of results per page.
+        results_field_name (str, optional): The name of the results field in the dictionary representation. Defaults to
+        "results".
+    """
     def __init__(self, results, count, page, pageSize, results_field_name="results"):
         self.results = results
         self.count = count
@@ -60,7 +75,23 @@ class CustomDjangoListObjectBase(DjangoListObjectBase):
 
 class CustomDjangoListField(DjangoListField):
     """
-    Removes the compulsion of using `get_queryset` in the DjangoListField
+
+    CustomDjangoListField
+
+    This class extends the DjangoListField and provides additional functionality for resolving lists in
+    DjangoObjectType.
+
+    Methods:
+    - list_resolver: A static method that resolves the list for a DjangoObjectType. It takes the following parameters:
+        - django_object_type: The DjangoObjectType for the list.
+        - resolver: The resolver function for the parent field.
+        - root: The root object.
+        - info: The GraphQLResolveInfo object.
+        - args: Additional arguments passed to the resolver.
+
+    - get_resolver: Overrides the get_resolver method of DjangoListField. It returns a partial function that calls the
+    list_resolver method with the appropriate arguments.
+
     """
     @staticmethod
     def list_resolver(
@@ -89,9 +120,38 @@ class CustomDjangoListField(DjangoListField):
 
 
 class CustomPaginatedListObjectField(DjangoFilterPaginateListField):
-    '''
-    For non-model (or custom queryset) pagination and filtering
-    '''
+    """
+    CustomPaginatedListObjectField
+
+    A class that extends DjangoFilterPaginateListField and provides additional functionality for paginated lists of
+    objects.
+
+    Parameters:
+        _type: The GraphQLObjectType to use for the list items.
+        pagination: (optional) The pagination type to use for the list. If not provided, OrderingOnlyArgumentPagination
+        will be used.
+        extra_filter_meta: (optional) Additional meta data for the filterset class.
+        filterset_class: (optional) The filterset class to use for filtering the queryset.
+        *args: Additional positional arguments to pass to the parent class.
+        **kwargs: Additional keyword arguments to pass to the parent class.
+
+    Methods:
+        list_resolver: Resolves the list of objects based on the provided filterset class, filtering args, root, info
+        and kwargs.
+            Parameters:
+                filterset_class: The filterset class to use for filtering the queryset.
+                filtering_args: The filtering arguments for the filterset class.
+                root: The root of the GraphQL query.
+                info: The GraphQL ResolveInfo object.
+                **kwargs: Additional keyword arguments passed to the resolver.
+            Returns:
+                A CustomDjangoListObjectBase instance containing the filtered and paginated results.
+
+        get_resolver: Overrides the parent method to return a partial function of the list_resolver with the filterset
+        class and filtering args as arguments.
+
+    Note: This class assumes the use of DjangoFilterPaginateListField and its dependencies.
+    """
     def __init__(
         self,
         _type,
@@ -171,6 +231,28 @@ class CustomPaginatedListObjectField(DjangoFilterPaginateListField):
 
 
 class DjangoPaginatedListObjectField(DjangoFilterPaginateListField):
+    """
+    DjangoPaginatedListObjectField class is a subclass of DjangoFilterPaginateListField. It is used to create a
+    paginated list of objects with filtering capabilities.
+
+    Parameters:
+    - _type: The GraphQL object type of the objects in the list.
+    - pagination: An optional pagination configuration for the list. If None, only ordering fields will be allowed.
+    - fields: An optional list of fields to include in the object type.
+    - extra_filter_meta: An optional dictionary for extra filter metadata.
+    - filterset_class: An optional filterset class for filtering the queryset.
+
+    Attributes:
+    - filtering_args: A dictionary containing the filtering arguments for the GraphQL field.
+    - pagination: The pagination configuration for the list.
+    - accessor: An optional accessor for custom querysets.
+    - related_name: An optional related name for relationships spanning multiple fields.
+    - reverse_related_name: An optional reverse related name for relationships spanning multiple fields.
+
+    Methods:
+    - list_resolver: The resolver function for the list field. It fetches the objects from the queryset and applies
+    filtering and pagination.
+    """
     def __init__(
         self,
         _type,
@@ -329,6 +411,18 @@ class DjangoPaginatedListObjectField(DjangoFilterPaginateListField):
 
 
 def get_filtering_args_from_non_model_filterset(filterset_class):
+    """
+
+    Get filtering arguments from a non-model filterset class.
+
+    Parameters:
+    - filterset_class (class): The non-model filterset class from which to extract filtering arguments.
+
+    Returns:
+    - args (dict): A dictionary of filtering arguments, where the key is the name of the argument and the value is the
+    corresponding graphene argument type.
+
+    """
     from graphene_django.forms.converter import convert_form_field
 
     args = {}
@@ -341,6 +435,17 @@ def get_filtering_args_from_non_model_filterset(filterset_class):
 
 
 def generate_serializer_field_class(inner_type, serializer_field, non_null=False):
+    """
+
+    Args:
+        inner_type (type): The inner type of the serializer field class.
+        serializer_field (type): The base class of the serializer field.
+        non_null (bool, optional): Whether the field should be non-null or not. Defaults to False.
+
+    Returns:
+        type: The newly generated serializer field class.
+
+    """
     new_serializer_field = type(
         "{}SerializerField".format(inner_type.__name__),
         (serializer_field,),
@@ -354,6 +459,17 @@ def generate_serializer_field_class(inner_type, serializer_field, non_null=False
 
 # Only use this for single object type with direct scaler access.
 def generate_object_field_from_input_type(input_type, skip_fields=[]):
+    """
+    Generates a new map of fields for an input type object.
+
+    Args:
+        input_type (InputObjectType): The input type object.
+        skip_fields (list, optional): List of fields to skip. Defaults to [].
+
+    Returns:
+        dict: A new map of fields for the input type object.
+
+    """
     new_fields_map = {}
     for field_key, field in input_type._meta.fields.items():
         if field_key in skip_fields:
@@ -371,11 +487,34 @@ def generate_object_field_from_input_type(input_type, skip_fields=[]):
 
 # use this for input type with direct scaler fields only.
 def generate_simple_object_type_from_input_type(input_type):
+    """Generate a simple object type from an input type.
+
+    Parameters:
+    - input_type: The input type to generate the object type from.
+
+    Returns:
+    - The newly generated object type.
+
+    """
     new_fields_map = generate_object_field_from_input_type(input_type)
     return type(input_type._meta.name.replace('Input', ''), (graphene.ObjectType,), new_fields_map)
 
 
 def compare_input_output_type_fields(input_type, output_type):
+    """
+    Compares the fields between the input type and the output type.
+
+    Args:
+        input_type (Type): The input type to compare.
+        output_type (Type): The output type to compare against.
+
+    Raises:
+        Exception: If the number of fields in output_type differs from the number of fields in input_type.
+
+    Returns:
+        None
+
+    """
     if len(output_type._meta.fields) != len(input_type._meta.fields):
         for field in input_type._meta.fields.keys():
             if field not in output_type._meta.fields.keys():
@@ -385,9 +524,16 @@ def compare_input_output_type_fields(input_type, output_type):
 
 def convert_serializer_field(field, convert_choices_to_enum=True, force_optional=False):
     """
-    Converts a django rest frameworks field to a graphql field
-    and marks the field as required if we are creating an type
-    and the field itself is required
+    Convert a Django REST Framework serializer field into a corresponding GraphQL field.
+
+    Parameters:
+    - field (Field): The Django REST Framework serializer field to convert.
+    - convert_choices_to_enum (bool): Whether to convert ChoiceField to Enum type (default: True).
+    - force_optional (bool): Whether to force the field to be optional (default: False).
+
+    Returns:
+    - The corresponding GraphQL field.
+
     """
 
     if isinstance(field, serializers.ChoiceField) and not convert_choices_to_enum:
@@ -429,7 +575,14 @@ def convert_serializer_field(field, convert_choices_to_enum=True, force_optional
 
 def convert_serializer_to_type(serializer_class):
     """
-    graphene_django.rest_framework.serializer_converter.convert_serializer_to_type
+    Converts a Django REST Framework serializer class to a GraphQL type class.
+
+    :param serializer_class: The serializer class to convert.
+    :type serializer_class: class
+
+    :return: The converted GraphQL type class.
+    :rtype: class
+
     """
     cached_type = convert_serializer_to_type.cache.get(
         serializer_class.__name__, None
@@ -469,8 +622,28 @@ def fields_for_serializer(
     partial=False,
 ):
     """
-    NOTE: Same as the original definition. Needs overriding to
-    handle relative import of convert_serializer_field
+    Generate a dictionary of fields to be used in a serializer.
+
+    Parameters:
+    - serializer: The serializer object to generate fields from.
+    - only_fields (list): A list of field names to include in the generated fields. If provided, only these fields will
+    be included. Default is an empty list.
+    - exclude_fields (list): A list of field names to exclude from the generated fields. If provided, these fields will
+    be skipped. Default is an empty list.
+    - convert_choices_to_enum (bool): Indicates whether serializer field choices should be converted to enums. Set to
+    True to convert choices to enum values. Default is True.
+    - partial (bool): Indicates whether the serializer is used for partial updates. Set to True if the serializer is
+    used for partial updates. Default is False.
+
+    Returns:
+    - fields (OrderedDict): A dictionary of fields generated from the provided serializer. The keys are field names, and
+    the values are the converted serializer fields.
+
+    Example usage:
+        serializer_class = MySerializer
+        only_fields = ["field1", "field2"]
+        exclude_fields = ["field3"]
+        fields = fields_for_serializer(serializer_class, only_fields, exclude_fields)
     """
     fields = OrderedDict()
     for name, field in serializer.fields.items():
@@ -492,6 +665,24 @@ def generate_type_for_serializer(
     partial=False,
     update_cache=False,
 ) -> typing.Type[graphene.ObjectType]:
+    """
+    Generate a type for a serializer.
+
+    Parameters:
+    - name (str): The name of the type.
+    - serializer_class: The serializer class.
+    - partial (bool, optional): Whether to generate a partial type or not. Defaults to False.
+    - update_cache (bool, optional): Whether to update the type cache or not. Defaults to False.
+
+    Returns:
+    typing.Type[graphene.ObjectType]: The generated type.
+
+    Raises:
+    Exception: If a type with the same name already exists in the cache.
+
+    Note:
+    Custom converters are defined in a mutation, which need to be set first.
+    """
     # NOTE: Custom converter are defined in mutation which needs to be set first.
     import utils.mutation  # noqa:F401
 

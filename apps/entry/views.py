@@ -23,6 +23,30 @@ from utils.db import Array
 
 
 def get_idu_data(filters=None):
+    """
+
+    This method `get_idu_data` takes an optional parameter `filters` and returns a queryset of Figure objects with
+    annotated values.
+
+    Parameters:
+    - `filters` (optional): A dictionary of filters to apply to the queryset. Default value is None.
+
+    Returns:
+    - A queryset of Figure objects with annotated values.
+
+    Example usage:
+
+    filter_param = {
+        'country_name': 'India',
+        'event_start_date__year__gte': 2019,
+        'figure_role': 'Affected',
+    }
+
+    queryset = get_idu_data(filters=filter_param)
+
+    Note: This is a sample usage, and the actual filters you can apply may vary based on the implementation.
+
+    """
     base_query = Figure.objects.annotate(
         displacement_date=Coalesce('end_date', 'start_date'),
     ).filter(
@@ -339,6 +363,18 @@ def get_idu_data(filters=None):
 
 
 class FigureViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A Django viewset for handling read-only operations on Figure objects.
+
+    Attributes:
+        serializer_class (class): The serializer class to use for Figure objects.
+        permission_classes (list): The list of permission classes to use for authentication and authorization of Figure
+        objects.
+
+    Methods:
+        get_queryset(): Retrieves the queryset for Figure objects.
+
+    """
     # TODO Add url for this viewset
     serializer_class = FigureReadOnlySerializer
     permission_classes = [AllowAny]
@@ -348,6 +384,16 @@ class FigureViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class ExternalEndpointBaseCachedViewMixin():
+    """
+    This class represents a mixin that can be used with external endpoint views to add caching functionality.
+
+    Attributes:
+        ENDPOINT_TYPE (str): The type of the external endpoint.
+
+    Methods:
+        get(request): Retrieves data from the external endpoint.
+
+    """
     ENDPOINT_TYPE = None
 
     @client_id
@@ -386,12 +432,58 @@ class ExternalEndpointBaseCachedViewMixin():
 
 
 class IdusFlatCachedView(ExternalEndpointBaseCachedViewMixin, APIView):
+    """
+    Class: IdusFlatCachedView
+
+    This class is a subclass of ExternalEndpointBaseCachedViewMixin and APIView. It represents a view for the Idus flat
+    cached API endpoint.
+
+    Attributes:
+        ENDPOINT_TYPE (str): Specifies the type of the external API as IDUS.
+
+    """
     ENDPOINT_TYPE = ExternalApiDump.ExternalApiType.IDUS
 
 
 class IdusAllFlatCachedView(ExternalEndpointBaseCachedViewMixin, APIView):
+    """
+    Class IdusAllFlatCachedView
+
+    This class is a subclass of ExternalEndpointBaseCachedViewMixin and APIView. It represents a cached view for the
+    Idus All Flat endpoint.
+
+    Attributes:
+    - ENDPOINT_TYPE (ExternalApiDump.ExternalApiType): Constant attribute that represents the type of the endpoint,
+    which is ExternalApiDump.ExternalApiType.IDUS_ALL.
+
+    """
     ENDPOINT_TYPE = ExternalApiDump.ExternalApiType.IDUS_ALL
 
 
 class IdusAllDisasterCachedView(ExternalEndpointBaseCachedViewMixin, APIView):
+    """
+    A class representing a cached view for the IDUS All Disaster external API endpoint.
+
+    Usage:
+        Instantiate an object of this class to handle requests for the IDUS All Disaster endpoint.
+
+    Attributes:
+        ENDPOINT_TYPE (ExternalApiDump.ExternalApiType): The type of the external API endpoint.
+
+    Methods:
+        get(request, *args, **kwargs):
+            Handle GET requests to the IDUS All Disaster endpoint.
+
+        post(request, *args, **kwargs):
+            Handle POST requests to the IDUS All Disaster endpoint.
+
+        put(request, *args, **kwargs):
+            Handle PUT requests to the IDUS All Disaster endpoint.
+
+        patch(request, *args, **kwargs):
+            Handle PATCH requests to the IDUS All Disaster endpoint.
+
+        delete(request, *args, **kwargs):
+            Handle DELETE requests to the IDUS All Disaster endpoint.
+    """
     ENDPOINT_TYPE = ExternalApiDump.ExternalApiType.IDUS_ALL_DISASTER

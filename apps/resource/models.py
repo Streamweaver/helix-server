@@ -11,6 +11,21 @@ from apps.contrib.models import MetaInformationArchiveAbstractModel
 
 
 class ResourceGroup(MetaInformationArchiveAbstractModel):
+    """
+    Represents a group of resources.
+
+    Attributes:
+        name (str): The name of the resource group.
+
+    Methods:
+        is_deletable(): Checks if the resource group is deletable.
+        can_delete(): Checks if the resource group can be deleted and returns a tuple with a boolean and a string.
+        __str__(): Returns a string representation of the resource group.
+        save(): Saves the resource group.
+
+    Inherits from:
+        MetaInformationArchiveAbstractModel
+    """
     name = models.CharField(verbose_name=_('Name'), max_length=256)
 
     def is_deletable(self) -> bool:
@@ -37,6 +52,24 @@ class ResourceGroup(MetaInformationArchiveAbstractModel):
 
 
 class Resource(MetaInformationArchiveAbstractModel):
+    """
+
+    Class Resource
+
+    This class represents a resource and inherits from the MetaInformationArchiveAbstractModel class.
+
+    Attributes:
+    - name (CharField): The name of the resource (256 characters maximum).
+    - url (URLField): The URL of the resource (2000 characters maximum).
+    - group (ForeignKey): The resource group that this resource belongs to.
+    - countries (ManyToManyField): The countries where this resource is available.
+    - last_accessed_on (DateTimeField): The datetime when this resource was last accessed.
+
+    Methods:
+    - __str__(): Returns a string representation of the resource.
+    - save(args, kwargs): Overrides the save method to enforce a maximum number of resources that can be created.
+
+    """
     name = models.CharField(verbose_name=_('Name'), max_length=256)
     url = models.URLField(verbose_name=_('URL'), max_length=2000)
     group = models.ForeignKey('ResourceGroup', verbose_name=_('Resource Group'),

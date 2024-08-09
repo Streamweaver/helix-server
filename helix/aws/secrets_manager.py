@@ -7,6 +7,24 @@ logger = logging.getLogger(__name__)
 
 
 def fetch_db_credentials_from_secret_arn(cluster_secret_arn):
+    """
+    Fetches database credentials from a secret ARN.
+
+    Parameters:
+    - cluster_secret_arn (str): The ARN of the secret containing the database credentials.
+
+    Returns:
+    - dict: A dictionary containing the parsed database credentials.
+
+    Raises:
+    - Exception: If the secret cannot be fetched or parsed.
+
+    Example:
+
+    cluster_secret_arn = 'arn:aws:secretsmanager:us-east-1:1234567890:secret:my-cluster-secret-arn'
+    credentials = fetch_db_credentials_from_secret_arn(cluster_secret_arn)
+    print(credentials)
+    """
     logger.warning(f'Fetching db cluster secret using ARN: {cluster_secret_arn}')
 
     # the passed secret is the aws arn instead

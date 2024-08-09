@@ -12,6 +12,49 @@ from apps.entry.constants import STOCK, FLOW
 
 
 class QueryAbstractModel(models.Model):
+    """
+    This class represents an abstract model for querying data.
+
+    Attributes:
+        filter_figure_geographical_groups (ManyToManyField): A field for selecting geographical groups.
+        filter_figure_regions (ManyToManyField): A field for selecting regions.
+        filter_figure_countries (ManyToManyField): A field for selecting countries.
+        filter_figure_events (ManyToManyField): A field for selecting events.
+        filter_figure_crises (ManyToManyField): A field for selecting crises.
+        filter_figure_categories (ArrayField): An array field for selecting figure categories.
+        filter_figure_sources (ManyToManyField): A field for selecting sources.
+        filter_entry_publishers (ManyToManyField): A field for selecting publishers.
+        filter_figure_start_after (DateField): A field for selecting a start date.
+        filter_figure_end_before (DateField): A field for selecting an end date.
+        filter_figure_roles (ArrayField): An array field for selecting figure roles.
+        filter_figure_tags (ManyToManyField): A field for selecting figure tags.
+        filter_entry_article_title (TextField): A field for selecting an article title.
+        filter_figure_crisis_types (ArrayField): An array field for selecting crisis types.
+        filter_figure_glide_number (ArrayField): An array field for selecting glide numbers.
+        filter_figure_created_by (ManyToManyField): A field for selecting figure creators.
+        filter_figure_approved_by (ManyToManyField): A field for selecting figure approvers.
+        filter_figure_terms (ArrayField): An array field for selecting figure terms.
+        filter_figure_review_status (ArrayField): An array field for selecting figure review statuses.
+        filter_figure_disaster_categories (ManyToManyField): A field for selecting disaster categories.
+        filter_figure_disaster_sub_categories (ManyToManyField): A field for selecting disaster sub categories.
+        filter_figure_disaster_types (ManyToManyField): A field for selecting disaster types.
+        filter_figure_disaster_sub_types (ManyToManyField): A field for selecting disaster sub types.
+        filter_figure_violence_types (ManyToManyField): A field for selecting violence types.
+        filter_figure_violence_sub_types (ManyToManyField): A field for selecting violence sub types.
+        filter_figure_osv_sub_types (ManyToManyField): A field for selecting OSV sub types.
+        filter_figure_category_types (ArrayField): An array field for selecting category types.
+        filter_figure_has_disaggregated_data (BooleanField): A field for selecting if data is disaggregated.
+        filter_figure_context_of_violence (ManyToManyField): A field for selecting context of violence.
+        filter_figure_is_to_be_reviewed (BooleanField): A field for selecting if figure is to be reviewed.
+        filter_figure_has_excerpt_idu (BooleanField): A field for selecting if figure has excerpt IDU.
+        filter_figure_has_housing_destruction (BooleanField): A field for selecting if figure has housing destruction.
+
+    Methods:
+        get_filter_kwargs(): Returns a dictionary of filter arguments.
+        extract_report_figures(): A method for extracting report figures.
+        get_entries(data): A method for getting entries.
+        entries: A property for accessing the entries.
+    """
     filter_figure_geographical_groups = models.ManyToManyField(
         'country.GeographicalGroup',
         verbose_name=_('Geographical Group'),
@@ -242,6 +285,18 @@ class QueryAbstractModel(models.Model):
 
 
 class ExtractionQuery(MetaInformationAbstractModel, QueryAbstractModel):
+    """
+    ExtractionQuery
+
+    This class represents a query for extracting meta information. It inherits from MetaInformationAbstractModel and
+    QueryAbstractModel.
+
+    Attributes:
+        name (django.db.models.CharField): The name of the extraction query.
+
+    Methods:
+        None
+    """
     name = models.CharField(
         verbose_name=_('Name'),
         max_length=128

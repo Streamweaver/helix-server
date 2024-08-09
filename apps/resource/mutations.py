@@ -26,6 +26,24 @@ ResourceUpdateInputType = generate_input_type_for_serializer(
 
 
 class CreateResource(graphene.Mutation):
+    """
+    CreateResource
+
+    A class that represents a GraphQL mutation for creating a resource.
+
+    Attributes:
+        errors (List[CustomErrorType]): A list of custom error types.
+        ok (bool): A boolean indicating if the mutation was successful.
+        result (ResourceType): An instance of the created resource.
+
+    Methods:
+        mutate(root, info, data)
+            A static method that is called to perform the mutation.
+
+    Example Usage:
+        mutation = CreateResource(data=data)
+        mutation.mutate(root, info, data)
+    """
     class Arguments:
         data = ResourceCreateInputType(required=True)
 
@@ -45,6 +63,23 @@ class CreateResource(graphene.Mutation):
 
 
 class UpdateResource(graphene.Mutation):
+    """
+    UpdateResource class
+
+    This class represents a mutation for updating a resource. It inherits from the `graphene.Mutation` class.
+
+    Attributes:
+        Arguments: A nested class representing the arguments for the mutation.
+        - data: An instance of the ResourceUpdateInputType class representing the data for the update.
+
+        errors: A list of CustomErrorType objects representing any errors that occurred during the mutation.
+        ok: A boolean indicating whether the mutation was successful or not.
+        result: An instance of the ResourceType class representing the updated resource.
+
+    Methods:
+        mutate: A static method that performs the mutation operation.
+
+    """
     class Arguments:
         data = ResourceUpdateInputType(required=True)
 
@@ -72,6 +107,26 @@ class UpdateResource(graphene.Mutation):
 
 
 class DeleteResource(graphene.Mutation):
+    """
+        This class represents a GraphQL mutation to delete a resource.
+
+        Args:
+            graphene.Mutation: The base mutation class provided by the Graphene library.
+
+        Attributes:
+            id (graphene.ID): The ID of the resource to be deleted.
+            errors (graphene.List[graphene.NonNull(CustomErrorType)]): List of custom error types.
+            ok (graphene.Boolean): Indicates whether the deletion was successful.
+            result (graphene.Field(ResourceType)): The deleted resource.
+
+        Methods:
+            mutate(root, info, id): Static method that performs the resource deletion.
+
+        Examples:
+            delete_resource = DeleteResource(id="123456")
+            result = delete_resource.mutate(root, info, id)
+
+    """
     class Arguments:
         id = graphene.ID(required=True)
 
@@ -105,6 +160,40 @@ ResourceGroupUpdateInputType = generate_input_type_for_serializer(
 
 
 class CreateResourceGroup(graphene.Mutation):
+    """
+    Class: CreateResourceGroup
+
+    A class representing a GraphQL mutation for creating a resource group.
+
+    Attributes:
+        - Arguments:
+            - data: Required argument of type ResourceGroupCreateInputType
+                - Represents the data needed to create a resource group
+
+        - errors: List of CustomErrorType
+            - Represents any errors that occurred during the mutation
+
+        - ok: Boolean
+            - Indicates the success or failure of the mutation
+
+        - result: Field of type ResourceGroupType
+            - Represents the result of the mutation, i.e., the created resource group
+
+
+    Methods:
+        - mutate(root, info, data)
+            - A static method that is responsible for executing the mutation
+            - Parameters:
+                - root: The root value passed for the mutation (not used in this implementation)
+                - info: GraphQLResolveInfo representing the information about the execution (not used in this
+                implementation)
+                - data: Represents the input data for creating a resource group
+            - Returns:
+                - An instance of CreateResourceGroup with the result field set to the created resource group and errors
+                field set to None, and ok field set to True if the mutation was successful
+                - An instance of CreateResourceGroup with errors field set to a list of errors and ok field set to False
+                if the mutation was not valid
+    """
     class Arguments:
         data = ResourceGroupCreateInputType(required=True)
 
@@ -124,6 +213,23 @@ class CreateResourceGroup(graphene.Mutation):
 
 
 class UpdateResourceGroup(graphene.Mutation):
+    """
+
+    UpdateResourceGroup class
+
+    This class is a mutation class for updating a resource group. It inherits from the `graphene.Mutation` class.
+
+    Attributes:
+        data (ResourceGroupUpdateInputType): Input data for updating the resource group.
+        errors (List[CustomErrorType]): List of errors that occurred during the mutation.
+        ok (Boolean): Indicates whether the mutation was successful or not.
+        result (ResourceGroupType): Updated resource group.
+
+    Methods:
+        mutate(root, info, data)
+            This method is responsible for executing the mutation and updating the resource group.
+
+    """
     class Arguments:
         data = ResourceGroupUpdateInputType(required=True)
 
@@ -151,6 +257,40 @@ class UpdateResourceGroup(graphene.Mutation):
 
 
 class DeleteResourceGroup(graphene.Mutation):
+    """
+    The `DeleteResourceGroup` class is a mutation class in a GraphQL schema that is used to delete a resource group. It
+    takes an `id` argument and deletes the resource group with the corresponding ID.
+
+    Attributes:
+        - `errors`: A list of custom error types.
+        - `ok`: A boolean indicating whether the deletion was successful.
+        - `result`: A field of type `ResourceGroupType` that represents the deleted resource group.
+
+    Methods:
+        - `mutate(root, info, id)`: This is a static method decorated with the `permission_checker` decorator. It is
+        called when the mutation is executed. It takes the `root` object, `info` object, and the `id` argument as
+        parameters. In this method, it tries to retrieve the resource group instance from the database based on the
+        provided ID and the authenticated user. If the resource group does not exist, it returns an error with a message
+        indicating that the resource group does not exist. If the resource group can be deleted, it deletes the instance
+        from the database. Finally, it returns the result of the deletion along with any errors that occurred during the
+        deletion process.
+
+    Usage Example:
+        mutation {
+            deleteResourceGroup(id: "1") {
+                errors {
+                    field
+                    messages
+                }
+                ok
+                result {
+                    id
+                    name
+                    ...
+                }
+            }
+        }
+    """
     class Arguments:
         id = graphene.ID(required=True)
 
@@ -178,6 +318,22 @@ class DeleteResourceGroup(graphene.Mutation):
 
 
 class Mutation:
+    """
+
+    Mutation class
+
+    This class defines the mutations available in the system for creating, updating, and deleting resources and resource
+    groups.
+
+    Attributes:
+        create_resource: Mutation field for creating a resource.
+        update_resource: Mutation field for updating a resource.
+        delete_resource: Mutation field for deleting a resource.
+        create_resource_group: Mutation field for creating a resource group.
+        update_resource_group: Mutation field for updating a resource group.
+        delete_resource_group: Mutation field for deleting a resource group.
+
+    """
     create_resource = CreateResource.Field()
     update_resource = UpdateResource.Field()
     delete_resource = DeleteResource.Field()

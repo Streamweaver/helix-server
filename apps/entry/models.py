@@ -52,6 +52,41 @@ CANNOT_UPDATE_MESSAGE = _('You cannot sign off the entry.')
 
 
 class OSMName(UUIDAbstractModel, models.Model):
+    """
+
+    Class OSMName
+
+    A class representing an OpenStreetMap name.
+
+    Attributes:
+    - uuid (UUID): The unique identifier of the OSMName.
+    - wikipedia (str): The Wikipedia link for the name.
+    - rank (int): The rank of the name.
+    - country (str): The country of the name.
+    - country_code (str): The country code of the name.
+    - street (str): The street of the name.
+    - wiki_data (str): The Wiki data for the name.
+    - osm_id (str): The OSM ID of the name.
+    - osm_type (str): The OSM type of the name.
+    - house_numbers (str): The house numbers of the name.
+    - identifier (OSMName.IDENTIFIER): The identifier of the name.
+    - city (str): The city of the name.
+    - display_name (str): The display name of the name.
+    - lon (float): The longitude of the name.
+    - lat (float): The latitude of the name.
+    - state (str): The state of the name.
+    - bounding_box (List[float]): The bounding box of the name.
+    - type (str): The type of the name.
+    - importance (float): The importance of the name.
+    - class_name (str): The class of the name.
+    - name (str): The name.
+    - name_suffix (str): The name suffix.
+    - place_rank (int): The place rank of the name.
+    - alternative_names (str): The alternative names of the name.
+    - accuracy (OSMName.OSM_ACCURACY): The accuracy of the name.
+    - moved (bool): Indicates if the name has been moved.
+
+    """
     class OSM_ACCURACY(enum.Enum):
         ADM0 = 0
         ADM1 = 1
@@ -136,6 +171,38 @@ class OSMName(UUIDAbstractModel, models.Model):
 
 
 class FigureDisaggregationAbstractModel(models.Model):
+    """
+    Class: FigureDisaggregationAbstractModel
+
+    This class is an abstract model that defines the disaggregation information for various categories.
+
+    Attributes:
+        - disaggregation_displacement_urban (PositiveIntegerField): Represents the number of individuals displaced in
+        urban areas.
+        - disaggregation_displacement_rural (PositiveIntegerField): Represents the number of individuals displaced in
+        rural areas.
+        - disaggregation_location_camp (PositiveIntegerField): Represents the number of individuals located in camps.
+        - disaggregation_location_non_camp (PositiveIntegerField): Represents the number of individuals located in
+        non-camp areas.
+        - disaggregation_lgbtiq (PositiveIntegerField): Represents the number of individuals who identify as LGBTIQ+.
+        - disaggregation_disability (PositiveIntegerField): Represents the number of individuals with disabilities.
+        - disaggregation_indigenous_people (PositiveIntegerField): Represents the number of indigenous people.
+        - disaggregation_sex_male (PositiveIntegerField): Represents the number of male individuals.
+        - disaggregation_sex_female (PositiveIntegerField): Represents the number of female individuals.
+        - disaggregation_age (ManyToManyField): Represents the disaggregated age groups.
+        - disaggregation_strata_json (ArrayField): Represents the JSON array of stratum disaggregation.
+        - disaggregation_conflict (PositiveIntegerField): Represents the number of individuals affected by conflict.
+        - disaggregation_conflict_political (PositiveIntegerField): Represents the number of individuals affected by
+        political violence.
+        - disaggregation_conflict_criminal (PositiveIntegerField): Represents the number of individuals affected by
+        criminal violence.
+        - disaggregation_conflict_communal (PositiveIntegerField): Represents the number of individuals affected by
+        communal violence.
+        - disaggregation_conflict_other (PositiveIntegerField): Represents the number of individuals affected by other
+        conflicts.
+
+    Meta:
+        abstract ("""
     # disaggregation information
     disaggregation_displacement_urban = models.PositiveIntegerField(
         verbose_name=_('Displacement/Urban'),
@@ -226,6 +293,21 @@ class FigureDisaggregationAbstractModel(models.Model):
 
 
 class DisaggregatedAge(models.Model):
+    """
+
+    DisaggregatedAge model represents the disaggregated age data.
+
+    Attributes:
+        - sex: A choice field representing the gender (male, female, other).
+        - uuid: A UUID field representing the unique identifier for the DisaggregatedAge instance.
+        - value: An integer field representing the value associated with the DisaggregatedAge instance.
+        - age_from: An integer field representing the starting age for the DisaggregatedAge instance.
+        - age_to: An integer field representing the ending age for the DisaggregatedAge instance.
+
+    Methods:
+        - __str__(self): Returns the string representation of the DisaggregatedAge instance.
+
+    """
     sex = enum.EnumField(enum=GENDER_TYPE, verbose_name=_('Sex'))
     uuid = models.UUIDField(verbose_name='UUID', blank=True, default=uuid4)
     value = models.PositiveIntegerField(blank=True, null=True, verbose_name=_('Value'))
@@ -240,6 +322,40 @@ class Figure(MetaInformationArchiveAbstractModel,
              UUIDAbstractModel,
              FigureDisaggregationAbstractModel,
              models.Model):
+    """
+    :class: `Figure` class represents a figure related to a particular entry in the database.
+
+    It inherits from the following classes:
+        - `MetaInformationArchiveAbstractModel`
+        - `UUIDAbstractModel`
+        - `FigureDisaggregationAbstractModel`
+        - `models.Model`
+
+    Attributes:
+        - `QUANTIFIER` (enum.Enum): Enumeration of quantifier options.
+            - `MORE_THAN_OR_EQUAL`: Represents "More than or equal to".
+            - `LESS_THAN_OR_EQUAL`: Represents "Less than or equal to".
+            - `EXACT`: Represents "Exact".
+            - `APPROXIMATELY`: Represents "Approximately".
+        - `UNIT` (enum.Enum): Enumeration of unit options.
+            - `PERSON`: Represents "Person".
+            - `HOUSEHOLD`: Represents "Household".
+        - `ROLE` (enum.Enum): Enumeration of role options.
+            - `RECOMMENDED`: Represents "Recommended figure".
+            - `TRIANGULATION`: Represents "Triangulation".
+        - `DISPLACEMENT_OCCURRED` (enum.Enum): Enumeration of displacement occurred options.
+            - `BEFORE`: Represents "Before".
+            - `DURING`: Represents "During".
+            - `AFTER`: Represents "After".
+            - `UNKNOWN`: Represents "Unknown".
+        - `SOURCES_RELIABILITY` (enum.Enum): Enumeration of sources reliability options.
+            - `LOW`: Represents "Low".
+            - `MEDIUM`: Represents "Medium".
+            - `HIGH`: Represents "High".
+            - `LOW_TO_HIGH`: Represents "Low to high".
+            - `LOW_TO_MEDIUM`: Represents "Low to medium".
+            - `MEDIUM_TO_HIGH`: Represents "Medium to high".
+       """
     from apps.crisis.models import Crisis
 
     class QUANTIFIER(enum.Enum):
@@ -1215,6 +1331,27 @@ class Figure(MetaInformationArchiveAbstractModel,
 
 
 class FigureTag(MetaInformationAbstractModel):
+    """
+    Class: FigureTag
+
+    This class represents a figure tag. It inherits from the MetaInformationAbstractModel.
+
+    Attributes:
+    - name: CharField - The name of the figure tag.
+
+    Methods:
+    - get_excel_sheets_data(cls, user_id, filters):
+        Retrieves excel sheets data for the figure tags based on the provided user ID and filters.
+        Args:
+            - user_id: int - The ID of the user.
+            - filters: dict - Filters to be applied.
+        Returns:
+            dict: A dictionary containing the following keys:
+               - headers: OrderedDict - The headers for the excel sheet data.
+               - data: QuerySet - The filtered data for the excel sheet.
+               - formulae: None - Placeholder for formulas.
+               - transformer: None - Placeholder for transformers.
+    """
     name = models.CharField(verbose_name=_('Name'), max_length=256)
 
     @classmethod
@@ -1247,6 +1384,35 @@ class FigureTag(MetaInformationAbstractModel):
 
 
 class EntryReviewer(MetaInformationAbstractModel, models.Model):
+    """
+
+    Class: EntryReviewer
+
+    This class represents the relationship between an Entry and a Reviewer. It stores information about the review
+    status of an Entry by a specific Reviewer.
+
+    Attributes:
+    - entry: ForeignKey field representing the related Entry.
+    - reviewer: ForeignKey field representing the related Reviewer.
+    - status: EnumField representing the review status.
+
+    Methods:
+    - __str__(self): Returns a string representation of the EntryReviewer object.
+    - assign_creator(cls, entry: 'Entry', user: 'User') -> None: Class method that assigns a creator to the Entry if it
+    doesn't have one already.
+    - update_status(self, status: REVIEW_STATUS) -> None: Updates the review status of the EntryReviewer object.
+
+    Exceptions:
+    - CannotUpdateStatusException: Custom exception raised when trying to update the status to SIGNED_OFF without the
+    necessary permissions.
+
+    Note:
+    - The REVIEW_STATUS enum provides predefined values for the review status.
+    - The __labels__ attribute of the REVIEW_STATUS enum provides localized labels for each value of the enum.
+    - The exception message is stored in the CannotUpdateStatusException.message attribute.
+    - The REVIEW_STATUS enum values have significance and are used for comparison in other parts of the code.
+
+    """
     class CannotUpdateStatusException(Exception):
         message = CANNOT_UPDATE_MESSAGE
 
@@ -1289,6 +1455,23 @@ class EntryReviewer(MetaInformationAbstractModel, models.Model):
 
 
 class Entry(MetaInformationArchiveAbstractModel, models.Model):
+    """
+    The `Entry` class represents an entry in the MetaInformationArchive.
+
+    Attributes:
+        FIGURES_PER_ENTRY (int): The number of figures per entry.
+
+    Methods:
+        _total_figure_disaggregation_subquery(cls, figures=None): Returns a subquery that calculates the total figures
+        for the entry.
+        get_excel_sheets_data(cls, user_id, filters): Returns data for excel sheets.
+        is_under_review(self): Returns True if the entry is under review, False otherwise.
+        is_reviewed(self): Returns True if the entry has been reviewed, False otherwise.
+        is_signed_off(self): Returns True if the entry has been signed off, False otherwise.
+        latest_reviews(self): Returns the latest reviews for the entry.
+        source_methodology(self) -> str: Returns the source methodology for the entry.
+        clean_url_and_document(values: dict, instance=None) -> OrderedDict: Cleans the URL and document values.
+    """
     FIGURES_PER_ENTRY = FIGURE_NUMBER
 
     # NOTE figure disaggregation variable definitions
@@ -1524,6 +1707,22 @@ class Entry(MetaInformationArchiveAbstractModel, models.Model):
 
 
 def dump_file_upload_to(instance, filename):
+    """
+    Dump a file upload to a specific location.
+
+    Parameters:
+        instance (object): The instance of the file upload.
+        filename (str): The name of the file to be dumped.
+
+    Returns:
+        str: The path where the file upload is dumped.
+
+    Example:
+        instance = FileUpload()
+        filename = "example.pdf"
+        dump_file_upload_to(instance, filename)
+        # Returns: 'api-dump/{api_type}/{date_str}/{random_chars}/{filename}'
+    """
     date_str = timezone.now().strftime('%Y-%m-%d-%H-%M-%S')
     api_type = instance.api_type
     random_chars = get_random_string(length=5)
@@ -1535,7 +1734,18 @@ IDMC_WEBSITE_CLIENT_CODE = 'IDMCWSHSOLO009'
 
 
 class ExternalApiDump(models.Model):
+    """
+    ExternalApiDump class is a model class that represents different types of external API endpoints and their metadata.
 
+    Attributes:
+        ExternalApiType (TextChoices): An enumeration of different external API types.
+        Status (IntegerChoices): An enumeration of different status codes for API calls.
+        API_TYPE_METADATA (Dict): A dictionary that maps each ExternalApiType to its corresponding Metadata.
+
+    Methods:
+        None
+
+    """
     class ExternalApiType(models.TextChoices):
         # There might be other external endpoints
         IDUS = 'idus', _('/external-api/idus/last-180-days/')

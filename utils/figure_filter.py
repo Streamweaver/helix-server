@@ -20,6 +20,9 @@ from apps.extraction.filters import (
 
 
 class FigureFilterHelper:
+    """
+
+    """
     @staticmethod
     def get_report_id_from_filter_data(aggregate_figures_filter: typing.Optional[dict]) -> typing.Optional[int]:
         return (
@@ -82,6 +85,16 @@ class FigureFilterHelper:
 
 # -- Filters
 class FigureAggregateFilter(django_filters.FilterSet):
+    """
+    A filter set class for aggregating figures.
+
+    This class extends the `FilterSet` class from the `django_filters` package and
+    provides a filter for figures.
+
+    Attributes:
+        filter_figures (SimpleInputFilter): A filter for figures based on the
+            `FigureExtractionFilterDataInputType` input type.
+    """
     filter_figures = SimpleInputFilter(FigureExtractionFilterDataInputType, method='noop')
 
     def noop(self, qs, *_):
@@ -89,6 +102,15 @@ class FigureAggregateFilter(django_filters.FilterSet):
 
 
 class CountryFigureAggregateFilter(FigureAggregateFilter):
+    """
+    A class that represents a filter for country figure aggregates.
+
+    :class: `CountryFigureAggregateFilter` inherits from `FigureAggregateFilter` class.
+
+    Attributes:
+        year (int): The year to filter the figures by.
+
+    """
     year = django_filters.NumberFilter(method='noop')
 
 

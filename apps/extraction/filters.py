@@ -26,6 +26,27 @@ FEMALE = GENDER_TYPE.FEMALE.name
 
 
 class EntryExtractionFilterSet(df.FilterSet):
+    """
+    EntryExtractionFilterSet is a subclass of df.FilterSet.
+
+    Attributes:
+        filter_figure_events: An IDListFilter object used for filtering entries based on event IDs.
+        filter_figure_crises: An IDListFilter object used for filtering entries based on crisis IDs.
+        filter_figure_sources: An IDListFilter object used for filtering entries based on source IDs.
+        filter_entry_publishers: An IDListFilter object used for filtering entries based on publisher IDs.
+        filter_entry_article_title: A CharFilter object used for filtering entries based on article titles.
+        filter_figure_created_by: An IDListFilter object used for filtering entries based on creator IDs.
+        filter_figure_regions: An IDListFilter object used for filtering entries based on region IDs.
+        filter_figure_geographical_groups: An IDListFilter object used for filtering entries based on geographical group
+        IDs.
+        filter_figure_countries: An IDListFilter object used for filtering entries based on country IDs.
+        filter_figure_category_types: A StringListFilter object used for filtering entries based on category types.
+        filter_figure_categories: A StringListFilter object used for filtering entries based on category names.
+        filter_figure_start_after: A DateFilter object used for filtering entries based on start date.
+        filter_figure_end_before: A DateFilter object used for filtering entries based on end date.
+        filter_figure_roles: A StringListFilter object used for filtering entries based on figure roles.
+        filter_figure_tags: An IDListFilter object used for filtering entries based on tag IDs.
+        filter_figure_terms: An IDListFilter object used for filtering entries based"""
     # NOTE: these filter names exactly match the extraction query model field names
     filter_figure_events = IDListFilter(method='filter_figure_events_')
 
@@ -321,6 +342,32 @@ class EntryExtractionFilterSet(df.FilterSet):
 
 
 class BaseFigureExtractionFilterSet(df.FilterSet):
+    """
+
+    BaseFigureExtractionFilterSet
+
+    This class extends the df.FilterSet class and provides a set of filters for extracting figures. These filters are
+    used to query the Figure model.
+
+    Attributes:
+    filter_figure_regions: Filter for filtering figures based on geographical regions (IDListFilter)
+    filter_figure_geographical_groups: Filter for filtering figures based on geographical groups (IDListFilter)
+    filter_figure_countries: Filter for filtering figures based on countries (IDListFilter)
+    filter_figure_events: Filter for filtering figures based on events (IDListFilter)
+    filter_figure_crises: Filter for filtering figures based on crises (IDListFilter)
+    filter_figure_sources: Filter for filtering figures based on sources (IDListFilter)
+    filter_entry_publishers: Filter for filtering figures based on publishers (IDListFilter)
+    filter_figure_category_types: Filter for filtering figures based on category types (StringListFilter)
+    filter_figure_categories: Filter for filtering figures based on categories (StringListFilter)
+    filter_figure_start_after: Filter for filtering figures based on start date (DateFilter)
+    filter_figure_end_before: Filter for filtering figures based on end date (DateFilter)
+    filter_figure_roles: Filter for filtering figures based on roles (StringListFilter)
+    filter_entry_article_title: Filter for filtering figures based on article title (CharFilter)
+    filter_figure_tags: Filter for filtering figures based on tags (IDListFilter)
+    filter_figure_crisis_types: Filter for filtering figures based on crisis types (StringListFilter)
+    filter_figure_created_by: Filter for filtering figures based on created by (IDListFilter)
+    filter_figure_terms: Filter for filtering figures based on terms (IDListFilter)
+    filter_figure_disaster_categories: Filter for filtering figures based on"""
     # NOTE: these filter names exactly match the extraction query model field names
     filter_figure_regions = IDListFilter(method='filter_regions')
     filter_figure_geographical_groups = IDListFilter(method='filter_geographical_groups')
@@ -605,8 +652,29 @@ class BaseFigureExtractionFilterSet(df.FilterSet):
 
 class FigureExtractionFilterSet(BaseFigureExtractionFilterSet):
     """
-    NOTE: Return queryset as it is, don't apply filter here,
-    filter is handled in qs method
+
+    Class: FigureExtractionFilterSet
+
+    This class is a subclass of BaseFigureExtractionFilterSet. It represents a filter set for extracting figures.
+
+    Attributes:
+    - filter_figure_start_after (df.DateFilter): A DateFilter object representing the filter for figures starting after
+    a specific date.
+    - filter_figure_end_before (df.DateFilter): A DateFilter object representing the filter for figures ending before a
+    specific date.
+
+    Methods:
+    - noop(self, qs, *args): This method takes a queryset (qs) and additional arguments (*args) and returns the same
+    queryset without any modifications.
+
+    Properties:
+    - qs: This property returns the combined queryset of filtered figures for both stock and flow. It first calls the qs
+    property of the superclass, then annotates the queryset with stock and flow dates and geolocations. It also
+    annotates the queryset with sources reliability. Finally, it applies the filters for figure start date and figure
+    end date to the queryset using the Figure.filtered_nd_figures_for_listing and
+    Figure.filtered_idp_figures_for_listing methods. The result is the combined queryset of filtered figures for both
+    stock and flow.
+
     """
     filter_figure_start_after = df.DateFilter(method='noop')
     filter_figure_end_before = df.DateFilter(method='noop')
@@ -635,10 +703,25 @@ class FigureExtractionFilterSet(BaseFigureExtractionFilterSet):
 
 class ReportFigureExtractionFilterSet(BaseFigureExtractionFilterSet):
     """
-    NOTE: Return queryset as it is, don't apply filter here,
-    filter is handled in qs method
+    Class: ReportFigureExtractionFilterSet
 
-    NOTE: In report figures we have to pass end date as reference point
+    This class is a subclass of BaseFigureExtractionFilterSet and is used for filtering figure extraction reports.
+
+    Attributes:
+    - filter_figure_start_after: A DateFilter object used for filtering the start date of the figures in the report.
+    - filter_figure_end_before: A DateFilter object used for filtering the end date of the figures in the report.
+
+    Methods:
+    - noop(qs, *args): A method that returns the passed queryset as is without any modifications.
+
+    Properties:
+    - qs: A property that returns the filtered queryset based on the start and end dates provided.
+
+    Example Usage:
+        filter_set = ReportFigureExtractionFilterSet()
+        filter_set.filter_figure_start_after = DateFilter()
+        filter_set.filter_figure_end_before = DateFilter()
+        figures = filter_set.qs
     """
     filter_figure_start_after = df.DateFilter(method='noop')
     filter_figure_end_before = df.DateFilter(method='noop')
@@ -662,6 +745,38 @@ class ReportFigureExtractionFilterSet(BaseFigureExtractionFilterSet):
 
 
 class FigureExtractionBulkOperationFilterSet(ReportFigureExtractionFilterSet):
+    """
+
+    Class: FigureExtractionBulkOperationFilterSet
+
+    This class is a filter set that extends the ReportFigureExtractionFilterSet class.
+    It provides filters for the figure IDs to include or exclude from the queryset.
+
+    Attributes:
+    - filter_figure_ids: An IDListFilter object used for filtering the queryset based on included figure IDs.
+    - filter_figure_exclude_ids: An IDListFilter object used for filtering the queryset based on excluded figure IDs.
+
+    Methods:
+    - filter_ids(qs, _, value): This method applies the filter to include figures with specified IDs in the queryset.
+      Parameters:
+        - qs (QuerySet): The original queryset to be filtered.
+        - _ (str): Unused parameter (django-filter convention).
+        - value (list): The list of figure IDs to include.
+      Returns:
+        - QuerySet: The filtered queryset with only the figures whose IDs are included in the value list.
+
+    - filter_exclude_ids(qs, _, value): This method applies the filter to exclude figures with specified IDs from the
+    queryset.
+      Parameters:
+        - qs (QuerySet): The original queryset to be filtered.
+        - _ (str): Unused parameter (django-filter convention).
+        - value (list): The list of figure IDs to exclude.
+      Returns:
+        - QuerySet: The filtered queryset with all figures except those whose IDs are in the value list.
+
+    Note: This class inherits other attributes and methods from the ReportFigureExtractionFilterSet class.
+
+    """
     filter_figure_ids = IDListFilter(method='filter_ids')
     filter_figure_exclude_ids = IDListFilter(method='filter_exclude_ids')
 
@@ -677,6 +792,26 @@ class FigureExtractionBulkOperationFilterSet(ReportFigureExtractionFilterSet):
 
 
 class ExtractionQueryFilter(df.FilterSet):
+    """
+    ExtractionQueryFilter class is a subclass of df.FilterSet.
+
+    This class is used to filter ExtractionQuery objects based on specified fields and values.
+
+    Attributes:
+        Meta: A nested class which specifies the model to be filtered (ExtractionQuery)
+              and the fields to be used for filtering.
+
+    Methods:
+        qs: A property method that returns a filtered queryset based on the specified fields and values.
+            The method filters the queryset based on the 'created_by' field if the request user is authenticated,
+            otherwise it returns an empty queryset.
+
+    Example usage:
+        filter = ExtractionQueryFilter(request=request)  # Create an instance of ExtractionQueryFilter
+        queryset = filter.qs  # Apply the filter and get the filtered queryset
+
+    Note: This class requires the django-filter library (df) to be installed.
+    """
     class Meta:
         model = ExtractionQuery
         fields = {

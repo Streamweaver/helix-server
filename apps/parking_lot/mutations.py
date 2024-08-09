@@ -32,6 +32,31 @@ ParkedItemFilterDataType, ParkedItemFilterDataInputType = generate_type_for_filt
 
 
 class CreateParkedItem(graphene.Mutation):
+    """
+    A mutation class for creating a new ParkedItem.
+
+    ...
+
+    Attributes
+    ----------
+    Arguments : class
+        The Arguments class for the mutation, containing the required 'data' argument.
+
+    errors : list
+        A list of CustomErrorType objects. Represents any errors that occurred during the mutation.
+
+    ok : bool
+        A boolean value indicating the success or failure of the mutation.
+
+    result : ParkedItemType
+        The ParkedItemType object representing the newly created ParkedItem.
+
+    Methods
+    -------
+    mutate(root, info, data):
+        Mutates the data and creates a new ParkedItem. Returns the appropriate CreateParkedItem object.
+
+    """
     class Arguments:
         data = ParkedItemCreateInputType(required=True)
 
@@ -50,6 +75,23 @@ class CreateParkedItem(graphene.Mutation):
 
 
 class UpdateParkedItem(graphene.Mutation):
+    """Class to update a ParkedItem
+
+    Returns an instance of UpdateParkedItem with updated data.
+
+    Args:
+        graphene.Mutation: The parent class of UpdateParkedItem.
+
+    Attributes:
+        Arguments: The class that defines the arguments for the mutation.
+        errors (graphene.List(graphene.NonNull(CustomErrorType))): A list of errors, if any.
+        ok (graphene.Boolean): A boolean indicating if the mutation was successful.
+        result (graphene.Field(ParkedItemType)): The updated ParkedItem instance.
+
+    Methods:
+        mutate(root, info, data): Static method to perform the mutation.
+
+    """
     class Arguments:
         data = ParkedItemUpdateInputType(required=True)
 
@@ -75,6 +117,26 @@ class UpdateParkedItem(graphene.Mutation):
 
 
 class DeleteParkedItem(graphene.Mutation):
+    """
+    DeleteParkedItem Class
+
+    This class is responsible for deleting a parked item from the database.
+
+    Attributes:
+        - Arguments: A nested class that defines the input arguments for deleting the parked item.
+          - id (graphene.ID): The ID of the parked item to be deleted.
+
+        - errors (graphene.List[graphene.NonNull[CustomErrorType]]): A list of custom error messages.
+        - ok (graphene.Boolean): A flag indicating if the deletion was successful.
+        - result (graphene.Field[ParkedItemType]): The deleted parked item.
+
+    Methods:
+        - mutate: A static method that performs the deletion of the parked item.
+
+    Example Usage:
+        TODO: Add example usage here.
+
+    """
     class Arguments:
         id = graphene.ID(required=True)
 
@@ -100,12 +162,35 @@ class DeleteParkedItem(graphene.Mutation):
 
 
 class ExportParkedItem(ExportBaseMutation):
+    """
+    Class representing an export of parked items.
+
+    This class is a subclass of ExportBaseMutation and provides additional functionality specific to exporting parked
+    items.
+
+    Attributes:
+        DOWNLOAD_TYPE (str): The type of download, which is set to "PARKING_LOT" for parked items.
+
+    Args:
+        filters (ParkedItemFilterDataInputType): The input data type for filtering parked items. Required argument.
+
+    """
     class Arguments(ExportBaseMutation.Arguments):
         filters = ParkedItemFilterDataInputType(required=True)
     DOWNLOAD_TYPE = ExcelDownload.DOWNLOAD_TYPES.PARKING_LOT
 
 
 class Mutation(object):
+    """
+    The `Mutation` class represents a collection of mutation fields for managing parked items.
+
+    Attributes:
+        create_parked_item (Field): Field for creating a new parked item.
+        update_parked_item (Field): Field for updating an existing parked item.
+        delete_parked_item (Field): Field for deleting a parked item.
+        export_parked_item (Field): Field for exporting a parked item.
+
+    """
     create_parked_item = CreateParkedItem.Field()
     update_parked_item = UpdateParkedItem.Field()
     delete_parked_item = DeleteParkedItem.Field()

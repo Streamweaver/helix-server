@@ -6,6 +6,14 @@ import requests
 
 
 class MissingCaptchaException(Exception):
+    """Exception raised when a captcha value is missing.
+
+    This exception is raised when a captcha value is missing in a form submission or any other scenario where a captcha
+    is required.
+
+    Attributes:
+        None
+    """
     pass
 
 
@@ -16,8 +24,26 @@ def is_child_parent_dates_valid(
     p_name
 ) -> OrderedDict:
     """
-    c = child
-    p = parent
+
+    Check if the child-parent dates are valid.
+
+    :param c_start_date: Start date of the child.
+    :param c_end_date: End date of the child.
+    :param p_start_date: Start date of the parent.
+    :param p_name: Name of the parent.
+
+    :return: An OrderedDict of errors, if any.
+
+    The function first checks if the child start date, child end date, and parent start date are provided and if the
+    child start date is later than the child end date. If so, it adds errors for both the start date and end date,
+    indicating that the start date should be earlier than the end date.
+
+    If the child start date and parent start date are provided and if the parent start date is later than the child
+    start date, it adds an error for the start date, indicating that the child start date should be after the parent
+    start date.
+
+    Otherwise, it returns an empty OrderedDict, indicating that there are no errors.
+
     """
     errors = OrderedDict()
 
@@ -34,9 +60,22 @@ def is_child_parent_dates_valid(
 
 
 def is_child_parent_inclusion_valid(data, instance, field, parent_field) -> OrderedDict:
-    '''
-    parent_field= '.' separated field, so that nested fields can be extracted
-    '''
+    """
+
+    Check if the child-parent inclusion is valid for a given field.
+
+    :param data: The data from the request.
+    :type data: dict
+    :param instance: The instance of the model.
+    :type instance: object
+    :param field: The field to check.
+    :type field: str
+    :param parent_field: The parent field to check against.
+    :type parent_field: str
+    :return: The errors encountered during validation.
+    :rtype: OrderedDict
+
+    """
     errors = OrderedDict()
     value = data.get(field)
     if not value and instance:
@@ -66,6 +105,20 @@ def is_child_parent_inclusion_valid(data, instance, field, parent_field) -> Orde
 
 
 def validate_hcaptcha(captcha, site_key):
+    """
+
+        Validate hCaptcha
+
+        Validates a user's response to an hCaptcha challenge by making a request to the hCaptcha verification endpoint.
+
+        :param captcha: The user's response to the hCaptcha challenge.
+        :type captcha: str
+        :param site_key: The site key for the hCaptcha widget.
+        :type site_key: str
+        :return: True if the user's response is valid, False otherwise.
+        :rtype: bool
+
+    """
     CAPTCHA_VERIFY_URL = 'https://hcaptcha.com/siteverify'
     SECRET_KEY = settings.HCAPTCHA_SECRET
 

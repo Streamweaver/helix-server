@@ -28,6 +28,46 @@ from django.db.models.fields import BooleanField, CharField, DateField, TextFiel
 
 
 def check_is_pfa_visible_in_gidd(report):
+    """
+
+    This method, check_is_pfa_visible_in_gidd, is used to check if a report meets certain criteria that determine its
+    visibility in the GIDD (Global Internal Displacement Database) interface.
+
+    Parameters:
+    - report: A Report object that represents the report to be checked.
+
+    Returns:
+    - errors: A list containing any error messages encountered during the checking process. If the list is empty, it
+    means the report is visible in GIDD.
+
+    The method performs the following checks:
+    1. If the report parameter is not provided, it appends the error message 'Report does not exist.' to the errors
+    list.
+    2. It checks if the report has start and end dates specified. If not, it appends the error message 'Start date and
+    end date are required.' to the errors list.
+    3. If the start and end dates are specified, it checks if the report spans for the full year. If not, it appends the
+    error message 'The report should span for the full year.' to the errors list.
+    4. It checks if the report is marked as public. If not, it appends the error message 'Report should be public.' to
+    the errors list.
+    5. It checks if the report has exactly one country specified. If not, it appends the error message 'Report should
+    have exactly one country.' to the errors list.
+    6. It checks if the report has either the conflict or disaster crisis type specified. If not, it appends the error
+    message 'Report should have conflict or disaster crisis type.' to the errors list.
+    7. It checks if the report has either the IDPs or Internal Displacements category specified. If not, it appends the
+    error message 'Report should have IDPs or Internal Displacements category.' to the errors list.
+
+    Example usage:
+
+    report = Report(...)
+    errors = check_is_pfa_visible_in_gidd(report)
+    if errors:
+        # Handle the errors
+        ...
+    else:
+        # The report is visible in GIDD
+        ...
+
+    """
     errors = []
     if not report:
         errors.append('Report does not exist.')
@@ -78,7 +118,9 @@ def check_is_pfa_visible_in_gidd(report):
 
 class ReportSerializer(MetaInformationSerializerMixin,
                        serializers.ModelSerializer):
-
+    """
+    ReportSerializer class
+    """
     gidd_report_year = serializers.IntegerField(
         allow_null=True,
         required=False,
@@ -187,11 +229,33 @@ class ReportSerializer(MetaInformationSerializerMixin,
 
 
 class ReportUpdateSerializer(UpdateSerializerMixin, ReportSerializer):
+    """
+    A class that serializes and deserializes the data for updating a report.
+
+    Inherits from UpdateSerializerMixin and ReportSerializer.
+
+    Attributes:
+        id (IntegerField): The ID of the report being updated. It is required.
+
+    """
     id = IntegerIDField(required=True)
 
 
 class ReportCommentSerializer(MetaInformationSerializerMixin,
                               serializers.ModelSerializer):
+    """
+    Serializer for ReportComment model.
+
+    This serializer is used to serialize and deserialize ReportComment instances.
+
+    Attributes:
+        model: Class attribute indicating the model class that is being serialized/deserialized.
+        fields: Class attribute indicating the fields that are included in the serialization.
+
+    Methods:
+        validate_body(body): Validates the body field of the report comment.
+
+    """
     class Meta:
         model = ReportComment
         fields = '__all__'
@@ -203,6 +267,21 @@ class ReportCommentSerializer(MetaInformationSerializerMixin,
 
 
 class ReportSignoffSerializer(serializers.Serializer):
+    """Serializer for signing off a report.
+
+    This serializer is used to validate the data for signing off a report and perform the necessary actions for saving
+    the sign off status.
+
+    Attributes:
+        report (serializers.IntegerField): The ID of the report to sign off.
+        include_history (serializers.BooleanField): Optional field indicating whether to include the sign off history in
+        the report.
+
+    Methods:
+        validate_report(report): Validates the report ID and checks if there is anything to sign off.
+        save(): Performs the sign off action and returns the updated report.
+
+    """
     report = serializers.IntegerField(required=True)
     include_history = serializers.BooleanField(required=False)
 
@@ -226,6 +305,31 @@ class ReportSignoffSerializer(serializers.Serializer):
 
 class ReportGenerationSerializer(MetaInformationSerializerMixin,
                                  serializers.ModelSerializer):
+    """
+
+    The `ReportGenerationSerializer` class is responsible for serializing and deserializing `ReportGeneration` objects.
+
+    Parameters:
+    - `MetaInformationSerializerMixin`: A mixin class that provides additional serialization and deserialization
+    functionality.
+    - `serializers.ModelSerializer`: A base class for creating serializer classes.
+
+    Attributes:
+    - `Meta`: A nested class that contains metadata for the serializer, including the `model` and `fields` to be
+    serialized.
+
+    Methods:
+    - `validate_report(report)`: A method used for validating the `report` field of a serialized `ReportGeneration`
+    object.
+
+    Returns:
+    - `report`: The validated `report` field.
+
+    Exceptions:
+    - `serializers.ValidationError`: Raised if the maximum page size for report generation has been reached or if there
+    is an existing unsigned report.
+
+    """
     class Meta:
         model = ReportGeneration
         fields = ['report']
@@ -248,6 +352,21 @@ class ReportGenerationSerializer(MetaInformationSerializerMixin,
 
 
 class ReportApproveSerializer(serializers.Serializer):
+    """
+
+    ReportApproveSerializer
+
+    Serializer class for approving a report.
+
+    Attributes:
+        report (serializers.IntegerField): Field to store the report ID that is being approved.
+        is_approved (serializers.BooleanField): Field to store the approval status of the report.
+
+    Methods:
+        validate_report(report): Custom validation method to check if the report is valid for approval.
+        save(): Method to save the approval status of the report.
+
+    """
     report = serializers.IntegerField(required=True)
     is_approved = serializers.BooleanField(required=False)
 

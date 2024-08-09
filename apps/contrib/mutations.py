@@ -30,11 +30,42 @@ BulkApiOperationInputType = generate_input_type_for_serializer(
 
 
 class AttachmentCreateInputType(graphene.InputObjectType):
+    """
+
+    Class: AttachmentCreateInputType
+
+    Description:
+    This class represents the input type for creating a new attachment.
+
+    Attributes:
+    - attachment (required): The attachment file.
+    - attachment_for (required): The identifier for the attachment's target object.
+
+    """
     attachment = Upload(required=True)
     attachment_for = graphene.String(required=True)
 
 
 class CreateAttachment(graphene.Mutation):
+    """CreateAttachment Class
+
+    This class represents a mutation to create an attachment. It is used to create an attachment by
+    taking input data, validating it, and saving the instance in the database.
+
+    Attributes:
+        errors: A list of custom error types.
+        ok: A boolean indicating whether the mutation was successful or not.
+        result: The field representing the created attachment.
+
+    Methods:
+        mutate: A static method that performs the mutation by validating and saving the input data.
+
+    Usage:
+        mutation = CreateAttachment.mutate(root, info, data)
+        result = mutation.result
+        errors = mutation.errors
+        ok = mutation.ok
+    """
     class Arguments:
         data = AttachmentCreateInputType(required=True)
 
@@ -65,6 +96,30 @@ ClientUpdateInputType = generate_input_type_for_serializer(
 
 
 class CreateClient(graphene.Mutation):
+    """
+    Class: CreateClient
+
+    A class that represents a GraphQL mutation for creating a client.
+
+    Attributes:
+    - errors (graphene.List[CustomErrorType]): A list of custom error types.
+    - ok (graphene.Boolean): A boolean indicating if the mutation was successful.
+    - result (graphene.Field[ClientType]): A field representing the created client.
+
+    Methods:
+    - mutate(root, info, data):
+        A static method that performs the mutation to create a client.
+
+        Parameters:
+        - root: The root value or object.
+        - info: The GraphQL ResolveInfo object.
+        - data: The input data for creating the client.
+
+        Returns:
+        - If the mutation is valid and successful, it returns an instance of CreateClient with the created client object
+        and no errors.
+        - If the mutation is not valid, it returns an instance of CreateClient with the errors and ok set to False.
+    """
     class Arguments:
         data = ClientCreateInputType(required=True)
 
@@ -86,6 +141,33 @@ class CreateClient(graphene.Mutation):
 
 
 class UpdateClient(graphene.Mutation):
+    """
+    UpdateClient class is a mutation class in a GraphQL schema that is used to update a client object.
+
+    Attributes:
+        Arguments: A nested class that defines the arguments required for the mutation.
+            - data: An instance of the ClientUpdateInputType class, representing the data to update the client object.
+
+        errors: A list of CustomErrorType objects. Represents any errors that occurred during the mutation.
+        ok: A boolean value indicating the success of the mutation.
+        result: An instance of the ClientType class representing the updated client object.
+
+    Methods:
+        mutate(root, info, data):
+            Static method that performs the mutation operation.
+
+            Parameters:
+                root: The root object. Not used in this method.
+                info: The GraphQL ResolveInfo object containing information about the query.
+                data: The data to update the client object.
+
+            Returns:
+                If the client object with the specified ID does not exist, it returns an instance of the
+                ClientUpdateSerializer class with an error object.
+                If the mutation data is not valid, it returns an instance of the UpdateClient class with error objects.
+                Otherwise, it updates the client object and returns an instance of the UpdateClient class with the
+                updated client.
+    """
     class Arguments:
         data = ClientUpdateInputType(required=True)
 
@@ -115,6 +197,26 @@ class UpdateClient(graphene.Mutation):
 
 
 class ExportBaseMutation(graphene.Mutation, abstract=True):
+    """
+    ExportBaseMutation
+
+    This class is a base mutation class for exporting data. It is a subclass of graphene.Mutation and is designed to be
+    extended by other mutation classes.
+
+    Attributes:
+        errors (List[CustomErrorType]): A list of custom error types.
+        ok (bool): A boolean flag indicating the success of the mutation.
+
+    Class Variables:
+        DOWNLOAD_TYPE (ExcelDownload.DOWNLOAD_TYPES): A class variable representing the download type for the mutation.
+
+    Methods:
+        __init_subclass__(cls, **kwargs): Special method called when a subclass is created. It checks for the presence
+        of required attributes and raises an error if any are missing.
+        mutate(cls, _, info, filters): Executes the mutation. It creates an instance of ExcelDownloadSerializer and
+        saves the data. Returns an instance of the class with the appropriate errors and success flag.
+
+    """
     class Arguments:
         ...
 
@@ -153,6 +255,26 @@ class ExportBaseMutation(graphene.Mutation, abstract=True):
 
 
 class ExportTrackingData(ExportBaseMutation):
+    """
+    ExportTrackingData is a class that extends ExportBaseMutation and is used for exporting tracking data.
+
+    Attributes:
+        DOWNLOAD_TYPE (str): The download type for the exported tracking data.
+
+    Methods:
+        Arguments: A class that extends ExportBaseMutation.Arguments and defines the arguments for exporting tracking
+        data.
+
+    Args:
+        filters (ClientTrackInfoFilterDataInputType): The filters to be applied for exporting tracking data.
+
+    Usage:
+        To use the ExportTrackingData class, create an instance of it and provide the required arguments.
+
+    Example:
+        filters = ClientTrackInfoFilterDataInputType(...)
+        export_data = ExportTrackingData(filters=filters)
+    """
     class Arguments(ExportBaseMutation.Arguments):
         filters = ClientTrackInfoFilterDataInputType(required=True)
     DOWNLOAD_TYPE = ExcelDownload.DOWNLOAD_TYPES.TRACKING_DATA
@@ -160,8 +282,14 @@ class ExportTrackingData(ExportBaseMutation):
 
 class ExportClients(ExportBaseMutation):
     """
-    A mutation for exporting client data based on provided filters.
-    Utilizes the DOWNLOAD_TYPE attribute to specify the type of data to be exported.
+
+    The ExportClients class is a subclass of the ExportBaseMutation class and is used for exporting client data in Excel
+    format. It provides a method to execute the export operation.
+
+    Attributes:
+        DOWNLOAD_TYPE (str): The download type for exporting client data. The value is set to 'CLIENT' indicating the
+        client download type.
+
     """
     class Arguments:
         filters = ClientFilterDataInputType(required=True)
@@ -169,6 +297,31 @@ class ExportClients(ExportBaseMutation):
 
 
 class TriggerBulkOperation(graphene.Mutation):
+    """
+    The `TriggerBulkOperation` class is a subclass of `graphene.Mutation` and represents a GraphQL mutation for
+    triggering bulk operations.
+
+    Attributes:
+        Arguments:
+            - data: An instance of the `BulkApiOperationInputType` class, which is a required argument for the mutation.
+
+        errors: A list of `CustomErrorType` objects, representing any errors that occurred during the mutation.
+
+        ok: A boolean value indicating the success or failure of the mutation.
+
+        result: An instance of the `BulkApiOperationObjectType` class, representing the result of the mutation.
+
+    Methods:
+        mutate(_: Any, info: ResolveInfo, data: BulkApiOperationInputType) -> TriggerBulkOperation:
+            This is a static method that handles the mutation logic. It takes three parameters:
+                - _: An unused parameter.
+                - info: An instance of the `ResolveInfo` class, which contains the GraphQL execution information.
+                - data: An instance of the `BulkApiOperationInputType` class, providing the input data for the mutation.
+
+            Returns:
+                An instance of the `TriggerBulkOperation` class, with the appropriate attributes set based on the
+                mutation logic.
+    """
     class Arguments:
         data = BulkApiOperationInputType(required=True)
 
@@ -189,6 +342,19 @@ class TriggerBulkOperation(graphene.Mutation):
 
 
 class Mutation:
+    """
+    Class Mutation
+
+    This class represents a collection of mutation fields that can be used to perform operations on the data.
+
+    Attributes:
+        create_attachment (Field): The field for creating an attachment.
+        create_client (Field): The field for creating a client.
+        update_client (Field): The field for updating a client.
+        export_tracking_data (Field): The field for exporting tracking data.
+        export_clients (Field): The field for exporting clients.
+        trigger_bulk_operation (Field): The field for triggering a bulk operation.
+    """
     create_attachment = CreateAttachment.Field()
     create_client = CreateClient.Field()
     update_client = UpdateClient.Field()

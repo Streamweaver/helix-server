@@ -58,11 +58,54 @@ logger = logging.getLogger(__name__)
 
 @convert_django_field.register(JSONField)
 def convert_json_field_to_scalar(field, registry=None):
+    """
+    Convert a JSONField to a Scalar field in GraphQL.
+
+    This method is used to convert a JSONField from Django models to a Scalar field in GraphQL.
+    It is registered as a converter for JSONField type in the graphene-django library.
+
+    Parameters:
+    - field (JSONField): The JSONField to be converted.
+    - registry (Registry): The registry used for field conversions (default: None).
+
+    Returns:
+    - GenericScalar: The converted Scalar field.
+
+    Example:
+    @convert_django_field.register(JSONField)
+    def convert_json_field_to_scalar(field, registry=None):
+        return GenericScalar()
+    """
     # https://github.com/graphql-python/graphene-django/issues/303#issuecomment-339939955
     return GenericScalar()
 
 
 class DisaggregatedAgeType(DjangoObjectType):
+    """
+
+    Class: DisaggregatedAgeType
+    ----------------------------
+
+    A class representing the DisaggregatedAgeType in the system.
+
+
+    Attributes:
+    -----------
+
+    - uuid (str): The unique identifier of the DisaggregatedAgeType object.
+    - age_from (int): The starting age of the DisaggregatedAgeType.
+    - age_to (int): The ending age of the DisaggregatedAgeType.
+    - sex (GenderTypeGrapheneEnum): The gender of the DisaggregatedAgeType.
+    - sex_display (str): The display value of the gender of the DisaggregatedAgeType.
+
+
+    Methods:
+    --------
+
+    None
+
+
+    """
     class Meta:
         model = DisaggregatedAge
     uuid = graphene.String(required=True)
@@ -73,18 +116,55 @@ class DisaggregatedAgeType(DjangoObjectType):
 
 
 class DisaggregatedAgeListType(CustomDjangoListObjectType):
+    """
+    Class representing a DisaggregatedAgeListType.
+
+    Inherits from CustomDjangoListObjectType.
+
+    Attributes:
+        Meta (class): Meta information for the DisaggregatedAgeListType.
+
+    """
     class Meta:
         model = DisaggregatedAge
         filterset_class = DisaggregatedAgeFilter
 
 
 class DisaggregatedStratumType(ObjectType):
+    """
+
+    Class to represent a type of disaggregated stratum.
+
+    Attributes:
+        uuid (str): The UUID of the stratum type.
+        date (str): The date of the stratum.
+        value (int): The value of the stratum.
+
+    """
     uuid = graphene.String(required=True)
     date = graphene.String()  # because inside the json field
     value = graphene.Int()
 
 
 class OSMNameType(DjangoObjectType):
+    """
+
+    This class, OSMNameType, is a subclass of DjangoObjectType. It is used to define the GraphQL type for OSMName model.
+
+    Attributes:
+        - model (Class): The Django model associated with the GraphQL type.
+
+        - accuracy (Field): A graphene Field representing the accuracy of the OSMName.
+
+        - accuracy_display (EnumDescription): An EnumDescription object that provides a source for displaying the
+        accuracy enum value.
+
+        - identifier (Field): A graphene Field representing the identifier of the OSMName.
+
+        - identifier_display (EnumDescription): An EnumDescription object that provides a source for displaying the
+        identifier enum value.
+
+    """
     class Meta:
         model = OSMName
 
@@ -95,23 +175,110 @@ class OSMNameType(DjangoObjectType):
 
 
 class OSMNameListType(CustomDjangoListObjectType):
+    """
+
+    OSMNameListType is a class that extends CustomDjangoListObjectType and represents a list of OSMName objects.
+
+    Attributes:
+        model (Model): The Django model associated with this list.
+        filterset_class (FilterSet): The filter class used for filtering the list.
+
+    """
     class Meta:
         model = OSMName
         filterset_class = OSMNameFilter
 
 
 class FigureTagType(DjangoObjectType):
+    """
+
+    Class: FigureTagType
+
+    A class that represents the Figure tag type.
+
+    Attributes:
+    - model (Class): The Django model for the Figure tag type.
+
+    """
     class Meta:
         model = FigureTag
 
 
 class FigureLastReviewCommentStatusType(ObjectType):
+    """
+    Represents the type of last review comment for a figure.
+
+    Attributes:
+        id (ID): The ID of the FigureLastReviewCommentStatusType.
+        field (ReviewFieldTypeEnum): The field associated with the last review comment.
+        comment_type (ReviewCommentTypeEnum): The type of the last review comment.
+
+    """
     id = graphene.ID(required=True)
     field = graphene.Field(ReviewFieldTypeEnum, required=True)
     comment_type = graphene.Field(ReviewCommentTypeEnum, required=True)
 
 
 class FigureType(DjangoObjectType):
+    """
+    Class: FigureType
+
+    A class representing a GraphQL object type for Figure.
+
+    Attributes:
+    - exclude_fields: A tuple of fields to be excluded from the GraphQL object type.
+    - model: The model class associated with the FigureType.
+
+    Methods:
+    - quantifier: A field representing the quantifier of the figure.
+    - get_quantifier: A field description for the quantifier.
+    - unit: A field representing the unit of measurement for the figure.
+    - unit_display: A field description for the unit of measurement.
+    - role: A field representing the role of the figure.
+    - role_display: A field description for the figure's role.
+    - displacement_occurred: A field representing whether displacement has occurred.
+    - displacement_occurred_display: A field description for displacement occurred.
+    - disaggregation_age: A field representing the disaggregation age of the figure.
+    - disaggregation_strata_json: A list of disaggregated stratum types.
+    - geo_locations: A field representing the geographical locations associated with the figure.
+    - start_date_accuracy: A field representing the accuracy of the start date.
+    - start_date_accuracy_display: A field description for the start date accuracy.
+    - end_date_accuracy: A field representing the accuracy of the end date.
+    - end_date_accuracy_display: A field description for the end date accuracy.
+    - category: A field representing the category type of the figure.
+    - category_display: A field description for the category type.
+    - term: A field representing the terms of the figure.
+    - term_display: A field description for the terms.
+    - figure_cause: A field representing the cause of the figure.
+    - figure_cause_display: A field description for the figure's cause.
+    - other_sub_type: A field representing the other sub type of the figure.
+    - figure_typology: A string representing the typology of the figure.
+    - sources: A field representing the sources associated with the figure.
+    - stock_date: A field representing the stock date of the figure.
+    - stock_reporting_date: A field representing the stock reporting date of the figure.
+    - flow_start_date: A field representing the flow start date of the figure.
+    - flow_end_date: A field representing the flow end date of the figure.
+    - geolocations: A string representing the geolocations of the figure.
+    - sources_reliability: A field representing the reliability of the figure's sources.
+    - review_status: A field representing the review status of the figure.
+    - review_status_display: A field description for the review status.
+    - last_review_comment_status: A list of last review comment statuses associated with the figure.
+    - event: A field representing the event associated with the figure.
+    - event_id: The ID of the event associated with the figure.
+    - entry: A field representing the entry associated with the figure.
+    - entry_id: The ID of the entry associated with the figure.
+
+    Methods:
+    - resolve_stock_date: Resolves the stock date of the figure.
+    - resolve_stock_reporting_date: Resolves the stock reporting date of the figure.
+    - resolve_flow_start_date: Resolves the flow start date of the figure.
+    - resolve_flow_end_date: Resolves the flow end date of the figure.
+    - resolve_figure_typology: Resolves the typology of the figure.
+    - resolve_geolocations: Resolves the geolocations of the figure.
+    - resolve_sources_reliability: Resolves the reliability of the figure's sources.
+    - resolve_last_review_comment_status: Resolves the last review comment statuses of the figure.
+    - resolve_entry: Resolves the entry associated with the figure.
+    """
     class Meta:
         exclude_fields = (
             'figure_reviews',
@@ -199,12 +366,34 @@ class FigureType(DjangoObjectType):
 
 
 class FigureListType(CustomDjangoListObjectType):
+    """
+
+    FigureListType - Custom Django List Object Type for Figure Model
+
+    This class extends the CustomDjangoListObjectType class and is used to represent a list of Figure objects in the
+    Django application.
+
+    Attributes:
+        model (Figure): The model class representing the Figure object in the Django application.
+        filterset_class (FigureFilter): The filterset class to be used for filtering the list of Figure objects.
+
+    """
     class Meta:
         model = Figure
         filterset_class = FigureFilter
 
 
 class TotalFigureFilterInputType(graphene.InputObjectType):
+    """
+    TotalFigureFilterInputType class represents the input type for filtering figures based on various criteria.
+
+    Attributes:
+        categories (List[str]): A list of categories to filter figures by.
+        filter_figure_start_after (Date): A date object representing the start date to filter figures after.
+        filter_figure_end_before (Date): A date object representing the end date to filter figures before.
+        roles (List[str]): A list of roles to filter figures by.
+
+    """
     categories = graphene.List(graphene.NonNull(graphene.String))
     filter_figure_start_after = graphene.Date()
     filter_figure_end_before = graphene.Date()
@@ -212,6 +401,30 @@ class TotalFigureFilterInputType(graphene.InputObjectType):
 
 
 class EntryType(DjangoObjectType):
+    """
+
+    This class represents an EntryType, which is a subclass of DjangoObjectType. It is used to define the fields and
+    behaviors of an Entry object in the system.
+
+    Attributes:
+        - created_by (graphene.Field): A field representing the creator of the entry.
+        - last_modified_by (graphene.Field): A field representing the user who last modified the entry.
+        - publishers (DjangoPaginatedListObjectField): A field representing the publishers of the entry.
+        - figures (graphene.List): A list of FigureType objects associated with the entry.
+        - preview (graphene.Field): A field representing the preview of the entry.
+
+    Methods:
+        - resolve_figures: A method used to resolve the figures field. It retrieves the figures related to the entry and
+        selects the related fields using a filter and select_related and prefetch_related methods.
+        - resolve_document: A method used to resolve the document field. It uses a DataLoader to load the document
+        associated with the entry.
+        - resolve_preview: A method used to resolve the preview field. It uses a DataLoader to load the preview
+        associated with the entry.
+
+    Note: The exclude_fields attribute in the Meta class excludes certain fields from the Entry model when creating the
+    EntryType. These fields are 'reviewers', 'review_status', 'review_comments', and 'reviewing'.
+
+    """
     class Meta:
         model = Entry
         exclude_fields = (
@@ -272,12 +485,33 @@ class EntryType(DjangoObjectType):
 
 
 class EntryListType(CustomDjangoListObjectType):
+    """
+    Class EntryListType
+
+    A custom Django list object type for querying and filtering Entry objects.
+
+    Attributes:
+        model (Model): The Entry model associated with this list type.
+        filterset_class (FilterSet): The filter set class used for filtering the entries.
+
+    """
     class Meta:
         model = Entry
         filterset_class = EntryExtractionFilterSet
 
 
 class SourcePreviewType(DjangoObjectType):
+    """
+    A class representing a GraphQL object type for SourcePreview.
+
+    Attributes:
+        - status: A graphene Field representing the status of the preview.
+        - status_display: A graphene Field representing the display value of the status.
+
+    Methods:
+        - resolve_pdf: A method that resolves the PDF property of the SourcePreview.
+
+    """
     class Meta:
         model = SourcePreview
         exclude_fields = ('entry', 'token')
@@ -292,11 +526,37 @@ class SourcePreviewType(DjangoObjectType):
 
 
 class VisualizationValueType(ObjectType):
+    """
+    This class represents a visualization value type.
+
+    Attributes:
+        date (Date): The date corresponding to the value.
+        value (Int): The value of the visualization.
+
+    """
     date = graphene.Date(required=True)
     value = graphene.Int(required=True)
 
 
 class VisualizationFigureType(ObjectType):
+    """
+
+    Class: VisualizationFigureType
+    Inherits from: ObjectType
+
+    Description: This class represents a type of visualization figure.
+
+    Attributes:
+    - idps_conflict_figures: A list of non-null VisualizationValueType objects representing figures related to IDPs and
+    conflicts.
+    - idps_disaster_figures: A list of non-null VisualizationValueType objects representing figures related to IDPs and
+    disasters.
+    - nds_conflict_figures: A list of non-null VisualizationValueType objects representing figures related to NDS and
+    conflicts.
+    - nds_disaster_figures: A list of non-null VisualizationValueType objects representing figures related to NDS and
+    disasters.
+
+    """
     idps_conflict_figures = graphene.List(graphene.NonNull(VisualizationValueType))
     idps_disaster_figures = graphene.List(graphene.NonNull(VisualizationValueType))
     nds_conflict_figures = graphene.List(graphene.NonNull(VisualizationValueType))
@@ -304,12 +564,43 @@ class VisualizationFigureType(ObjectType):
 
 
 class FigureTagListType(CustomDjangoListObjectType):
+    """
+    A custom class for managing a list of FigureTag objects.
+
+    Inherits from CustomDjangoListObjectType.
+
+    Attributes:
+        model (Model): The model associated with the FigureTag list.
+        filterset_class (FilterSet): The filterset class used for filtering the FigureTag list.
+
+    """
     class Meta:
         model = FigureTag
         filterset_class = FigureTagFilter
 
 
 class Query:
+    """
+    Class Query
+
+    This class is responsible for defining the GraphQL queries and their resolvers.
+
+    Attributes:
+    - figure_tag (DjangoObjectField): A field to retrieve a single FigureTag object.
+    - figure_tag_list (DjangoPaginatedListObjectField): A paginated list field to retrieve a list of FigureTag objects.
+    - figure (DjangoObjectField): A field to retrieve a single Figure object.
+    - figure_list (DjangoPaginatedListObjectField): A paginated list field to retrieve a list of Figure objects.
+    - source_preview (DjangoObjectField): A field to retrieve a single SourcePreview object.
+    - entry (DjangoObjectField): A field to retrieve a single Entry object.
+    - entry_list (DjangoPaginatedListObjectField): A paginated list field to retrieve a list of Entry objects.
+    - disaggregated_age (DjangoObjectField): A field to retrieve a single DisaggregatedAge object.
+    - figure_aggregations (graphene.Field): A field to retrieve different types of aggregated figures based on filters.
+
+    Methods:
+    - resolve_figure_aggregations: A static method that resolves the figure_aggregations field by filtering and
+    aggregating figure data.
+
+    """
     figure_tag = DjangoObjectField(FigureTagType)
     figure_tag_list = DjangoPaginatedListObjectField(FigureTagListType,
                                                      pagination=PageGraphqlPaginationWithoutCount(

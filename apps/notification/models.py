@@ -4,6 +4,29 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Notification(models.Model):
+    """
+    Class: Notification
+
+    A class representing a notification in the system.
+
+    Attributes:
+    - type (Notification.Type): The type of the notification.
+    - recipient (users.User): The user who will receive the notification.
+    - actor (users.User): The user who performed the action that triggered the notification.
+    - is_read (bool): Whether the notification has been marked as read.
+    - event (event.Event): The event associated with the notification.
+    - figure (entry.Figure): The figure associated with the notification.
+    - entry (entry.Entry): The entry associated with the notification.
+    - review_comment (review.UnifiedReviewComment): The review comment associated with the notification.
+    - text (str): The raw text of the notification.
+    - created_at (datetime): The date and time when the notification was created.
+
+    Methods:
+    - __str__(self) -> str: Returns a string representation of the notification.
+    - send_safe_multiple_notifications(cls, recipients, actor, type, figure=None, event=None, entry=None, text=None,
+    review_comment=None): Sends multiple notifications to the specified recipients.
+
+    """
     class Type(enum.Enum):
         FIGURE_RE_REQUESTED_REVIEW = 0
         FIGURE_CREATED_IN_APPROVED_EVENT = 1

@@ -13,10 +13,30 @@ from apps.notification.filters import NotificationFilter
 
 
 def notificaiton_qs(info):
+    """
+    Queries the database for notifications related to the current user.
+
+    :param info: GraphQL context object containing information about the current execution
+    :return: QuerySet of notification objects filtered by recipient as the current user
+    """
     return Notification.objects.filter(recipient=info.context.user)
 
 
 class GenericNotificationType(DjangoObjectType):
+    """
+    GenericNotificationType
+
+    A class representing the GraphQL ObjectType for the Notification model.
+
+    Attributes:
+        type: A graphene.Field representing the NotificationTypeEnum of the notification.
+        type_display: A EnumDescription field representing the display value of the notification type.
+
+    Methods:
+        get_custom_queryset(queryset, info): A static method that returns a modified queryset based on the provided
+        info.
+
+    """
     class Meta:
         model = Notification
         fields = (
@@ -43,12 +63,44 @@ class GenericNotificationType(DjangoObjectType):
 
 
 class GenericNotificationListType(CustomDjangoListObjectType):
+    """
+
+    GenericNotificationListType is a class that inherits from CustomDjangoListObjectType.
+
+    Attributes:
+        Meta (class): A class that contains meta information about the GenericNotificationListType class.
+
+        - model (model class): The Django model class for the Notification model.
+
+        - filterset_class (class): The Django filterset class for filtering the notifications.
+
+    """
     class Meta:
         model = Notification
         filterset_class = NotificationFilter
 
 
 class Query(object):
+    """
+    Class: Query
+
+    This class represents the query resolver for GraphQL queries related to notifications.
+
+    Attributes:
+    - notification: A DjangoObjectField representing a single notification.
+    - notifications: A DjangoPaginatedListObjectField representing a paginated list of notifications.
+
+    Methods:
+    - resolve_notification(root, info, **kwargs): This method is used to resolve the 'notification' field in the query.
+        - Parameters:
+            - root: The root object.
+            - info: The GraphQLResolveInfo object.
+            - **kwargs: Additional keyword arguments.
+        - Returns:
+            - If the user is authenticated, it returns the result of the `notification_qs(info)` function, which
+            represents the query to fetch the notification.
+            - Otherwise, it returns an empty list.
+    """
     notification = DjangoObjectField(GenericNotificationType)
     notifications = DjangoPaginatedListObjectField(
         GenericNotificationListType,

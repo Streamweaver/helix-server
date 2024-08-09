@@ -34,6 +34,19 @@ logger = logging.getLogger(__name__)
 
 
 def get_excel_sheet_content(headers, data, **kwargs):
+    """
+    Get the content of an Excel sheet.
+
+    Parameters:
+    - headers (dict): A dictionary where the keys represent the column names and the values represent the column
+    headers.
+    - data (iterator): An iterator that contains the data for the sheet.
+    - **kwargs (optional): Additional keyword arguments.
+
+    Returns:
+    - wb (Workbook): An instance of the Workbook class from the openpyxl library.
+
+    """
     wb = Workbook(write_only=True)
 
     ws = wb.create_sheet('Main')
@@ -85,6 +98,17 @@ def get_excel_sheet_content(headers, data, **kwargs):
 
 
 def save_download_file(download, workbook, path):
+    """
+    Saves the workbook as a file, updates the download object with file size, and saves the file to the specified path.
+
+    Parameters:
+        download (Download): The download object to update with file size.
+        workbook (Workbook): The workbook to save.
+        path (str): The path to save the file.
+
+    Returns:
+        None
+    """
     with get_temp_file() as tmp:
         workbook.save(tmp.name)
         workbook.close()
@@ -96,11 +120,34 @@ def save_download_file(download, workbook, path):
 
 @celery_app.task(time_limit=settings.EXCEL_EXPORT_PROGRESS_STATE_TIMEOUT)
 def generate_excel_file(download_id, user_id, model_instance_id=None):
-    '''
-    Fetch the filter data from excel download
-    Fetch the request from the task argument
-    Call appropriate model excel data getter
-    '''
+    """
+
+    Generate an Excel file for download.
+
+    Params:
+    - download_id: int - The ID of the ExcelDownload object.
+    - user_id: int - The ID of the user requesting the download.
+    - model_instance_id: int, optional - The ID of the model instance for which to generate the Excel file.
+
+    Returns:
+    None
+
+    This method generates an Excel file for download based on the provided parameters. It updates the status of the
+    ExcelDownload object accordingly.
+
+    The Excel file is generated based on the type of download specified in the ExcelDownload object. If the download
+    type is INDIVIDUAL_REPORT and a model_instance_id is provided, it generates the Excel file for the specified report
+    using the report_get_excel_sheets_data and report_generate_excel_file functions from the 'apps.report' module.
+    Otherwise, it calls the get_model_sheet_data_getter method of the ExcelDownload object to get the sheet data getter
+    function and generates the Excel file using the get_excel_sheet_content function.
+
+    If an exception occurs during the generation process, the method catches the exception and updates the status of the
+    ExcelDownload object as FAILED.
+
+    Note: This method is a Celery task and has a time limit set using the settings.EXCEL_EXPORT_PROGRESS_STATE_TIMEOUT
+    value.
+
+    """
     from apps.contrib.models import ExcelDownload
     download = ExcelDownload.objects.get(id=download_id)
     download.started_at = timezone.now()
@@ -141,6 +188,11 @@ def generate_excel_file(download_id, user_id, model_instance_id=None):
 
 @celery_app.task
 def kill_all_old_excel_exports():
+    """
+
+    @celery_app.task
+    def kill_all_old_excel_exports():
+        """
     from apps.contrib.models import ExcelDownload
     # if a task has been pending for too long, move it to killed
     pending = ExcelDownload.objects.filter(
@@ -159,6 +211,20 @@ def kill_all_old_excel_exports():
 
 @celery_app.task
 def kill_all_long_running_previews():
+    """
+    Kills all long running previews by updating the status of the SourcePreview objects to 'KILLED'. The method is a
+    Celery task and is decorated with '@celery_app.task'.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+
+    Example usage:
+        kill_all_long_running_previews()
+
+    """
     from apps.contrib.models import SourcePreview
 
     progress = SourcePreview.objects.filter(
@@ -171,6 +237,14 @@ def kill_all_long_running_previews():
 
 @celery_app.task
 def kill_all_long_running_report_generations():
+    """
+
+    This method kills all long-running report generations which have been in progress for more than twice the
+    REPORT_TIMEOUT value.
+
+    @return: None
+
+    """
     from apps.report.models import ReportGeneration
 
     progress = ReportGeneration.objects.filter(
@@ -187,6 +261,30 @@ def generate_external_endpoint_dump_file(
     get_data,
     filename,
 ):
+    """Generate an external endpoint dump file.
+
+    Parameters:
+    - endpoint_type (str): The type of the endpoint.
+    - serializer: The serializer object used to serialize the data.
+    - get_data: A function that returns the data to be serialized.
+    - filename (str): The name of the dump file.
+
+    Returns:
+    - bool: True if the dump file is successfully created, False otherwise.
+
+    This method generates a dump file for a given external endpoint. It uses the provided `serializer`
+    to serialize the data returned by the `get_data` function. The serialized data is then saved into a temporary file
+    using the provided `filename`. The dump file is associated with the given `endpoint_type` in the database.
+
+    If the dump file generation is successful, the method sets the status of the `external_api_dump` object to COMPLETED
+    and logs a message indicating the success. If an exception occurs during the process, the status is set to FAILED
+    and an error message is logged.
+
+    Example usage:
+    ```
+    generate_external_endpoint_dump_file('endpoint_type', MySerializer, get_data_function, 'dump_file.json')
+    ```
+    """
     from apps.entry.models import ExternalApiDump
     external_api_dump, _ = ExternalApiDump.objects.get_or_create(api_type=endpoint_type)
     try:
@@ -209,6 +307,18 @@ def generate_external_endpoint_dump_file(
 
 
 def _generate_idus_dump_file(api_type):
+    """
+    Generate IDUS dump file based on the provided API type.
+
+    Parameters:
+    - api_type (int): The type of ExternalApiDump. Use ExternalApiDump.ExternalApiType constants.
+
+    Returns:
+    - File: The generated dump file.
+
+    Example usage:
+    _generate_idus_dump_file(ExternalApiDump.ExternalApiType.IDUS_ALL)
+    """
     from apps.entry.serializers import FigureReadOnlySerializer
     from apps.entry.views import get_idu_data
     from apps.entry.models import ExternalApiDump
@@ -239,18 +349,47 @@ def _generate_idus_dump_file(api_type):
 
 @celery_app.task
 def generate_idus_dump_file():
+    """
+    Generate IDUS dump file.
+
+    This method is a Celery task that generates a dump file for the IDUS external API.
+
+    Returns:
+        None: This method does not return any values.
+
+    Raises:
+        <Exception Type>: <Description of the exception raised, if any>
+
+    """
     from apps.entry.models import ExternalApiDump
     return _generate_idus_dump_file(ExternalApiDump.ExternalApiType.IDUS)
 
 
 @celery_app.task
 def generate_idus_all_dump_file():
+    """
+    Generate IDUS All Dump File.
+
+    This method generates a dump file for the IDUS All external API.
+
+    Returns:
+        None
+    """
     from apps.entry.models import ExternalApiDump
     return _generate_idus_dump_file(ExternalApiDump.ExternalApiType.IDUS_ALL)
 
 
 @celery_app.task
 def generate_idus_all_disaster_dump_file():
+    """
+    Generate IDUS All Disaster Dump File
+
+    Generates a dump file for the IDUS API that includes all disaster data.
+
+    Returns:
+        None: This method does not return any value.
+
+    """
     from apps.entry.models import ExternalApiDump
     return _generate_idus_dump_file(ExternalApiDump.ExternalApiType.IDUS_ALL_DISASTER)
 
@@ -258,6 +397,14 @@ def generate_idus_all_disaster_dump_file():
 @celery_app.task
 @redis_lock('remaining_lead_extract', 60 * 5)
 def save_and_delete_tracked_data_from_redis_to_db():
+    """
+
+    Save and Delete Tracked Data from Redis to Database
+
+    This method retrieves tracked data from Redis cache, updates the corresponding records in the database, and deletes
+    the Redis keys.
+
+    """
     from apps.contrib.models import ClientTrackInfo
 
     tracking_keys = get_client_tracked_cache_keys()
@@ -319,6 +466,9 @@ def save_and_delete_tracked_data_from_redis_to_db():
 
 @celery_app.task
 def run_bulk_api_operation(operation_id: int):
+    """
+
+    """
     from apps.contrib.models import BulkApiOperation
     operation = BulkApiOperation.objects.get(pk=operation_id)
     return _run_bulk_api_operation(operation)

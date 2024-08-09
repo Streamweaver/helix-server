@@ -8,6 +8,14 @@ from apps.entry.models import Figure
 
 
 class TotalFigureThisYearByCountryCategoryEventTypeLoader(DataLoader):
+    """
+    class TotalFigureThisYearByCountryCategoryEventTypeLoader(DataLoader):
+        def __init__(
+            self,
+            *args,
+            **kwargs
+        ):
+            """
     def __init__(
         self,
         *args,
@@ -51,6 +59,21 @@ class TotalFigureThisYearByCountryCategoryEventTypeLoader(DataLoader):
 
 
 class MonitoringSubRegionCountryCountLoader(DataLoader):
+    """
+
+    MonitoringSubRegionCountryCountLoader Class
+
+    Inherits: DataLoader
+
+    This class is responsible for loading the country counts for monitoring sub-regions.
+
+    Attributes:
+        None
+
+    Methods:
+        - batch_load_fn(keys: list)
+
+    """
     def batch_load_fn(self, keys: list):
         qs = MonitoringSubRegion.objects.filter(
             id__in=keys
@@ -64,6 +87,41 @@ class MonitoringSubRegionCountryCountLoader(DataLoader):
 
 
 class MonitoringSubRegionCountryLoader(DataLoader):
+    """
+    Class MonitoringSubRegionCountryLoader
+
+    This class extends DataLoader and is used to load countries associated with monitoring sub-regions.
+
+    Attributes:
+        No additional attributes for this class.
+
+    Methods:
+        - batch_load_fn(keys):
+            This method is responsible for loading the countries for the given list of keys (monitoring sub-regions).
+
+            Parameters:
+                - keys (list): A list of monitoring sub-region keys (strings) for which the countries need to be loaded.
+
+            Returns:
+                - Promise: A Promise that resolves to a list of lists. Each inner list corresponds to a monitoring
+                sub-region key and contains the associated Country objects.
+
+    Usage Example:
+        # Create an instance of MonitoringSubRegionCountryLoader
+        loader = MonitoringSubRegionCountryLoader()
+
+        # Specify the list of keys (monitoring sub-regions) for which the countries need to be loaded
+        keys = ['key1', 'key2', 'key3']
+
+        # Load the countries for the specified keys
+        result = loader.batch_load_fn(keys)
+
+        # Access the loaded countries
+        for countries in result:
+            for country in countries:
+                # Do something with the country object
+                print(country.name)
+    """
     def batch_load_fn(self, keys: list):
         country_qs = Country.objects.filter(
             monitoring_sub_region__in=keys
